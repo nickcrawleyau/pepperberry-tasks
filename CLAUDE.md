@@ -39,42 +39,45 @@ The system must be simple enough for someone to log in on a phone, check their t
 ```
 pepperberry-tasks/
 ├── CLAUDE.md
-├── src/
-│   ├── app/                    # Next.js App Router pages
-│   │   ├── layout.tsx          # Root layout
-│   │   ├── page.tsx            # Login page (default route)
-│   │   ├── dashboard/          # Admin dashboard
-│   │   │   └── page.tsx
-│   │   ├── tasks/              # Task views
-│   │   │   ├── page.tsx        # Task list
-│   │   │   ├── [id]/
-│   │   │   │   └── page.tsx    # Task detail
-│   │   │   └── new/
-│   │   │       └── page.tsx    # Create task (admin only)
-│   │   └── api/                # API routes
-│   │       ├── auth/
-│   │       ├── tasks/
-│   │       └── users/
-│   ├── components/             # React components
-│   │   ├── ui/                 # Generic UI (Button, Card, Modal, etc.)
-│   │   └── tasks/              # Task-specific components
-│   ├── lib/                    # Shared utilities
-│   │   ├── supabase/
-│   │   │   ├── client.ts       # Browser Supabase client
-│   │   │   ├── server.ts       # Server Supabase client
-│   │   │   └── admin.ts        # Service role client (server only)
-│   │   ├── auth.ts             # Auth helpers (PIN verification, session)
-│   │   ├── constants.ts        # Enums for roles, locations, categories, statuses
-│   │   └── types.ts            # Shared TypeScript types
-│   ├── hooks/                  # Custom React hooks
-│   └── middleware.ts           # Auth middleware (protect routes)
-├── supabase/
-│   └── migrations/             # SQL migration files
-├── public/                     # Static assets
+├── .env.local                  # Environment variables (gitignored)
+├── .eslintrc.json
+├── .gitignore
+├── next.config.mjs
+├── next-env.d.ts
+├── package.json
+├── postcss.config.mjs
 ├── tailwind.config.ts
 ├── tsconfig.json
-├── next.config.js
-└── package.json
+├── src/
+│   └── app/                    # Next.js App Router
+│       ├── favicon.ico
+│       ├── fonts/              # Local fonts (Geist Sans, Geist Mono)
+│       ├── globals.css         # Tailwind imports + CSS variables
+│       ├── layout.tsx          # Root layout
+│       └── page.tsx            # Login page (default route)
+├── supabase/
+│   └── config.toml             # Supabase project config
+└── public/                     # Static assets
+```
+
+### Planned structure (to be created as features are built)
+
+```
+src/
+├── app/
+│   ├── dashboard/              # Admin dashboard
+│   ├── tasks/                  # Task views
+│   └── api/                    # API routes (auth, tasks, users)
+├── components/                 # React components
+│   ├── ui/                     # Generic UI (Button, Card, Modal, etc.)
+│   └── tasks/                  # Task-specific components
+├── lib/                        # Shared utilities
+│   ├── supabase/               # Supabase clients (browser, server, admin)
+│   ├── auth.ts                 # Auth helpers (PIN verification, session)
+│   ├── constants.ts            # Enums for roles, locations, categories, statuses
+│   └── types.ts                # Shared TypeScript types
+├── hooks/                      # Custom React hooks
+└── middleware.ts               # Auth middleware (protect routes)
 ```
 
 ### Conventions
