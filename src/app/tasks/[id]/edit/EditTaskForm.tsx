@@ -11,6 +11,7 @@ import {
   LOCATION_LABELS,
   PRIORITY_LABELS,
   STATUS_LABELS,
+  RECURRENCE_LABELS,
 } from '@/lib/constants';
 
 interface TaskData {
@@ -23,6 +24,7 @@ interface TaskData {
   location: string;
   assigned_to: string | null;
   due_date: string | null;
+  recurrence_pattern: string | null;
 }
 
 interface UserOption {
@@ -95,6 +97,13 @@ export default function EditTaskForm({ task, users }: EditTaskFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
+      {task.recurrence_pattern && (
+        <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 text-xs text-amber-700">
+          This task is part of a repeating series ({RECURRENCE_LABELS[task.recurrence_pattern]?.toLowerCase()}).
+          Changes apply to this instance only.
+        </div>
+      )}
+
       <div className="bg-white rounded-xl border border-stone-200 p-5 space-y-5">
         <div>
           <label htmlFor="title" className={labelClass}>Title *</label>

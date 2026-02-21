@@ -8,10 +8,12 @@ import {
   PRIORITY_LABELS,
   CATEGORY_LABELS,
   LOCATION_LABELS,
+  RECURRENCE_LABELS,
 } from '@/lib/constants';
 import StatusUpdater from '@/components/tasks/StatusUpdater';
 import CommentSection from '@/components/tasks/CommentSection';
 import DeleteTaskButton from '@/components/tasks/DeleteTaskButton';
+import DeleteSeriesButton from '@/components/tasks/DeleteSeriesButton';
 
 const PRIORITY_DOT: Record<string, string> = {
   low: 'bg-stone-300',
@@ -113,6 +115,9 @@ export default async function TaskDetailPage({
                 Edit
               </Link>
               <DeleteTaskButton taskId={id} />
+              {typedTask.recurrence_group_id && (
+                <DeleteSeriesButton groupId={typedTask.recurrence_group_id} />
+              )}
             </div>
           )}
         </div>
@@ -192,6 +197,15 @@ export default async function TaskDetailPage({
                 {formatDate(typedTask.created_at)}
               </p>
             </div>
+
+            {typedTask.recurrence_pattern && (
+              <div>
+                <p className="text-xs text-stone-400 mb-0.5">Repeats</p>
+                <p className="text-sm text-stone-700">
+                  {RECURRENCE_LABELS[typedTask.recurrence_pattern] || typedTask.recurrence_pattern}
+                </p>
+              </div>
+            )}
 
             {typedTask.completed_at && (
               <div>

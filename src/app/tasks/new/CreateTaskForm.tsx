@@ -1,14 +1,16 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   CATEGORIES,
   LOCATIONS,
   PRIORITIES,
+  RECURRENCE_PATTERNS,
   CATEGORY_LABELS,
   LOCATION_LABELS,
   PRIORITY_LABELS,
+  RECURRENCE_LABELS,
 } from '@/lib/constants';
 
 interface UserOption {
@@ -20,6 +22,35 @@ interface UserOption {
 
 interface CreateTaskFormProps {
   users: UserOption[];
+}
+
+function todayString(): string {
+  return new Date().toLocaleDateString('en-CA');
+}
+
+function countOccurrences(pattern: string, start: string, end: string): number {
+  if (!start || !end || end < start) return 0;
+  const current = new Date(start + 'T00:00:00');
+  const endDate = new Date(end + 'T00:00:00');
+  let count = 0;
+  while (current <= endDate && count < 365) {
+    count++;
+    switch (pattern) {
+      case 'daily':
+        current.setDate(current.getDate() + 1);
+        break;
+      case 'weekly':
+        current.setDate(current.getDate() + 7);
+        break;
+      case 'fortnightly':
+        current.setDate(current.getDate() + 14);
+        break;
+      case 'monthly':
+        current.setMonth(current.getMonth() + 1);
+        break;
+    }
+  }
+  return count;
 }
 
 export default function CreateTaskForm({ users }: CreateTaskFormProps) {
@@ -35,24 +66,44 @@ export default function CreateTaskForm({ users }: CreateTaskFormProps) {
   const [assignedTo, setAssignedTo] = useState('');
   const [dueDate, setDueDate] = useState('');
 
+  const [recurrencePattern, setRecurrencePattern] = useState('');
+  const [recurrenceStart, setRecurrenceStart] = useState(todayString());
+  const [recurrenceEnd, setRecurrenceEnd] = useState('');
+
+  const isRepeating = recurrencePattern !== '';
+
+  const occurrenceCount = useMemo(() => {
+    if (!isRepeating || !recurrenceStart || !recurrenceEnd) return 0;
+    return countOccurrences(recurrencePattern, recurrenceStart, recurrenceEnd);
+  }, [isRepeating, recurrencePattern, recurrenceStart, recurrenceEnd]);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
     setLoading(true);
 
     try {
+      const payload: Record<string, unknown> = {
+        title: title.trim(),
+        description: description.trim() || null,
+        priority,
+        category,
+        location,
+        assigned_to: assignedTo || null,
+      };
+
+      if (isRepeating) {
+        payload.recurrence_pattern = recurrencePattern;
+        payload.recurrence_start = recurrenceStart;
+        payload.recurrence_end = recurrenceEnd;
+      } else {
+        payload.due_date = dueDate || null;
+      }
+
       const res = await fetch('/api/tasks', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: title.trim(),
-          description: description.trim() || null,
-          priority,
-          category,
-          location,
-          assigned_to: assignedTo || null,
-          due_date: dueDate || null,
-        }),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -197,20 +248,84 @@ export default function CreateTaskForm({ users }: CreateTaskFormProps) {
             </select>
           </div>
         </div>
+      </div>
 
-        {/* Due date */}
-        <div className="max-w-[50%]">
-          <label htmlFor="due_date" className={labelClass}>
-            Due date
-          </label>
-          <input
-            id="due_date"
-            type="date"
-            value={dueDate}
-            onChange={(e) => setDueDate(e.target.value)}
-            className={inputClass}
-          />
+      {/* Schedule section */}
+      <div className="bg-white rounded-xl border border-stone-200 p-5 space-y-5">
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="repeat" className={labelClass}>
+              Repeat
+            </label>
+            <select
+              id="repeat"
+              value={recurrencePattern}
+              onChange={(e) => setRecurrencePattern(e.target.value)}
+              className={selectClass}
+            >
+              <option value="">Does not repeat</option>
+              {RECURRENCE_PATTERNS.map((p) => (
+                <option key={p} value={p}>
+                  {RECURRENCE_LABELS[p]}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {!isRepeating && (
+            <div>
+              <label htmlFor="due_date" className={labelClass}>
+                Due date
+              </label>
+              <input
+                id="due_date"
+                type="date"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+                className={inputClass}
+              />
+            </div>
+          )}
         </div>
+
+        {isRepeating && (
+          <>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="recurrence_start" className={labelClass}>
+                  Start date *
+                </label>
+                <input
+                  id="recurrence_start"
+                  type="date"
+                  value={recurrenceStart}
+                  onChange={(e) => setRecurrenceStart(e.target.value)}
+                  required
+                  className={inputClass}
+                />
+              </div>
+              <div>
+                <label htmlFor="recurrence_end" className={labelClass}>
+                  End date *
+                </label>
+                <input
+                  id="recurrence_end"
+                  type="date"
+                  value={recurrenceEnd}
+                  onChange={(e) => setRecurrenceEnd(e.target.value)}
+                  required
+                  className={inputClass}
+                />
+              </div>
+            </div>
+
+            {occurrenceCount > 0 && (
+              <p className="text-xs text-stone-400">
+                This will create {occurrenceCount} task{occurrenceCount !== 1 ? 's' : ''}
+              </p>
+            )}
+          </>
+        )}
       </div>
 
       {error && (
@@ -220,10 +335,14 @@ export default function CreateTaskForm({ users }: CreateTaskFormProps) {
       <div className="flex gap-3">
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || (isRepeating && occurrenceCount === 0)}
           className="flex-1 rounded-lg bg-stone-800 py-2.5 text-sm font-medium text-white hover:bg-stone-700 active:bg-stone-900 transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {loading ? 'Creating...' : 'Create Task'}
+          {loading
+            ? 'Creating...'
+            : isRepeating
+              ? `Create ${occurrenceCount} Task${occurrenceCount !== 1 ? 's' : ''}`
+              : 'Create Task'}
         </button>
         <button
           type="button"

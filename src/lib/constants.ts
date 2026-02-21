@@ -48,6 +48,15 @@ export const CATEGORY_LABELS: Record<string, string> = {
   general: 'General',
 };
 
+export const RECURRENCE_PATTERNS = ['daily', 'weekly', 'fortnightly', 'monthly'] as const;
+
+export const RECURRENCE_LABELS: Record<string, string> = {
+  daily: 'Daily',
+  weekly: 'Weekly',
+  fortnightly: 'Fortnightly',
+  monthly: 'Monthly',
+};
+
 export const LOCATION_LABELS: Record<string, string> = {
   workshop: 'Workshop',
   house: 'House',

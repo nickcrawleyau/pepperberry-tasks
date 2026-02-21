@@ -18,6 +18,8 @@ export interface Task {
   assigned_to: string | null;
   created_by: string;
   due_date: string | null;
+  recurrence_pattern: string | null;
+  recurrence_group_id: string | null;
   completed_at: string | null;
   created_at: string;
   updated_at: string;
