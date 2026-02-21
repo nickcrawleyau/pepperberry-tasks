@@ -228,6 +228,11 @@ npm run lint
 # Deploy (via Vercel CLI or git push to main)
 vercel --prod
 ```
+## Skills
+
+- `.claude/skills/supabase-migration.md` — follow this for all database schema changes
+
+
 
 ## Coding Conventions
 
