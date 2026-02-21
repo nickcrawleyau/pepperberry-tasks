@@ -11,6 +11,7 @@ import {
 } from '@/lib/constants';
 import StatusUpdater from '@/components/tasks/StatusUpdater';
 import CommentSection from '@/components/tasks/CommentSection';
+import DeleteTaskButton from '@/components/tasks/DeleteTaskButton';
 
 const PRIORITY_DOT: Record<string, string> = {
   low: 'bg-stone-300',
@@ -98,11 +99,22 @@ export default async function TaskDetailPage({
               <path d="m15 18-6-6 6-6" />
             </svg>
           </Link>
-          <div>
+          <div className="flex-1">
             <h1 className="text-lg font-medium text-stone-800">
               Task Detail
             </h1>
           </div>
+          {session.role === 'admin' && (
+            <div className="flex items-center gap-2">
+              <Link
+                href={`/tasks/${id}/edit`}
+                className="px-3 py-1.5 rounded-lg border border-stone-200 text-xs font-medium text-stone-600 hover:bg-stone-50 transition"
+              >
+                Edit
+              </Link>
+              <DeleteTaskButton taskId={id} />
+            </div>
+          )}
         </div>
       </header>
 
