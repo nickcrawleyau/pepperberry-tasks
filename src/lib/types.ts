@@ -36,6 +36,16 @@ export interface TaskPhoto {
   uploader?: { name: string } | null;
 }
 
+export interface TaskActivity {
+  id: string;
+  task_id: string;
+  user_id: string;
+  action: string;
+  detail: string;
+  created_at: string;
+  user?: { name: string } | null;
+}
+
 export interface TaskComment {
   id: string;
   task_id: string;

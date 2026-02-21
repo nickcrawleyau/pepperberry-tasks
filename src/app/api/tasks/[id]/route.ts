@@ -3,6 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase/admin';
 import { getSession } from '@/lib/auth';
 import { CATEGORIES, LOCATIONS, PRIORITIES, STATUSES, STATUS_LABELS } from '@/lib/constants';
 import { sendPushToUser, notifyUsersExcluding } from '@/lib/notifications';
+import { logActivity } from '@/lib/activity';
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -18,7 +19,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
   // Fetch the task to check permissions
   const { data: task, error: fetchError } = await supabaseAdmin
     .from('tasks')
-    .select('id, assigned_to, category, title, created_by, status')
+    .select('id, assigned_to, category, title, created_by, status, priority')
     .eq('id', id)
     .single();
 
@@ -49,6 +50,8 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     if (error) {
       return NextResponse.json({ error: 'Failed to update task' }, { status: 500 });
     }
+
+    logActivity(id, session.userId, 'status_changed', `Status changed from ${STATUS_LABELS[task.status] || task.status} to ${STATUS_LABELS[status] || status}`);
 
     if (task.created_by) {
       sendPushToUser(task.created_by, {
@@ -115,6 +118,29 @@ export async function PATCH(request: NextRequest, { params }: Params) {
 
   if (updateError) {
     return NextResponse.json({ error: 'Failed to update task' }, { status: 500 });
+  }
+
+  // Log activity for each changed field
+  if (body.status !== undefined && body.status !== task.status) {
+    logActivity(id, session.userId, 'status_changed', `Status changed from ${STATUS_LABELS[task.status] || task.status} to ${STATUS_LABELS[body.status] || body.status}`);
+  }
+  if (body.assigned_to !== undefined && body.assigned_to !== task.assigned_to) {
+    if (body.assigned_to) {
+      const { data: assignee } = await supabaseAdmin
+        .from('users')
+        .select('name')
+        .eq('id', body.assigned_to)
+        .single();
+      logActivity(id, session.userId, 'assigned', `Assigned to ${assignee?.name || 'someone'}`);
+    } else {
+      logActivity(id, session.userId, 'assigned', 'Unassigned');
+    }
+  }
+  if (body.priority !== undefined && body.priority !== task.priority) {
+    logActivity(id, session.userId, 'edited', `Priority changed to ${body.priority}`);
+  }
+  if (body.title !== undefined && body.title.trim() !== task.title) {
+    logActivity(id, session.userId, 'edited', 'Title updated');
   }
 
   // Notify on reassignment

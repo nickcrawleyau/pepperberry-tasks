@@ -2,7 +2,7 @@ import { getSession } from '@/lib/auth';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
-import { Task, TaskComment, TaskPhoto } from '@/lib/types';
+import { Task, TaskComment, TaskPhoto, TaskActivity } from '@/lib/types';
 import {
   STATUS_LABELS,
   PRIORITY_LABELS,
@@ -15,6 +15,7 @@ import CommentSection from '@/components/tasks/CommentSection';
 import DeleteTaskButton from '@/components/tasks/DeleteTaskButton';
 import DeleteSeriesButton from '@/components/tasks/DeleteSeriesButton';
 import PhotoSection from '@/components/tasks/PhotoSection';
+import ActivityLog from '@/components/tasks/ActivityLog';
 
 const PRIORITY_DOT: Record<string, string> = {
   low: 'bg-stone-500',
@@ -83,6 +84,15 @@ export default async function TaskDetailPage({
     .order('created_at', { ascending: true });
 
   const typedPhotos = (photos || []) as unknown as TaskPhoto[];
+
+  // Fetch activity log
+  const { data: activities } = await supabaseAdmin
+    .from('task_activity')
+    .select('id, task_id, user_id, action, detail, created_at, user:users(name)')
+    .eq('task_id', id)
+    .order('created_at', { ascending: true });
+
+  const typedActivities = (activities || []) as unknown as TaskActivity[];
 
   const isOverdue =
     typedTask.due_date &&
@@ -237,6 +247,11 @@ export default async function TaskDetailPage({
             currentUserRole={session.role}
             supabaseUrl={process.env.NEXT_PUBLIC_SUPABASE_URL!}
           />
+        </div>
+
+        {/* Activity Log */}
+        <div className="bg-stone-900 rounded-xl border border-stone-700 p-5">
+          <ActivityLog activities={typedActivities} />
         </div>
 
         {/* Comments */}
