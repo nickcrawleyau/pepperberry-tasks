@@ -137,6 +137,11 @@ export default async function TaskDetailPage({
           </div>
           {session.role === 'admin' && (
             <div className="flex items-center gap-2">
+              <TransferTask
+                taskId={typedTask.id}
+                currentAssignedTo={typedTask.assigned_to}
+                users={transferUsers}
+              />
               <Link
                 href={`/tasks/${id}/edit`}
                 className="px-3 py-1.5 rounded-lg border border-stone-200 text-xs font-medium text-stone-700 hover:bg-stone-100 transition"
@@ -203,11 +208,6 @@ export default async function TaskDetailPage({
               <p className="text-sm text-stone-900">
                 {typedTask.assigned_user?.name || 'Unassigned'}
               </p>
-              <TransferTask
-                taskId={typedTask.id}
-                currentAssignedTo={typedTask.assigned_to}
-                users={transferUsers}
-              />
             </div>
 
             <div>
