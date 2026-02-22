@@ -52,7 +52,7 @@ export default async function DashboardPage() {
       : `${openCount} task${openCount !== 1 ? 's' : ''} for you`;
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen bg-stone-100">
       <KeyboardShortcuts role={session.role} />
       <header className="bg-white border-b border-stone-200">
         <div className="max-w-2xl mx-auto px-5 py-4 flex items-center justify-between">
