@@ -117,9 +117,43 @@ export default function TaskList({ tasks, role, users = [] }: TaskListProps) {
 
       <div className="mt-4 space-y-3">
         {filtered.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-sm text-stone-500">No tasks found</p>
-          </div>
+          tasks.length === 0 ? (
+            <div className="text-center py-16">
+              <svg
+                className="w-16 h-16 mx-auto text-stone-300 mb-4"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <p className="text-sm font-medium text-stone-700 mb-1">All caught up!</p>
+              <p className="text-xs text-stone-400">No tasks right now. Enjoy the quiet.</p>
+            </div>
+          ) : (
+            <div className="text-center py-16">
+              <svg
+                className="w-16 h-16 mx-auto text-stone-300 mb-4"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z"
+                />
+              </svg>
+              <p className="text-sm font-medium text-stone-700 mb-1">No tasks match your filters</p>
+              <p className="text-xs text-stone-400">Try adjusting your filters to see more tasks.</p>
+            </div>
+          )
         ) : (
           filtered.map((task) => <TaskCard key={task.id} task={task} />)
         )}

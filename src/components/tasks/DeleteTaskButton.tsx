@@ -1,12 +1,21 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function DeleteTaskButton({ taskId }: { taskId: string }) {
   const router = useRouter();
   const [confirming, setConfirming] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!confirming) return;
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') setConfirming(false);
+    }
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [confirming]);
 
   async function handleDelete() {
     setLoading(true);

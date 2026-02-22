@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { TaskPhoto } from '@/lib/types';
 import { MAX_PHOTOS_PER_TASK } from '@/lib/constants';
@@ -27,6 +27,15 @@ export default function PhotoSection({
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [viewingPhoto, setViewingPhoto] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!viewingPhoto) return;
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') setViewingPhoto(null);
+    }
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [viewingPhoto]);
 
   const canUpload = photos.length < MAX_PHOTOS_PER_TASK;
 

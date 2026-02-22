@@ -25,7 +25,7 @@ export default function TransferTask({ taskId, currentAssignedTo, users }: Trans
 
   const availableUsers = users.filter((u) => u.id !== currentAssignedTo);
 
-  // Close panel on outside click
+  // Close panel on outside click or Escape
   useEffect(() => {
     if (!open) return;
     function handleClick(e: MouseEvent) {
@@ -33,8 +33,15 @@ export default function TransferTask({ taskId, currentAssignedTo, users }: Trans
         setOpen(false);
       }
     }
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') setOpen(false);
+    }
     document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', handleClick);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
   }, [open]);
 
   async function handleTransfer(e: React.FormEvent) {

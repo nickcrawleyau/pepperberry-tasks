@@ -7,6 +7,7 @@ import LogoutButton from './LogoutButton';
 import TaskList from '@/components/tasks/TaskList';
 import DashboardStats from '@/components/dashboard/DashboardStats';
 import PushNotificationPrompt from '@/components/PushNotificationPrompt';
+import KeyboardShortcuts from '@/components/KeyboardShortcuts';
 
 export default async function DashboardPage() {
   const session = await getSession();
@@ -16,6 +17,22 @@ export default async function DashboardPage() {
   }
 
   const tasks = await fetchTasks(session);
+
+  // Fetch current user's trade_type for header display
+  const { data: currentUser } = await supabaseAdmin
+    .from('users')
+    .select('trade_type')
+    .eq('id', session.userId)
+    .single();
+
+  const roleLabel =
+    session.role === 'admin'
+      ? 'Admin'
+      : session.role === 'riding_school'
+        ? 'Riding School'
+        : currentUser?.trade_type
+          ? currentUser.trade_type.charAt(0).toUpperCase() + currentUser.trade_type.slice(1).replace('_', ' ')
+          : 'Tradesperson';
 
   // Fetch active users for admin filter dropdown
   let users: { id: string; name: string }[] = [];
@@ -36,21 +53,23 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-stone-50">
+      <KeyboardShortcuts role={session.role} />
       <header className="bg-white border-b border-stone-200">
         <div className="max-w-2xl mx-auto px-5 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <img src="/PBLogo.png" alt="Pepperberry" className="w-8 h-8 object-contain" />
+            <img src="/PBLogo.png" alt="Pepperberry" className="w-6 h-6 sm:w-8 sm:h-8 object-contain" />
             <div>
-              <h1 className="text-lg font-medium text-stone-900">
-                Pepperberry
+              <h1 className="text-base sm:text-lg font-medium text-stone-900">
+                🌿 Pepperberry Farm
               </h1>
               <p className="text-xs text-stone-500">Task Board</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <p className="text-sm font-medium text-stone-900">
-              {session.name}
-            </p>
+            <div className="text-right">
+              <p className="text-sm font-medium text-stone-900">{session.name}</p>
+              <p className="text-xs text-stone-400">{roleLabel}</p>
+            </div>
             <PushNotificationPrompt />
             <LogoutButton />
           </div>
