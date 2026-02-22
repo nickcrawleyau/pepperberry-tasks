@@ -221,10 +221,6 @@ export default function LoginPage() {
           </div>
         </form>
 
-        {/* Footer */}
-        <p className="mt-8 text-center text-xs text-stone-600">
-          Coolongatta, NSW &middot; Pepperberry Farm
-        </p>
       </div>
     </div>
   );
