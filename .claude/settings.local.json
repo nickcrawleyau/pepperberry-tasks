@@ -11,7 +11,8 @@
       "Bash(npx tsc:*)",
       "Bash(npx web-push:*)",
       "Bash(node -e:*)",
-      "Bash(gh auth status:*)"
+      "Bash(gh auth status:*)",
+      "Bash(tail:*)"
     ]
   }
 }

@@ -55,11 +55,11 @@ export default function DashboardStats({ tasks }: DashboardStatsProps) {
   return (
     <div className="space-y-4 mb-6">
       {/* Summary cards */}
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {stats.map((s) => (
           <div
             key={s.label}
-            className="bg-stone-900 rounded-xl border border-stone-700 px-3 py-3 text-center"
+            className="bg-stone-900 rounded-xl border border-stone-800 px-3 py-3 text-center"
           >
             <p className={`text-2xl font-semibold ${s.color}`}>{s.value}</p>
             <p className="text-[11px] text-stone-500 mt-0.5">{s.label}</p>
@@ -69,18 +69,21 @@ export default function DashboardStats({ tasks }: DashboardStatsProps) {
 
       {/* Worker workload */}
       {workload.length > 0 && (
-        <div className="bg-stone-900 rounded-xl border border-stone-700 px-4 py-3">
-          <p className="text-xs font-medium text-stone-400 mb-2">Workload</p>
-          <div className="space-y-1.5">
+        <div className="bg-stone-900 rounded-xl border border-stone-800 px-4 py-3">
+          <p className="text-xs font-medium text-stone-400 mb-2.5">Workload</p>
+          <div className="flex flex-wrap gap-2">
             {workload.map((w) => (
-              <div key={w.name} className="flex items-center justify-between">
-                <span className={`text-sm ${w.name === 'Unassigned' ? 'text-stone-500 italic' : 'text-stone-200'}`}>
-                  {w.name}
-                </span>
-                <span className="text-sm text-stone-400">
-                  {w.count} task{w.count !== 1 ? 's' : ''}
-                </span>
-              </div>
+              <span
+                key={w.name}
+                className={`inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border ${
+                  w.name === 'Unassigned'
+                    ? 'border-stone-700 text-stone-500 italic'
+                    : 'border-stone-700 text-stone-300'
+                }`}
+              >
+                {w.name}
+                <span className="text-stone-500 font-medium">{w.count}</span>
+              </span>
             ))}
           </div>
         </div>

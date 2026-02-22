@@ -14,7 +14,7 @@ create table public.tasks (
     location in (
       'workshop', 'house', 'Big_Paddock', 'Front_paddock', 'Back_paddock',
       'driveway', 'riding_arena', 'stables', 'Front_garden', 'Back_garden',
-      'VegebtalePatch', 'front_gate'
+      'VegetablePatch', 'front_gate'
     )
   ),
   assigned_to uuid references public.users(id),

@@ -4,7 +4,6 @@ import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import { Task, TaskComment, TaskPhoto, TaskActivity } from '@/lib/types';
 import {
-  STATUS_LABELS,
   PRIORITY_LABELS,
   CATEGORY_LABELS,
   LOCATION_LABELS,

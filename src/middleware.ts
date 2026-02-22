@@ -4,7 +4,7 @@ import { jwtVerify } from 'jose';
 const SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
 const COOKIE_NAME = 'pb-session';
 
-const PUBLIC_PATHS = ['/', '/api/auth/login'];
+const PUBLIC_PATHS = ['/', '/api/auth/login', '/api/auth/users'];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
