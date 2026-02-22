@@ -132,6 +132,12 @@ export async function DELETE(request: NextRequest, { params }: Params) {
     .update({ user_id: session.userId })
     .eq('user_id', id);
 
+  // Transfer photo ownership to the admin
+  await supabaseAdmin
+    .from('task_photos')
+    .update({ uploaded_by: session.userId })
+    .eq('uploaded_by', id);
+
   // Now delete the user
   const { error: deleteError } = await supabaseAdmin
     .from('users')

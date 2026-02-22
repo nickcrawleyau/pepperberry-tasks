@@ -99,6 +99,7 @@ src/
 | role | text | `admin`, `tradesperson`, `riding_school` |
 | trade_type | text | Nullable. E.g. `fencer`, `plumber`, `electrician`, `handyman` |
 | is_active | boolean | Default true. Soft-disable accounts |
+| last_login | timestamptz | Nullable. Set on successful login |
 | created_at | timestamptz | Default `now()` |
 
 ### `tasks`
@@ -168,13 +169,13 @@ Use these exact string values in the `location` column:
 | `house` | Homestead / main house |
 | `Big_Paddock` | Eastern paddocks (leased to riding academy) |
 | `Front_paddock` | Western paddocks |
-| `Back_paddock` | Western paddocks | 
+| `Back_paddock` | South paddocks | 
 | `driveway` | Main driveway and access road |
 | `riding_arena` | Riding arena (riding academy) |
 | `stables` | Stables (riding academy) |
 | `Front_garden` | front garden area |
 | `Back_garden` | back garden area |
-| `VegebtalePatch` | Veggie beds |
+| `VegetablePatch` | Veggie beds |
 | `front_gate` | Front gate and entrance |
 
 ## Task Categories

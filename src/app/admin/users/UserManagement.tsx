@@ -26,6 +26,7 @@ interface User {
   trade_type: string | null;
   is_active: boolean;
   created_at: string;
+  last_login: string | null;
 }
 
 interface UserManagementProps {
@@ -139,6 +140,15 @@ export default function UserManagement({ initialUsers, currentUserId }: UserMana
   );
 }
 
+function formatLastLogin(dateStr: string): string {
+  const date = new Date(dateStr);
+  const dayName = date.toLocaleDateString('en-AU', { weekday: 'long' });
+  const day = date.getDate();
+  const month = date.getMonth() + 1;
+  const year = String(date.getFullYear()).slice(-2);
+  return `${dayName} ${day}/${month}/${year}`;
+}
+
 function UserRow({
   user,
   isSelf,
@@ -191,6 +201,11 @@ function UserRow({
           <div>
             <p className="text-sm font-medium text-stone-900">{user.name}</p>
             <p className="text-xs text-stone-500">{roleLabel}</p>
+            <p className="text-xs text-stone-400">
+              {user.last_login
+                ? `Last login: ${formatLastLogin(user.last_login)}`
+                : 'Never logged in'}
+            </p>
           </div>
         </div>
 

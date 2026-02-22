@@ -5,6 +5,7 @@ export interface User {
   trade_type: string | null;
   is_active: boolean;
   must_set_pin: boolean;
+  last_login: string | null;
   created_at: string;
 }
 

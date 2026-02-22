@@ -37,6 +37,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid name or PIN' }, { status: 401 });
   }
 
+  // Record last login time
+  await supabaseAdmin
+    .from('users')
+    .update({ last_login: new Date().toISOString() })
+    .eq('id', user.id);
+
   // Create JWT session
   const token = await createSession({
     userId: user.id,

@@ -9,10 +9,16 @@ export default async function AdminUsersPage() {
   if (!session) redirect('/');
   if (session.role !== 'admin') redirect('/dashboard');
 
-  const { data: users } = await supabaseAdmin
+  const { data: rawUsers } = await supabaseAdmin
     .from('users')
-    .select('id, name, role, trade_type, is_active, created_at')
-    .order('created_at', { ascending: true });
+    .select('id, name, role, trade_type, is_active, created_at, last_login')
+    .order('name', { ascending: true });
+
+  const users = (rawUsers || []).sort((a, b) => {
+    if (a.role === 'admin' && b.role !== 'admin') return -1;
+    if (a.role !== 'admin' && b.role === 'admin') return 1;
+    return 0;
+  });
 
   return (
     <div className="min-h-screen bg-stone-50">
