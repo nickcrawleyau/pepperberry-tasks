@@ -103,6 +103,7 @@ export default function LoginPage() {
 
   const fullPin = pin.join('');
   const canSubmit = selectedUser && fullPin.length === 4 && !loading;
+  const nextPinIndex = pin.findIndex((d) => d === '');
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-stone-950 px-4">
@@ -174,7 +175,11 @@ export default function LoginPage() {
                     onKeyDown={(e) => handlePinKeyDown(i, e)}
                     onPaste={i === 0 ? handlePinPaste : undefined}
                     aria-label={`PIN digit ${i + 1}`}
-                    className="w-14 h-14 text-center text-xl rounded-lg border border-stone-700 bg-stone-800 text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-600/50 focus:border-amber-600/50 transition"
+                    className={`w-14 h-14 text-center text-xl rounded-lg border bg-stone-800 text-stone-100 focus:outline-none transition ${
+                      i === nextPinIndex
+                        ? 'border-emerald-400 ring-2 ring-emerald-400/50'
+                        : 'border-stone-700'
+                    }`}
                   />
                 ))}
               </div>
