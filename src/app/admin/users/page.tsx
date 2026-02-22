@@ -41,7 +41,7 @@ export default async function AdminUsersPage() {
       </header>
 
       <main className="max-w-2xl mx-auto px-5 py-6">
-        <UserManagement initialUsers={users || []} />
+        <UserManagement initialUsers={users || []} currentUserId={session.userId} />
       </main>
     </div>
   );

@@ -30,13 +30,16 @@ interface User {
 
 interface UserManagementProps {
   initialUsers: User[];
+  currentUserId: string;
 }
 
-export default function UserManagement({ initialUsers }: UserManagementProps) {
+export default function UserManagement({ initialUsers, currentUserId }: UserManagementProps) {
   const router = useRouter();
   const [users, setUsers] = useState(initialUsers);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   return (
     <div className="space-y-6">
@@ -92,6 +95,9 @@ export default function UserManagement({ initialUsers }: UserManagementProps) {
             ) : (
               <UserRow
                 user={user}
+                isSelf={user.id === currentUserId}
+                isDeleting={deletingId === user.id}
+                deleteLoading={deleteLoading}
                 onEdit={() => setEditingId(user.id)}
                 onToggleActive={async () => {
                   const res = await fetch(`/api/users/${user.id}`, {
@@ -107,6 +113,23 @@ export default function UserManagement({ initialUsers }: UserManagementProps) {
                     );
                   }
                 }}
+                onDeleteClick={() => setDeletingId(user.id)}
+                onDeleteCancel={() => setDeletingId(null)}
+                onDeleteConfirm={async () => {
+                  setDeleteLoading(true);
+                  try {
+                    const res = await fetch(`/api/users/${user.id}`, {
+                      method: 'DELETE',
+                    });
+                    if (res.ok) {
+                      setUsers(users.filter((u) => u.id !== user.id));
+                      router.refresh();
+                    }
+                  } finally {
+                    setDeleteLoading(false);
+                    setDeletingId(null);
+                  }
+                }}
               />
             )}
           </div>
@@ -118,12 +141,24 @@ export default function UserManagement({ initialUsers }: UserManagementProps) {
 
 function UserRow({
   user,
+  isSelf,
+  isDeleting,
+  deleteLoading,
   onEdit,
   onToggleActive,
+  onDeleteClick,
+  onDeleteCancel,
+  onDeleteConfirm,
 }: {
   user: User;
+  isSelf: boolean;
+  isDeleting: boolean;
+  deleteLoading: boolean;
   onEdit: () => void;
   onToggleActive: () => void;
+  onDeleteClick: () => void;
+  onDeleteCancel: () => void;
+  onDeleteConfirm: () => void;
 }) {
   const roleLabel =
     user.role === 'riding_school'
@@ -136,51 +171,85 @@ function UserRow({
 
   return (
     <div
-      className={`bg-stone-900 rounded-xl border border-stone-700 p-4 flex items-center justify-between ${
+      className={`bg-stone-900 rounded-xl border border-stone-700 p-4 ${
         !user.is_active ? 'opacity-50' : ''
       }`}
     >
-      <div className="flex items-center gap-3">
-        <div
-          className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium ${
-            user.role === 'admin'
-              ? 'bg-stone-600 text-white'
-              : user.role === 'tradesperson'
-                ? 'bg-amber-900/40 text-amber-400'
-                : 'bg-emerald-900/40 text-emerald-400'
-          }`}
-        >
-          {user.name.charAt(0).toUpperCase()}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div
+            className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium ${
+              user.role === 'admin'
+                ? 'bg-stone-600 text-white'
+                : user.role === 'tradesperson'
+                  ? 'bg-amber-900/40 text-amber-400'
+                  : 'bg-emerald-900/40 text-emerald-400'
+            }`}
+          >
+            {user.name.charAt(0).toUpperCase()}
+          </div>
+          <div>
+            <p className="text-sm font-medium text-stone-100">{user.name}</p>
+            <p className="text-xs text-stone-500">{roleLabel}</p>
+          </div>
         </div>
-        <div>
-          <p className="text-sm font-medium text-stone-100">{user.name}</p>
-          <p className="text-xs text-stone-500">{roleLabel}</p>
+
+        <div className="flex items-center gap-3">
+          <button
+            onClick={onEdit}
+            className="px-3 py-1.5 rounded-lg border border-stone-700 text-xs font-medium text-stone-300 hover:bg-stone-800 transition"
+          >
+            Edit
+          </button>
+          {!isSelf && (
+            <button
+              onClick={onDeleteClick}
+              className="px-3 py-1.5 rounded-lg border border-red-900/50 text-xs font-medium text-red-400 hover:bg-red-900/20 transition"
+            >
+              Delete
+            </button>
+          )}
+          <button
+            onClick={onToggleActive}
+            role="switch"
+            aria-checked={user.is_active}
+            aria-label={user.is_active ? 'Deactivate user' : 'Activate user'}
+            className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${
+              user.is_active ? 'bg-emerald-600' : 'bg-stone-700'
+            }`}
+          >
+            <span
+              className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${
+                user.is_active ? 'translate-x-6' : 'translate-x-1'
+              }`}
+            />
+          </button>
         </div>
       </div>
 
-      <div className="flex items-center gap-3">
-        <button
-          onClick={onEdit}
-          className="px-3 py-1.5 rounded-lg border border-stone-700 text-xs font-medium text-stone-300 hover:bg-stone-800 transition"
-        >
-          Edit
-        </button>
-        <button
-          onClick={onToggleActive}
-          role="switch"
-          aria-checked={user.is_active}
-          aria-label={user.is_active ? 'Deactivate user' : 'Activate user'}
-          className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors ${
-            user.is_active ? 'bg-emerald-600' : 'bg-stone-700'
-          }`}
-        >
-          <span
-            className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${
-              user.is_active ? 'translate-x-6' : 'translate-x-1'
-            }`}
-          />
-        </button>
-      </div>
+      {isDeleting && (
+        <div className="mt-3 pt-3 border-t border-stone-700">
+          <p className="text-xs text-stone-400 mb-2">
+            Delete <span className="text-stone-200 font-medium">{user.name}</span>? Their open tasks will be transferred to you.
+          </p>
+          <div className="flex gap-2">
+            <button
+              onClick={onDeleteConfirm}
+              disabled={deleteLoading}
+              className="px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-medium hover:bg-red-500 transition disabled:opacity-50"
+            >
+              {deleteLoading ? 'Deleting...' : 'Confirm Delete'}
+            </button>
+            <button
+              onClick={onDeleteCancel}
+              disabled={deleteLoading}
+              className="px-3 py-1.5 rounded-lg border border-stone-700 text-xs font-medium text-stone-300 hover:bg-stone-800 transition"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -62,3 +62,86 @@ export async function PATCH(request: NextRequest, { params }: Params) {
 
   return NextResponse.json({ ok: true });
 }
+
+export async function DELETE(request: NextRequest, { params }: Params) {
+  const session = await getSession();
+  if (!session) {
+    return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+  }
+  if (session.role !== 'admin') {
+    return NextResponse.json({ error: 'Only admins can manage users' }, { status: 403 });
+  }
+
+  const { id } = await params;
+
+  // Prevent deleting yourself
+  if (id === session.userId) {
+    return NextResponse.json({ error: 'You cannot delete yourself' }, { status: 400 });
+  }
+
+  // Transfer open tasks (not done) to the admin performing the delete
+  const { error: transferError } = await supabaseAdmin
+    .from('tasks')
+    .update({ assigned_to: session.userId })
+    .eq('assigned_to', id)
+    .neq('status', 'done');
+
+  if (transferError) {
+    console.error('Error transferring tasks:', transferError);
+    return NextResponse.json({ error: 'Failed to transfer tasks' }, { status: 500 });
+  }
+
+  // Nullify assigned_to on completed tasks so the FK doesn't block deletion
+  const { error: nullifyError } = await supabaseAdmin
+    .from('tasks')
+    .update({ assigned_to: null })
+    .eq('assigned_to', id)
+    .eq('status', 'done');
+
+  if (nullifyError) {
+    console.error('Error nullifying completed tasks:', nullifyError);
+    return NextResponse.json({ error: 'Failed to update completed tasks' }, { status: 500 });
+  }
+
+  // Nullify created_by references by setting them to the admin
+  const { error: creatorError } = await supabaseAdmin
+    .from('tasks')
+    .update({ created_by: session.userId })
+    .eq('created_by', id);
+
+  if (creatorError) {
+    console.error('Error transferring created tasks:', creatorError);
+    return NextResponse.json({ error: 'Failed to transfer created tasks' }, { status: 500 });
+  }
+
+  // Delete push subscriptions
+  await supabaseAdmin
+    .from('push_subscriptions')
+    .delete()
+    .eq('user_id', id);
+
+  // Delete activity log entries for this user
+  await supabaseAdmin
+    .from('task_activity')
+    .update({ user_id: session.userId })
+    .eq('user_id', id);
+
+  // Delete comments by this user
+  await supabaseAdmin
+    .from('task_comments')
+    .update({ user_id: session.userId })
+    .eq('user_id', id);
+
+  // Now delete the user
+  const { error: deleteError } = await supabaseAdmin
+    .from('users')
+    .delete()
+    .eq('id', id);
+
+  if (deleteError) {
+    console.error('Error deleting user:', deleteError);
+    return NextResponse.json({ error: 'Failed to delete user' }, { status: 500 });
+  }
+
+  return NextResponse.json({ ok: true });
+}
