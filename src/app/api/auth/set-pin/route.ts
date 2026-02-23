@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { supabaseAdmin } from '@/lib/supabase/admin';
-import { getSession, createSession, secondsUntilMidnightAEST, COOKIE_NAME } from '@/lib/auth';
+import { getSession, createSession, secondsUntilMidnightAEST, MAX_SESSION_SECONDS, COOKIE_NAME } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   const session = await getSession();
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
-    maxAge: secondsUntilMidnightAEST(),
+    maxAge: Math.min(secondsUntilMidnightAEST(), MAX_SESSION_SECONDS),
     path: '/',
   });
 

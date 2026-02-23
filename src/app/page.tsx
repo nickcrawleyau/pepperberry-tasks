@@ -239,6 +239,9 @@ function LoginForm() {
           </div>
         </form>
 
+        <p className="text-center text-xs text-stone-400 mt-4">
+          Sessions expire after 3 hours
+        </p>
       </div>
     </div>
   );

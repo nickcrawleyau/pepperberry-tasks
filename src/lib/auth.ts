@@ -26,8 +26,10 @@ function secondsUntilMidnightAEST(): number {
   return diff;
 }
 
+const MAX_SESSION_SECONDS = 3 * 3600; // 3 hours
+
 export async function createSession(payload: SessionPayload): Promise<string> {
-  const expirySeconds = secondsUntilMidnightAEST();
+  const expirySeconds = Math.min(secondsUntilMidnightAEST(), MAX_SESSION_SECONDS);
   const token = await new SignJWT(payload as unknown as Record<string, unknown>)
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
@@ -36,7 +38,7 @@ export async function createSession(payload: SessionPayload): Promise<string> {
   return token;
 }
 
-export { secondsUntilMidnightAEST };
+export { secondsUntilMidnightAEST, MAX_SESSION_SECONDS };
 
 export async function verifySession(token: string): Promise<SessionPayload | null> {
   try {
