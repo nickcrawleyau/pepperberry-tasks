@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
   // Fetch user including pin_hash (service role bypasses RLS)
   const { data: user, error } = await supabaseAdmin
     .from('users')
-    .select('id, name, role, pin_hash, is_active, must_set_pin')
+    .select('id, name, role, pin_hash, is_active, must_set_pin, allowed_sections')
     .eq('name', name)
     .single();
 
@@ -93,6 +93,7 @@ export async function POST(request: NextRequest) {
     name: user.name,
     role: user.role,
     mustSetPin: user.must_set_pin ?? false,
+    allowedSections: user.allowed_sections ?? ['weather', 'cart'],
   });
 
   const response = NextResponse.json({

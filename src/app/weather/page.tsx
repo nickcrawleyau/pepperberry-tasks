@@ -7,6 +7,7 @@ import WeatherDisplay from '@/components/weather/WeatherDisplay';
 export default async function WeatherPage() {
   const session = await getSession();
   if (!session) redirect('/');
+  if (session.role !== 'admin' && !session.allowedSections?.includes('weather')) redirect('/dashboard');
 
   let weather;
   let error = false;

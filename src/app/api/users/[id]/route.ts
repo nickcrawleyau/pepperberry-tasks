@@ -46,6 +46,9 @@ export async function PATCH(request: NextRequest, { params }: Params) {
   if (body.phone !== undefined) {
     updates.phone = body.phone?.trim() || null;
   }
+  if (body.allowed_sections !== undefined) {
+    updates.allowed_sections = Array.isArray(body.allowed_sections) ? body.allowed_sections : ['weather', 'cart'];
+  }
 
   if (Object.keys(updates).length === 0) {
     return NextResponse.json({ error: 'No fields to update' }, { status: 400 });

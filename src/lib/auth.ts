@@ -9,6 +9,7 @@ export interface SessionPayload {
   name: string;
   role: 'admin' | 'tradesperson' | 'riding_school';
   mustSetPin?: boolean;
+  allowedSections?: string[];
 }
 
 /** Seconds from now until midnight AEST (UTC+11) */

@@ -19,6 +19,11 @@ const TRADE_TYPES = [
   'animal_carer',
 ] as const;
 
+const SECTIONS = [
+  { value: 'weather', label: 'Weather' },
+  { value: 'cart', label: 'Cart' },
+] as const;
+
 interface User {
   id: string;
   name: string;
@@ -28,6 +33,7 @@ interface User {
   created_at: string;
   last_login: string | null;
   phone: string | null;
+  allowed_sections: string[];
 }
 
 interface UserManagementProps {
@@ -316,6 +322,7 @@ function AddUserForm({ onDone }: { onDone: (user: User | null) => void }) {
   const [role, setRole] = useState('tradesperson');
   const [tradeType, setTradeType] = useState('');
   const [phone, setPhone] = useState('');
+  const [allowedSections, setAllowedSections] = useState<string[]>(['weather', 'cart']);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -334,6 +341,7 @@ function AddUserForm({ onDone }: { onDone: (user: User | null) => void }) {
           role,
           trade_type: role === 'tradesperson' ? tradeType || null : null,
           phone: phone.trim() || null,
+          allowed_sections: role === 'admin' ? ['weather', 'cart'] : allowedSections,
         }),
       });
 
@@ -432,6 +440,31 @@ function AddUserForm({ onDone }: { onDone: (user: User | null) => void }) {
         />
       </div>
 
+      {role !== 'admin' && (
+        <div>
+          <label className="block text-xs font-medium text-stone-500 mb-1">Sections</label>
+          <div className="flex gap-4">
+            {SECTIONS.map((s) => (
+              <label key={s.value} className="flex items-center gap-2 text-sm text-stone-700">
+                <input
+                  type="checkbox"
+                  checked={allowedSections.includes(s.value)}
+                  onChange={(e) => {
+                    setAllowedSections(
+                      e.target.checked
+                        ? [...allowedSections, s.value]
+                        : allowedSections.filter((v) => v !== s.value)
+                    );
+                  }}
+                  className="rounded border-stone-300 text-amber-600 focus:ring-amber-500"
+                />
+                {s.label}
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
+
       {error && <p className="text-sm text-red-500">{error}</p>}
 
       <div className="flex gap-2">
@@ -465,6 +498,7 @@ function EditUserForm({
   const [role, setRole] = useState(user.role);
   const [tradeType, setTradeType] = useState(user.trade_type || '');
   const [phone, setPhone] = useState(user.phone || '');
+  const [allowedSections, setAllowedSections] = useState<string[]>(user.allowed_sections || ['weather', 'cart']);
   const [newPin, setNewPin] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -485,6 +519,10 @@ function EditUserForm({
     if (newPin) updates.pin = newPin;
     if (phone.trim() !== (user.phone || '')) {
       updates.phone = phone.trim() || null;
+    }
+    const currentSections = user.allowed_sections || ['weather', 'cart'];
+    if (JSON.stringify([...allowedSections].sort()) !== JSON.stringify([...currentSections].sort())) {
+      updates.allowed_sections = allowedSections;
     }
 
     if (Object.keys(updates).length === 0) {
@@ -510,6 +548,7 @@ function EditUserForm({
         role,
         trade_type: role === 'tradesperson' ? tradeType || null : null,
         phone: phone.trim() || null,
+        allowed_sections: role === 'admin' ? ['weather', 'cart'] : allowedSections,
       });
     } catch {
       setError('Something went wrong');
@@ -599,6 +638,31 @@ function EditUserForm({
           className={inputClass}
         />
       </div>
+
+      {role !== 'admin' && (
+        <div>
+          <label className="block text-xs font-medium text-stone-500 mb-1">Sections</label>
+          <div className="flex gap-4">
+            {SECTIONS.map((s) => (
+              <label key={s.value} className="flex items-center gap-2 text-sm text-stone-700">
+                <input
+                  type="checkbox"
+                  checked={allowedSections.includes(s.value)}
+                  onChange={(e) => {
+                    setAllowedSections(
+                      e.target.checked
+                        ? [...allowedSections, s.value]
+                        : allowedSections.filter((v) => v !== s.value)
+                    );
+                  }}
+                  className="rounded border-stone-300 text-amber-600 focus:ring-amber-500"
+                />
+                {s.label}
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
 
       {error && <p className="text-sm text-red-500">{error}</p>}
 

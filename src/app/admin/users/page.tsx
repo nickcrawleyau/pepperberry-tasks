@@ -11,7 +11,7 @@ export default async function AdminUsersPage() {
 
   const { data: rawUsers } = await supabaseAdmin
     .from('users')
-    .select('id, name, role, trade_type, is_active, created_at, last_login, phone')
+    .select('id, name, role, trade_type, is_active, created_at, last_login, phone, allowed_sections')
     .order('name', { ascending: true });
 
   const users = (rawUsers || []).sort((a, b) => {

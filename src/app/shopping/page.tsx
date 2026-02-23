@@ -8,6 +8,7 @@ import { ShoppingItem } from '@/lib/types';
 export default async function ShoppingPage() {
   const session = await getSession();
   if (!session) redirect('/');
+  if (session.role !== 'admin' && !session.allowedSections?.includes('cart')) redirect('/dashboard');
 
   const { data } = await supabaseAdmin
     .from('shopping_items')

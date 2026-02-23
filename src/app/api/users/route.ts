@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json();
-  const { name, pin, role, trade_type, phone } = body;
+  const { name, pin, role, trade_type, phone, allowed_sections } = body;
 
   if (!name?.trim()) {
     return NextResponse.json({ error: 'Name is required' }, { status: 400 });
@@ -35,8 +35,9 @@ export async function POST(request: NextRequest) {
       role,
       trade_type: trade_type || null,
       phone: phone?.trim() || null,
+      allowed_sections: Array.isArray(allowed_sections) ? allowed_sections : ['weather', 'cart'],
     })
-    .select('id, name, role, trade_type, is_active, created_at, phone')
+    .select('id, name, role, trade_type, is_active, created_at, phone, allowed_sections')
     .single();
 
   if (error) {
