@@ -217,6 +217,42 @@ export default function WeatherDisplay({ data }: WeatherDisplayProps) {
         </p>
       </div>
 
+      {/* 7-Day Forecast */}
+      <div className="bg-white rounded-xl border border-stone-200 p-5">
+        <p className="text-xs font-medium text-stone-500 mb-3">7-Day Forecast</p>
+        <div className="divide-y divide-stone-100">
+          {forecast.map((day) => (
+            <div key={day.date} className="flex items-center py-2.5 first:pt-0 last:pb-0">
+              <span className="text-sm text-stone-700 w-10 shrink-0">
+                {formatDayName(day.date)}
+              </span>
+              <span className="text-stone-400 w-7 shrink-0">
+                <WeatherIcon type={day.condition.icon} size={18} />
+              </span>
+              <span className="text-xs text-stone-400 flex-1 ml-1 truncate">
+                {day.condition.description}
+              </span>
+              <span className="text-sm text-stone-900 font-medium w-8 text-right">
+                {Math.round(day.temperatureMax)}°
+              </span>
+              <span className="text-sm text-stone-400 w-8 text-right">
+                {Math.round(day.temperatureMin)}°
+              </span>
+              {day.precipitationProbability != null && day.precipitationProbability > 0 ? (
+                <span className="text-[10px] text-sky-500 w-8 text-right">{day.precipitationProbability}%</span>
+              ) : (
+                <span className="w-8" />
+              )}
+              <span className={`text-xs w-14 text-right font-medium ${
+                day.precipitationSum > 0 ? 'text-sky-600' : 'text-stone-300'
+              }`}>
+                {day.precipitationSum > 0 ? `${day.precipitationSum.toFixed(1)} mm` : '—'}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Rainfall Chart */}
       <div className="bg-white rounded-xl border border-stone-200 p-5">
         <div className="flex items-baseline justify-between mb-1">
@@ -412,36 +448,6 @@ export default function WeatherDisplay({ data }: WeatherDisplayProps) {
         )}
       </div>
 
-      {/* 7-Day Forecast */}
-      <div className="bg-white rounded-xl border border-stone-200 p-5">
-        <p className="text-xs font-medium text-stone-500 mb-3">7-Day Forecast</p>
-        <div className="divide-y divide-stone-100">
-          {forecast.map((day) => (
-            <div key={day.date} className="flex items-center py-2.5 first:pt-0 last:pb-0">
-              <span className="text-sm text-stone-700 w-10 shrink-0">
-                {formatDayName(day.date)}
-              </span>
-              <span className="text-stone-400 w-7 shrink-0">
-                <WeatherIcon type={day.condition.icon} size={18} />
-              </span>
-              <span className="text-xs text-stone-400 flex-1 ml-1 truncate">
-                {day.condition.description}
-              </span>
-              <span className="text-sm text-stone-900 font-medium w-8 text-right">
-                {Math.round(day.temperatureMax)}°
-              </span>
-              <span className="text-sm text-stone-400 w-8 text-right">
-                {Math.round(day.temperatureMin)}°
-              </span>
-              <span className={`text-xs w-14 text-right font-medium ${
-                day.precipitationSum > 0 ? 'text-sky-600' : 'text-stone-300'
-              }`}>
-                {day.precipitationSum > 0 ? `${day.precipitationSum.toFixed(1)} mm` : '—'}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }

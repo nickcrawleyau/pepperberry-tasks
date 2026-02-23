@@ -41,6 +41,7 @@ function getCondition(code: number): { description: string; icon: string } {
 export interface DailyWeather {
   date: string;
   precipitationSum: number;
+  precipitationProbability: number | null;
   temperatureMax: number;
   temperatureMin: number;
   weatherCode: number;
@@ -83,6 +84,7 @@ interface OpenMeteoResponse {
   daily: {
     time: string[];
     precipitation_sum: number[];
+    precipitation_probability_max: number[];
     temperature_2m_max: number[];
     temperature_2m_min: number[];
     weather_code: number[];
@@ -104,7 +106,7 @@ export async function fetchWeatherData(): Promise<WeatherData> {
   const lastYear = currentYear - 1;
 
   // Current forecast + 30 days history
-  const forecastUrl = `https://api.open-meteo.com/v1/forecast?latitude=${LATITUDE}&longitude=${LONGITUDE}&daily=precipitation_sum,temperature_2m_max,temperature_2m_min,weather_code&past_days=30&forecast_days=7&timezone=${TIMEZONE}&current=temperature_2m,weather_code,relative_humidity_2m,wind_speed_10m,precipitation`;
+  const forecastUrl = `https://api.open-meteo.com/v1/forecast?latitude=${LATITUDE}&longitude=${LONGITUDE}&daily=precipitation_sum,precipitation_probability_max,temperature_2m_max,temperature_2m_min,weather_code&past_days=30&forecast_days=7&timezone=${TIMEZONE}&current=temperature_2m,weather_code,relative_humidity_2m,wind_speed_10m,precipitation`;
 
   // Last year same 30-day window
   const todayDate = new Date(today + 'T00:00:00');
@@ -151,6 +153,7 @@ export async function fetchWeatherData(): Promise<WeatherData> {
   const daily: DailyWeather[] = raw.daily.time.map((date, i) => ({
     date,
     precipitationSum: raw.daily.precipitation_sum[i],
+    precipitationProbability: raw.daily.precipitation_probability_max?.[i] ?? null,
     temperatureMax: raw.daily.temperature_2m_max[i],
     temperatureMin: raw.daily.temperature_2m_min[i],
     weatherCode: raw.daily.weather_code[i],
