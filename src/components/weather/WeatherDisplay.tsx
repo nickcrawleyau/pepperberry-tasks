@@ -205,6 +205,10 @@ export default function WeatherDisplay({ data }: WeatherDisplayProps) {
                   style={{ height: '100%' }}
                   onClick={() => setSelectedBar(selectedBar === i ? null : i)}
                 >
+                  {/* Today marker line */}
+                  {isToday && (
+                    <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-px bg-stone-400 z-[5]" />
+                  )}
                   {/* Tooltip */}
                   {selectedBar === i && (
                     <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-stone-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10">
