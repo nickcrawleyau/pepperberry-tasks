@@ -149,6 +149,23 @@ function formatLastLogin(dateStr: string): string {
   return `${dayName} ${day}/${month}/${year}`;
 }
 
+/** Check if user logged in after the most recent midnight AEST (13:00 UTC) */
+function isLoggedInToday(lastLogin: string | null): boolean {
+  if (!lastLogin) return false;
+  const now = new Date();
+  const utcHours = now.getUTCHours();
+  // Most recent midnight AEST = today 13:00 UTC if current UTC >= 13, else yesterday 13:00 UTC
+  const midnightAEST = new Date(now);
+  midnightAEST.setUTCMinutes(0, 0, 0);
+  if (utcHours >= 13) {
+    midnightAEST.setUTCHours(13);
+  } else {
+    midnightAEST.setUTCHours(13);
+    midnightAEST.setUTCDate(midnightAEST.getUTCDate() - 1);
+  }
+  return new Date(lastLogin) >= midnightAEST;
+}
+
 function UserRow({
   user,
   isSelf,
@@ -187,16 +204,21 @@ function UserRow({
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div
-            className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium ${
-              user.role === 'admin'
-                ? 'bg-stone-200 text-stone-700'
-                : user.role === 'tradesperson'
-                  ? 'bg-amber-100 text-amber-700'
-                  : 'bg-emerald-100 text-emerald-700'
-            }`}
-          >
-            {user.name.charAt(0).toUpperCase()}
+          <div className="relative">
+            <div
+              className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium ${
+                user.role === 'admin'
+                  ? 'bg-stone-200 text-stone-700'
+                  : user.role === 'tradesperson'
+                    ? 'bg-amber-100 text-amber-700'
+                    : 'bg-emerald-100 text-emerald-700'
+              }`}
+            >
+              {user.name.charAt(0).toUpperCase()}
+            </div>
+            {isLoggedInToday(user.last_login) && (
+              <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full" />
+            )}
           </div>
           <div>
             <p className="text-sm font-medium text-stone-900">{user.name}</p>

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { createSession, secondsUntilMidnightAEST, COOKIE_NAME } from '@/lib/auth';
+import { sendPushToUser } from '@/lib/notifications';
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
@@ -43,6 +44,9 @@ export async function POST(request: NextRequest) {
     .update({ last_login: new Date().toISOString() })
     .eq('id', user.id);
 
+  // Notify Nick when someone logs in (don't block on it)
+  notifyNickOfLogin(user.name).catch(() => {});
+
   // Create JWT session
   const token = await createSession({
     userId: user.id,
@@ -65,4 +69,25 @@ export async function POST(request: NextRequest) {
   });
 
   return response;
+}
+
+async function notifyNickOfLogin(loginName: string) {
+  // Find Nick (admin) to notify
+  const { data: nick } = await supabaseAdmin
+    .from('users')
+    .select('id')
+    .eq('name', 'Nick')
+    .eq('role', 'admin')
+    .single();
+
+  if (!nick) return;
+
+  // Don't notify Nick about his own login
+  if (loginName === 'Nick') return;
+
+  await sendPushToUser(nick.id, {
+    title: 'User Login',
+    body: `${loginName} just logged in`,
+    url: '/admin/users',
+  });
 }
