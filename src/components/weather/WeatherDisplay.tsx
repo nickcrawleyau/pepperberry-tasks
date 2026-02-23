@@ -164,17 +164,18 @@ export default function WeatherDisplay({ data }: WeatherDisplayProps) {
 
       {/* Rain Radar */}
       <div className="bg-white rounded-xl border border-stone-200 p-5">
-        <p className="text-xs font-medium text-stone-500 mb-3">Rain Radar — Wollongong 128km</p>
-        <div className="relative w-full overflow-hidden rounded-lg bg-stone-100" style={{ aspectRatio: '1 / 1' }}>
-          <img
-            src="https://radar.weather.gov.au/latest/IDR032.gif"
-            alt="Rain radar Wollongong 128km"
-            className="w-full h-full object-contain"
+        <p className="text-xs font-medium text-stone-500 mb-3">Rain Radar — Wollongong</p>
+        <div className="relative w-full overflow-hidden rounded-lg bg-stone-100" style={{ aspectRatio: '4 / 3' }}>
+          <iframe
+            src="https://embed.windy.com/embed2.html?lat=-34.42&lon=150.87&detailLat=-34.42&detailLon=150.87&width=650&height=450&zoom=8&level=surface&overlay=radar&product=radar&menu=&message=&marker=&calendar=&pressure=&type=map&location=coordinates&detail=&metricWind=km%2Fh&metricTemp=%C2%B0C&radarRange=-1"
+            title="Rain radar Wollongong"
+            className="absolute inset-0 w-full h-full border-0"
             loading="lazy"
+            allowFullScreen
           />
         </div>
         <p className="text-[10px] text-stone-300 mt-2">
-          Source: Bureau of Meteorology
+          Source: Windy.com / BOM
         </p>
       </div>
 
@@ -192,91 +193,102 @@ export default function WeatherDisplay({ data }: WeatherDisplayProps) {
           </div>
         </div>
 
-        {/* Bar chart */}
+        {/* Bar chart with Y axis */}
         <div className="mt-3 overflow-x-auto">
-          <div className="flex items-end gap-px" style={{ minWidth: '100%', height: 120 }}>
-            {daily.map((day, i) => {
-              const height = day.precipitationSum > 0
-                ? Math.max((day.precipitationSum / maxPrecip) * 100, 4)
-                : 0;
-              const isToday = !day.isForecast && i === historicalDays.length - 1;
+          <div className="flex">
+            {/* Y axis labels */}
+            <div className="flex flex-col justify-between shrink-0 pr-1.5" style={{ height: 120 }}>
+              <span className="text-[9px] text-stone-400 leading-none">{Math.round(maxPrecip)} mm</span>
+              <span className="text-[9px] text-stone-400 leading-none">{Math.round(maxPrecip / 2)}</span>
+              <span className="text-[9px] text-stone-400 leading-none">0</span>
+            </div>
+            {/* Bars */}
+            <div className="flex-1">
+              <div className="flex items-end gap-px" style={{ minWidth: '100%', height: 120 }}>
+                {daily.map((day, i) => {
+                  const height = day.precipitationSum > 0
+                    ? Math.max((day.precipitationSum / maxPrecip) * 100, 4)
+                    : 0;
+                  const isToday = !day.isForecast && i === historicalDays.length - 1;
 
-              // Last year comparison bar (aligned by position)
-              const lyIndex = i < lastYearDaily.length ? i : -1;
-              const lyPrecip = lyIndex >= 0 ? lastYearDaily[lyIndex].precipitationSum : 0;
-              const lyHeight = lyPrecip > 0
-                ? Math.max((lyPrecip / maxPrecip) * 100, 4)
-                : 0;
+                  // Last year comparison bar (aligned by position)
+                  const lyIndex = i < lastYearDaily.length ? i : -1;
+                  const lyPrecip = lyIndex >= 0 ? lastYearDaily[lyIndex].precipitationSum : 0;
+                  const lyHeight = lyPrecip > 0
+                    ? Math.max((lyPrecip / maxPrecip) * 100, 4)
+                    : 0;
 
-              const precipLabel = day.precipitationSum >= 10
-                ? Math.round(day.precipitationSum).toString()
-                : day.precipitationSum.toFixed(1);
+                  const precipLabel = day.precipitationSum >= 10
+                    ? Math.round(day.precipitationSum).toString()
+                    : day.precipitationSum.toFixed(1);
 
-              return (
-                <button
-                  key={day.date}
-                  type="button"
-                  className="flex-1 flex flex-col justify-end items-center relative group"
-                  style={{ height: '100%' }}
-                  onClick={() => setSelectedBar(selectedBar === i ? null : i)}
-                >
-                  {/* Today marker line */}
-                  {isToday && (
-                    <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-px bg-stone-400 z-[5]" />
-                  )}
-                  {/* Rainfall label for 10mm+ days */}
-                  {day.precipitationSum >= 10 && (
-                    <span className="text-[8px] text-sky-700 font-medium leading-none mb-0.5">
-                      {Math.round(day.precipitationSum)}
-                    </span>
-                  )}
-                  {/* Tooltip */}
-                  {selectedBar === i && (
-                    <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-stone-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10">
-                      {formatDateShort(day.date)}: {precipLabel} mm
-                      {lyPrecip > 0 && ` (LY: ${lyPrecip >= 10 ? Math.round(lyPrecip) : lyPrecip.toFixed(1)})`}
+                  return (
+                    <button
+                      key={day.date}
+                      type="button"
+                      className="flex-1 flex flex-col justify-end items-center relative group"
+                      style={{ height: '100%' }}
+                      onClick={() => setSelectedBar(selectedBar === i ? null : i)}
+                    >
+                      {/* Today marker line */}
+                      {isToday && (
+                        <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-px bg-stone-400 z-[5]" />
+                      )}
+                      {/* Rainfall label for 10mm+ days */}
+                      {day.precipitationSum >= 10 && (
+                        <span className="text-[8px] text-sky-700 font-medium leading-none mb-0.5">
+                          {Math.round(day.precipitationSum)}
+                        </span>
+                      )}
+                      {/* Tooltip */}
+                      {selectedBar === i && (
+                        <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-stone-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10">
+                          {formatDateShort(day.date)}: {precipLabel} mm
+                          {lyPrecip > 0 && ` (LY: ${lyPrecip >= 10 ? Math.round(lyPrecip) : lyPrecip.toFixed(1)})`}
+                        </div>
+                      )}
+                      {/* Last year bar (faint, behind) */}
+                      {lyHeight > 0 && (
+                        <div
+                          className="absolute bottom-0 w-full rounded-t bg-sky-200/40"
+                          style={{ height: `${lyHeight}%`, minHeight: 3 }}
+                        />
+                      )}
+                      {/* Current year bar */}
+                      {height > 0 && (
+                        <div
+                          className={`w-full rounded-t transition-colors relative ${
+                            isToday
+                              ? 'bg-sky-500'
+                              : day.isForecast
+                                ? 'bg-sky-300'
+                                : 'bg-sky-600'
+                          }`}
+                          style={{ height: `${height}%`, minHeight: 3 }}
+                        />
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Date labels */}
+              <div className="flex mt-1.5" style={{ minWidth: '100%' }}>
+                {daily.map((day, i) => {
+                  const showLabel = i === 0 || i === daily.length - 1 || i % 7 === 0 ||
+                    (!day.isForecast && i === historicalDays.length - 1);
+                  return (
+                    <div key={day.date} className="flex-1 text-center">
+                      {showLabel && (
+                        <span className="text-[9px] text-stone-400 leading-none">
+                          {formatDateLabel(day.date)}
+                        </span>
+                      )}
                     </div>
-                  )}
-                  {/* Last year bar (faint, behind) */}
-                  {lyHeight > 0 && (
-                    <div
-                      className="absolute bottom-0 w-full rounded-t bg-sky-200/40"
-                      style={{ height: `${lyHeight}%`, minHeight: 3 }}
-                    />
-                  )}
-                  {/* Current year bar */}
-                  {height > 0 && (
-                    <div
-                      className={`w-full rounded-t transition-colors relative ${
-                        isToday
-                          ? 'bg-sky-500'
-                          : day.isForecast
-                            ? 'bg-sky-300'
-                            : 'bg-sky-600'
-                      }`}
-                      style={{ height: `${height}%`, minHeight: 3 }}
-                    />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Date labels */}
-          <div className="flex mt-1.5" style={{ minWidth: '100%' }}>
-            {daily.map((day, i) => {
-              const showLabel = i === 0 || i === daily.length - 1 || i % 7 === 0 ||
-                (!day.isForecast && i === historicalDays.length - 1);
-              return (
-                <div key={day.date} className="flex-1 text-center">
-                  {showLabel && (
-                    <span className="text-[9px] text-stone-400 leading-none">
-                      {formatDateLabel(day.date)}
-                    </span>
-                  )}
-                </div>
-              );
-            })}
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
 
