@@ -9,6 +9,11 @@ export async function GET() {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
   }
 
+  // Only admins and users with cart access can view shopping items
+  if (session.role !== 'admin' && !session.allowedSections?.includes('cart')) {
+    return NextResponse.json({ error: 'Not authorised' }, { status: 403 });
+  }
+
   const { data, error } = await supabaseAdmin
     .from('shopping_items')
     .select('*, adder:users!added_by(name), assignee:users!assigned_to(name)')
@@ -26,6 +31,11 @@ export async function POST(request: NextRequest) {
   const session = await getSession();
   if (!session) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+  }
+
+  // Only admins can add shopping items
+  if (session.role !== 'admin') {
+    return NextResponse.json({ error: 'Not authorised' }, { status: 403 });
   }
 
   const { title, category, assigned_to } = await request.json();

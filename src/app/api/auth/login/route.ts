@@ -52,11 +52,11 @@ export async function POST(request: NextRequest) {
 
   if (error || !user) {
     recordFailure(ip, now);
-    const remaining = MAX_ATTEMPTS - (failedAttempts.get(ip)?.count ?? 0);
-    return NextResponse.json(
-      { error: remaining > 0 ? `Invalid name or PIN (${remaining} attempt${remaining !== 1 ? 's' : ''} left)` : `Too many attempts. Try again in 30 min` },
-      { status: remaining > 0 ? 401 : 429 }
-    );
+    const entry2 = failedAttempts.get(ip);
+    if (entry2 && entry2.count >= MAX_ATTEMPTS) {
+      return NextResponse.json({ error: 'Too many attempts. Try again later.' }, { status: 429 });
+    }
+    return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
   }
 
   if (!user.is_active) {
@@ -68,11 +68,11 @@ export async function POST(request: NextRequest) {
 
   if (!pinValid) {
     recordFailure(ip, now);
-    const remaining = MAX_ATTEMPTS - (failedAttempts.get(ip)?.count ?? 0);
-    return NextResponse.json(
-      { error: remaining > 0 ? `Invalid name or PIN (${remaining} attempt${remaining !== 1 ? 's' : ''} left)` : `Too many attempts. Try again in 30 min` },
-      { status: remaining > 0 ? 401 : 429 }
-    );
+    const entry2 = failedAttempts.get(ip);
+    if (entry2 && entry2.count >= MAX_ATTEMPTS) {
+      return NextResponse.json({ error: 'Too many attempts. Try again later.' }, { status: 429 });
+    }
+    return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
   }
 
   // Successful login — clear failures
