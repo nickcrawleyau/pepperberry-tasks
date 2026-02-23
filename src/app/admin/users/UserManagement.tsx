@@ -225,7 +225,7 @@ function UserRow({
           <div>
             <p className="text-sm font-medium text-stone-900">{user.name}</p>
             <p className="text-xs text-stone-500">{roleLabel}</p>
-            {user.role === 'admin' && user.phone && (
+            {user.phone && (
               <a
                 href={`tel:${user.phone.replace(/\s/g, '')}`}
                 className="text-xs text-amber-600 hover:text-amber-500 transition"
@@ -333,7 +333,7 @@ function AddUserForm({ onDone }: { onDone: (user: User | null) => void }) {
           pin,
           role,
           trade_type: role === 'tradesperson' ? tradeType || null : null,
-          phone: role === 'admin' ? phone.trim() || null : null,
+          phone: phone.trim() || null,
         }),
       });
 
@@ -421,18 +421,16 @@ function AddUserForm({ onDone }: { onDone: (user: User | null) => void }) {
         )}
       </div>
 
-      {role === 'admin' && (
-        <div>
-          <label className="block text-xs font-medium text-stone-500 mb-1">Phone</label>
-          <input
-            type="tel"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="04XX XXX XXX"
-            className={inputClass}
-          />
-        </div>
-      )}
+      <div>
+        <label className="block text-xs font-medium text-stone-500 mb-1">Phone</label>
+        <input
+          type="tel"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          placeholder="04XX XXX XXX"
+          className={inputClass}
+        />
+      </div>
 
       {error && <p className="text-sm text-red-500">{error}</p>}
 
@@ -485,7 +483,7 @@ function EditUserForm({
       updates.trade_type = null;
     }
     if (newPin) updates.pin = newPin;
-    if (role === 'admin' && phone.trim() !== (user.phone || '')) {
+    if (phone.trim() !== (user.phone || '')) {
       updates.phone = phone.trim() || null;
     }
 
@@ -511,7 +509,7 @@ function EditUserForm({
         name: name.trim(),
         role,
         trade_type: role === 'tradesperson' ? tradeType || null : null,
-        phone: role === 'admin' ? phone.trim() || null : null,
+        phone: phone.trim() || null,
       });
     } catch {
       setError('Something went wrong');
@@ -591,18 +589,16 @@ function EditUserForm({
         )}
       </div>
 
-      {role === 'admin' && (
-        <div>
-          <label className="block text-xs font-medium text-stone-500 mb-1">Phone</label>
-          <input
-            type="tel"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="04XX XXX XXX"
-            className={inputClass}
-          />
-        </div>
-      )}
+      <div>
+        <label className="block text-xs font-medium text-stone-500 mb-1">Phone</label>
+        <input
+          type="tel"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          placeholder="04XX XXX XXX"
+          className={inputClass}
+        />
+      </div>
 
       {error && <p className="text-sm text-red-500">{error}</p>}
 
