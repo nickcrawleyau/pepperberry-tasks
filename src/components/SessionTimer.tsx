@@ -21,7 +21,7 @@ export default function SessionTimer({ expiresAt }: { expiresAt: number }) {
 
   return (
     <span className="text-[10px] text-stone-400">
-      {remaining > 0 ? label : 'Expired'}
+      {remaining > 0 ? `Session expires in ${label}` : 'Expired'}
     </span>
   );
 }
