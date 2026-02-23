@@ -2,25 +2,24 @@
 
 ## Project Overview
 
-A task management web app for **Pepperberry** — a private home property in Coolongatta, NSW, Australia. The property includes multiple paddocks, a workshop, a house and driveway. The eastern paddocks are leased to **Regal Riding School**.
+A property management web app for **Pepperberry** — a private home property in Coolangatta, NSW, Australia. The property includes multiple paddocks, a workshop, a house and driveway. The eastern paddocks are leased to **Regal Riding School**.
 
-The app lets the two owners assign and track tasks across the property. Workers (General workers, landscapers, fencers, plumbers, electricians, handymen, animal carers) log in to see only their assigned work. Riding school staff see only riding-school-related tasks.
+The app lets the two owners (admins) assign and track jobs across the property, manage a shared shopping list, and monitor local weather. Tradies (fencers, plumbers, electricians, handymen, landscapers, housekeepers, animal carers) log in to see only their assigned work. Regal Riding staff see only riding-school-related tasks.
 
 ### Horses
 
-The eastern paddocks are leased for agistment — the agisted horses are a separate concern and not managed by the farm. Pepperberry owns 3 horses (PB horses). Staff from the riding academy come to feed the PB horses. The `riding_school` role in the app exists solely for these staff to see and update tasks related to PB horse care (feeding, etc.).
+The eastern paddocks are leased for agistment — the agisted horses are a separate concern and not managed by the farm. Pepperberry owns 3 horses (PB horses). Staff from Regal Riding come to feed the PB horses. The `riding_school` role in the app exists solely for these staff to see and update tasks related to PB horse care (feeding, etc.).
 
-### Tradesperson Workflow
+### Tradie Workflow
 
-**Key domain concept:** Workers are **not permanent staff**. They come for specific jobs and might not return for weeks. The typical workflow is:
+**Key domain concept:** Tradies are **not permanent staff**. They come for specific jobs and might not return for weeks. The typical workflow is:
 1. Admin identifies a job that needs doing (e.g. fence repair in western paddock)
-2. Admin creates a task and assigns it to the relevant tradesperson.
-3. Admin can manage all non-admin users access.
-4. Admin can create a job with a repeating schedule with a start and end date. Default start date is today.
-5. Tradesperson logs in (often on their phone on-site), sees their assigned tasks
-6. Tradesperson updates status and adds photos/comments as they work
-7. Admin reviews completed work and can close a job or mark as incomplete and add comments
-8. Both Admin and Workers can add up to 5 photos to jobs.
+2. Admin creates a job and assigns it to the relevant tradie
+3. Admin can create a job with a repeating schedule (daily, weekly, fortnightly, monthly) with a start and end date
+4. Tradie logs in (often on their phone on-site), sees their assigned jobs
+5. Tradie updates status and adds photos/comments as they work
+6. Admin reviews completed work and can close a job or mark as incomplete and add comments
+7. Both admin and tradies can add up to 5 photos to jobs
 
 The system must be simple enough for someone to log in on a phone, check their tasks, and mark them done. No training should be required.
 
@@ -29,10 +28,13 @@ The system must be simple enough for someone to log in on a phone, check their t
 - **Framework:** Next.js 14 (App Router)
 - **Language:** TypeScript (strict mode)
 - **Database:** Supabase (Postgres) with Row Level Security (RLS)
-- **Storage:** Supabase Storage (for task photos/attachments)
+- **Storage:** Supabase Storage (for task photos)
 - **Styling:** Tailwind CSS
 - **Deployment:** Vercel
 - **Auth:** Custom name + 4-digit PIN (no email/password, no Supabase Auth)
+- **Weather:** Open-Meteo API (current conditions, 7-day forecast, rainfall history)
+- **Radar:** Windy.com embed (Wollongong region)
+- **PWA:** Service worker for offline support and push notifications
 
 ## Project Structure
 
@@ -41,52 +43,101 @@ pepperberry-tasks/
 ├── CLAUDE.md
 ├── .env.local                  # Environment variables (gitignored)
 ├── .eslintrc.json
-├── .gitignore
 ├── next.config.mjs
-├── next-env.d.ts
 ├── package.json
-├── postcss.config.mjs
 ├── tailwind.config.ts
 ├── tsconfig.json
-├── src/
-│   └── app/                    # Next.js App Router
-│       ├── favicon.ico
-│       ├── fonts/              # Local fonts (Geist Sans, Geist Mono)
-│       ├── globals.css         # Tailwind imports + CSS variables
-│       ├── layout.tsx          # Root layout
-│       └── page.tsx            # Login page (default route)
+├── public/
+│   ├── PBLogo.png              # App logo
+│   ├── sw.js                   # Service worker (push + offline only, no fetch caching)
+│   └── offline.html            # Offline fallback page
 ├── supabase/
-│   └── config.toml             # Supabase project config
-└── public/                     # Static assets
-```
-
-### Planned structure (to be created as features are built)
-
-```
-src/
-├── app/
-│   ├── dashboard/              # Admin dashboard
-│   ├── tasks/                  # Task views
-│   └── api/                    # API routes (auth, tasks, users)
-├── components/                 # React components
-│   ├── ui/                     # Generic UI (Button, Card, Modal, etc.)
-│   └── tasks/                  # Task-specific components
-├── lib/                        # Shared utilities
-│   ├── supabase/               # Supabase clients (browser, server, admin)
-│   ├── auth.ts                 # Auth helpers (PIN verification, session)
-│   ├── constants.ts            # Enums for roles, locations, categories, statuses
-│   └── types.ts                # Shared TypeScript types
-├── hooks/                      # Custom React hooks
-└── middleware.ts               # Auth middleware (protect routes)
+│   ├── config.toml
+│   └── migrations/             # Numbered SQL migrations
+└── src/
+    ├── middleware.ts            # Auth middleware (route protection, JWT validation)
+    ├── app/
+    │   ├── page.tsx             # Login page (root route)
+    │   ├── layout.tsx           # Root layout
+    │   ├── set-pin/             # First-login PIN setup
+    │   ├── dashboard/           # Main dashboard (job list, stats, nav)
+    │   │   ├── page.tsx
+    │   │   ├── loading.tsx
+    │   │   └── LogoutButton.tsx
+    │   ├── tasks/
+    │   │   ├── loading.tsx
+    │   │   ├── [id]/page.tsx        # Job detail view
+    │   │   ├── [id]/edit/           # Edit job form
+    │   │   └── new/                 # Create job form
+    │   ├── admin/
+    │   │   ├── loading.tsx
+    │   │   └── users/               # User management (admin only)
+    │   ├── shopping/
+    │   │   ├── page.tsx
+    │   │   └── loading.tsx
+    │   ├── weather/
+    │   │   ├── page.tsx
+    │   │   └── loading.tsx
+    │   └── api/
+    │       ├── auth/            # login, logout, check, set-pin, users
+    │       ├── tasks/           # CRUD, comments, photos, transfer, series, export
+    │       ├── users/           # CRUD
+    │       ├── shopping/        # CRUD
+    │       ├── weather/         # Weather data proxy
+    │       ├── push-subscription/   # Push notification registration
+    │       └── cron/            # Overdue task reminders
+    ├── components/
+    │   ├── LoadingScreen.tsx        # Shared loading spinner (used by all loading.tsx)
+    │   ├── SessionTimer.tsx         # "Session expires in Xh Xm" countdown
+    │   ├── SessionGuard.tsx         # Client-side auth guard
+    │   ├── KeyboardShortcuts.tsx    # Keyboard shortcut handler
+    │   ├── PushNotificationPrompt.tsx
+    │   ├── ServiceWorkerRegistration.tsx
+    │   ├── OfflineIndicator.tsx
+    │   ├── NavigationProgress.tsx
+    │   ├── dashboard/
+    │   │   └── DashboardStats.tsx   # Admin overview stats
+    │   ├── tasks/
+    │   │   ├── TaskList.tsx          # Filterable job list
+    │   │   ├── TaskCard.tsx          # Individual job card
+    │   │   ├── TaskFilters.tsx       # Filter controls
+    │   │   ├── AdminFilters.tsx      # Admin-specific filters
+    │   │   ├── StatusUpdater.tsx     # Status change controls
+    │   │   ├── CommentSection.tsx    # Job comments
+    │   │   ├── PhotoSection.tsx      # Photo upload/gallery (max 5, client-side compression)
+    │   │   ├── ActivityLog.tsx       # Job activity audit trail
+    │   │   ├── TransferTask.tsx      # Reassign job
+    │   │   ├── DeleteTaskButton.tsx
+    │   │   └── DeleteSeriesButton.tsx
+    │   ├── shopping/
+    │   │   └── ShoppingList.tsx      # Shopping list with buyer assignment
+    │   └── weather/
+    │       └── WeatherDisplay.tsx    # Full weather dashboard
+    └── lib/
+        ├── types.ts             # Shared TypeScript interfaces
+        ├── constants.ts         # Enums, labels, config values
+        ├── auth.ts              # PIN hashing, JWT session helpers
+        ├── tasks.ts             # Task query helpers
+        ├── activity.ts          # Activity logging
+        ├── notifications.ts     # Push notification helpers
+        ├── weather.ts           # Open-Meteo API client
+        └── supabase/
+            ├── client.ts        # Browser-side Supabase client
+            └── admin.ts         # Server-side Supabase client (cache: 'no-store' to bypass Next.js fetch cache)
 ```
 
 ### Conventions
 
 - **Pages** go in `src/app/` following Next.js App Router conventions.
-- **Components** go in `src/components/`. Subfolder by domain (`tasks/`, `ui/`).
+- **Components** go in `src/components/`. Subfolder by domain (`tasks/`, `shopping/`, `weather/`, `dashboard/`).
 - **Server-only code** (DB queries, auth checks) stays in API routes or Server Components. Never import `supabase/admin.ts` from client code.
 - **One component per file.** File name matches the default export: `TaskCard.tsx` exports `TaskCard`.
 - Use `'use client'` directive only on components that need interactivity.
+- Every route group has a `loading.tsx` that renders `<LoadingScreen />` (amber spinner on stone-100 background).
+
+### Important: Supabase Client Caching
+
+The `supabaseAdmin` client in `src/lib/supabase/admin.ts` is configured with `cache: 'no-store'` on its global fetch. This is critical — Next.js 14 caches `fetch()` responses by default, including Supabase's internal fetches, which causes stale data across deployments. Never remove this.
 
 ## Database Schema
 
@@ -97,9 +148,12 @@ src/
 | name | text | Display name, unique |
 | pin_hash | text | Hashed 4-digit PIN |
 | role | text | `admin`, `tradesperson`, `riding_school` |
-| trade_type | text | Nullable. E.g. `fencer`, `plumber`, `electrician`, `handyman` |
+| trade_type | text | Nullable. E.g. `fencer`, `plumber`, `electrician`, `handyman`, `landscaper`, `housekeeper`, `general`, `animal_carer` |
 | is_active | boolean | Default true. Soft-disable accounts |
+| must_set_pin | boolean | Default true. New users must set PIN on first login |
 | last_login | timestamptz | Nullable. Set on successful login |
+| phone | text | Nullable. Contact number |
+| allowed_sections | text[] | Nullable. Non-admin section access, e.g. `['weather', 'cart']` |
 | created_at | timestamptz | Default `now()` |
 
 ### `tasks`
@@ -115,7 +169,9 @@ src/
 | assigned_to | uuid | FK → `users.id`, nullable |
 | created_by | uuid | FK → `users.id` |
 | due_date | date | Nullable |
-| completed_at | timestamptz | Nullable, set when status → `done` |
+| recurrence_pattern | text | Nullable. `daily`, `weekly`, `fortnightly`, `monthly` |
+| recurrence_group_id | uuid | Nullable. Groups recurring task instances |
+| completed_at | timestamptz | Nullable, auto-set when status → `done` |
 | created_at | timestamptz | Default `now()` |
 | updated_at | timestamptz | Default `now()`, update via trigger |
 
@@ -123,7 +179,7 @@ src/
 | Column | Type | Notes |
 |--------|------|-------|
 | id | uuid | PK |
-| task_id | uuid | FK → `tasks.id` |
+| task_id | uuid | FK → `tasks.id`, cascade delete |
 | storage_path | text | Supabase Storage path |
 | uploaded_by | uuid | FK → `users.id` |
 | created_at | timestamptz | Default `now()` |
@@ -132,32 +188,66 @@ src/
 | Column | Type | Notes |
 |--------|------|-------|
 | id | uuid | PK |
-| task_id | uuid | FK → `tasks.id` |
+| task_id | uuid | FK → `tasks.id`, cascade delete |
 | user_id | uuid | FK → `users.id` |
 | content | text | Comment body |
 | created_at | timestamptz | Default `now()` |
 
+### `task_activity`
+| Column | Type | Notes |
+|--------|------|-------|
+| id | uuid | PK |
+| task_id | uuid | FK → `tasks.id`, cascade delete |
+| user_id | uuid | FK → `users.id` |
+| action | text | Type of action (e.g. `status_changed`) |
+| detail | text | Action details |
+| created_at | timestamptz | Default `now()` |
+
+### `push_subscriptions`
+| Column | Type | Notes |
+|--------|------|-------|
+| id | uuid | PK |
+| user_id | uuid | FK → `users.id`, cascade delete |
+| endpoint | text | Push service endpoint, unique |
+| p256dh | text | VAPID public key |
+| auth | text | VAPID auth token |
+| created_at | timestamptz | Default `now()` |
+
+### `shopping_items`
+| Column | Type | Notes |
+|--------|------|-------|
+| id | uuid | PK |
+| title | text | Item name |
+| category | text | `hardware`, `hay`, `feed`, `other` |
+| added_by | uuid | FK → `users.id` |
+| assigned_to | uuid | FK → `users.id`, nullable. Which admin buys it |
+| is_bought | boolean | Default false |
+| created_at | timestamptz | Default `now()` |
+
 ## User Roles & Permissions
 
-### `admin` (Farm Owners)
-- See ALL tasks across all categories and locations
-- Create, edit, delete, and reassign any task
-- Manage users (add/remove Workers and riding school staff)
-- Access the admin dashboard with overview stats
+### `admin` (Farm Owners — Nick & Anna)
+- See ALL jobs across all categories and locations
+- Create, edit, delete, and reassign any job
+- Manage users (add/remove tradies and riding school staff)
+- Access admin dashboard with overview stats
+- Access all sections (weather, shopping, etc.)
 
-### `tradesperson` (Fencer, Plumber, Electrician, Handyman)
-- See ONLY tasks assigned to them
-- Update status on their assigned tasks (`todo` → `in_progress` → `done`)
-- Add comments and photos to their assigned tasks
-- Cannot create, delete, or reassign tasks
-- Cannot see other Workers's tasks
+### `tradesperson` (Tradies — displayed as "Tradie" in UI)
+Trade types: `fencer`, `plumber`, `electrician`, `handyman`, `landscaper`, `housekeeper`, `general`, `animal_carer`
+- See ONLY jobs assigned to them
+- Update status on their assigned jobs (`todo` → `in_progress` → `done`)
+- Add comments and photos to their assigned jobs
+- Cannot create, delete, or reassign jobs
+- Cannot see other tradies' jobs
+- Section access controlled by `allowed_sections` column
 
-### `riding_school` (Coolongatta Riding Academy Staff)
-- See ONLY tasks with `category = 'riding_school'`
-- Update status on riding school tasks
-- Add comments and photos to riding school tasks
-- Cannot create or delete tasks
-- Cannot see non-riding-school tasks
+### `riding_school` (Regal Riding Academy Staff — displayed as "Regal Riding" in UI)
+- See ONLY jobs with `category = 'riding_school'`
+- Update status on riding school jobs
+- Add comments and photos to riding school jobs
+- Cannot create or delete jobs
+- Cannot see non-riding-school jobs
 
 ## Farm Locations
 
@@ -167,29 +257,27 @@ Use these exact string values in the `location` column:
 |-------|-------------|
 | `workshop` | Main barn / equipment storage |
 | `house` | Homestead / main house |
-| `Big_Paddock` | Eastern paddocks (leased to riding academy) |
+| `Big_Paddock` | Eastern paddocks (leased to Regal Riding) |
 | `Front_paddock` | Western paddocks |
-| `Back_paddock` | South paddocks | 
+| `Back_paddock` | South paddocks |
 | `driveway` | Main driveway and access road |
-| `riding_arena` | Riding arena (riding academy) |
-| `stables` | Stables (riding academy) |
-| `Front_garden` | front garden area |
-| `Back_garden` | back garden area |
+| `riding_arena` | Riding arena (Regal Riding) |
+| `stables` | Stables (Regal Riding) |
+| `Front_garden` | Front garden area |
+| `Back_garden` | Back garden area |
 | `VegetablePatch` | Veggie beds |
 | `front_gate` | Front gate and entrance |
 
 ## Task Categories
 
-Use these exact string values in the `category` column:
-
 | Value | Description |
 |-------|-------------|
 | `maintenance` | General property maintenance |
-| `horses` | Livestock management |
-| `donkeys` | Livestock management |
+| `horses` | Horse care |
+| `donkeys` | Donkey care |
 | `fencing` | Fencing repairs and new fencing |
+| `riding_school` | Regal Riding related tasks |
 | `general` | Catch-all for anything else |
-
 
 ## Task Statuses
 
@@ -206,34 +294,60 @@ Use these exact string values in the `category` column:
 | `low` | No rush |
 | `medium` | Standard priority |
 | `high` | Needs attention soon |
-| `urgent` | Do it today |
+| `urgent` | Do it today (always sorted first on the board) |
+
+## App Sections
+
+### Login Page (`/`)
+- "Private and Confidential" notice above the form
+- "Login as.." dropdown to select user
+- PIN input boxes appear only after a user is selected (amber highlight on active box)
+- Release name shown at bottom (e.g. `velvet-basalt`)
+- Auto-submits when 4th PIN digit entered
+
+### Dashboard (`/dashboard`)
+- Sticky header with PB logo, user name, session expiry countdown ("Session expires in Xh Xm"), and logout icon
+- Navigation buttons: **New Job** (admin only) → **Jobs** → **Weather** → **Cart** → **Users** (admin only)
+- Non-admin users only see sections permitted by their `allowed_sections`
+- Admin dashboard stats summary
+- Filterable/sortable job list; urgent jobs always sorted first
+
+### Weather (`/weather`)
+- Header shows "Weather" with "Open-Meteo · Updated {time}" subtitle
+- **Current conditions:** Temperature (red when ≥30°C), condition text, contextual summary sentence, icon-only stats (humidity, wind, rain, sea temp at Kiama)
+- **7-day forecast:** Day, icon, description, high/low temps, rain probability %, precipitation
+- **Rainfall chart:** 30-day bar chart comparing this year vs last year, with Y-axis, tooltips, date labels
+- **Rain radar:** Windy.com Wollongong embed, lazy-loaded on hover/tap (play button placeholder until activated)
+- **YTD comparison:** This year vs last year rainfall totals with monthly breakdown
+- Heavy rain warning banner when forecast includes 20mm+ days
+
+### Shopping (`/shopping`)
+- Add items with title, category (hardware/hay/feed/other), and buyer assignment (which admin buys it)
+- Each item shows who's assigned to buy it
+- Mark items as bought, delete items
+
+### User Management (`/admin/users`)
+- Create, edit, deactivate users
+- Role selector: Admin, Tradie, Regal Riding
+- Trade type selector for tradies (fencer, plumber, electrician, handyman, landscaper, housekeeper, general, animal_carer)
+- Per-user section access control (`allowed_sections`)
+- First-login PIN setup flow (new users get `must_set_pin = true`)
 
 ## Key Commands
 
 ```bash
-# Install dependencies
-npm install
-
-# Run dev server
-npm run dev
-
-# Build for production
-npm run build
-
-# Run type checking
-npx tsc --noEmit
-
-# Run linter
-npm run lint
-
-# Deploy (via Vercel CLI or git push to main)
-vercel --prod
+npm install          # Install dependencies
+npm run dev          # Run dev server
+npm run build        # Build for production
+npx tsc --noEmit     # Type checking
+npm run lint         # Linter
+vercel --prod        # Deploy via Vercel CLI
+npx supabase db push --linked --include-all  # Push migrations
 ```
+
 ## Skills
 
 - `.claude/skills/supabase-migration.md` — follow this for all database schema changes
-
-
 
 ## Coding Conventions
 
@@ -246,14 +360,13 @@ vercel --prod
 ### React / Next.js
 - Default to **Server Components**. Only add `'use client'` when the component needs hooks, event handlers, or browser APIs.
 - Use Next.js `<Link>` for navigation.
-- Use `next/image` for optimized images.
 - Data fetching happens in Server Components or API routes — never `useEffect` + fetch for initial data.
 
 ### Styling
 - **Tailwind CSS only.** No CSS modules, no styled-components.
 - Use Tailwind's design system (spacing scale, color palette). Avoid arbitrary values where possible.
-- Mobile-first responsive design. The primary use case is Workers on phones.
-- **Dark and elegant theme.** Dark backgrounds (`stone-950` pages, `stone-900` cards), light text (`stone-100` primary, `stone-200`–`stone-400` secondary), `stone-700` borders, `amber-600` primary buttons. Clean typography, generous whitespace. The UI should feel polished and high-quality — never cluttered or heavy.
+- Mobile-first responsive design. The primary use case is tradies on phones.
+- **Light clean theme.** `stone-100` page backgrounds, white cards with `stone-200` borders. `amber-600` primary buttons with white text. `stone-900` headings, `stone-500` secondary text. Login form uses dark theme (`stone-900` background, `stone-700` borders).
 
 ### API Routes
 - All API routes in `src/app/api/`.
@@ -267,7 +380,7 @@ vercel --prod
 
 ### Error Handling
 - API routes return `{ error: string }` on failure with appropriate status code.
-- Client-side: show user-friendly error messages via toast/alert. Log details to console.
+- Client-side: show user-friendly error messages. Log details to console.
 
 ### Git
 - Branch from `main` for features.
