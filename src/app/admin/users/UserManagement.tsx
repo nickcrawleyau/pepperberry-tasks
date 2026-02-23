@@ -40,7 +40,7 @@ interface User {
 interface UserManagementProps {
   initialUsers: User[];
   currentUserId: string;
-  loginsByUser: Record<string, string[]>;
+  loginsByUser: Record<string, Record<string, number>>;
 }
 
 export default function UserManagement({ initialUsers, currentUserId, loginsByUser }: UserManagementProps) {
@@ -108,7 +108,7 @@ export default function UserManagement({ initialUsers, currentUserId, loginsByUs
                 isSelf={user.id === currentUserId}
                 isDeleting={deletingId === user.id}
                 deleteLoading={deleteLoading}
-                loginDates={loginsByUser[user.id] || []}
+                loginCounts={loginsByUser[user.id] || {}}
                 onEdit={() => setEditingId(user.id)}
                 onToggleActive={async () => {
                   const res = await fetch(`/api/users/${user.id}`, {
@@ -181,7 +181,7 @@ function UserRow({
   isSelf,
   isDeleting,
   deleteLoading,
-  loginDates,
+  loginCounts,
   onEdit,
   onToggleActive,
   onDeleteClick,
@@ -192,7 +192,7 @@ function UserRow({
   isSelf: boolean;
   isDeleting: boolean;
   deleteLoading: boolean;
-  loginDates: string[];
+  loginCounts: Record<string, number>;
   onEdit: () => void;
   onToggleActive: () => void;
   onDeleteClick: () => void;
@@ -295,7 +295,7 @@ function UserRow({
       </div>
 
       {/* 14-day login history */}
-      <LoginHistory loginDates={loginDates} />
+      <LoginHistory loginCounts={loginCounts || {}} />
 
       {isDeleting && (
         <div className="mt-3 pt-3 border-t border-stone-200">
@@ -324,9 +324,9 @@ function UserRow({
   );
 }
 
-function LoginHistory({ loginDates }: { loginDates: string[] }) {
+function LoginHistory({ loginCounts }: { loginCounts: Record<string, number> }) {
   // Build array of last 14 days (oldest first)
-  const days: { date: string; label: string; active: boolean }[] = [];
+  const days: { date: string; label: string; count: number }[] = [];
   const today = new Date();
   for (let i = 13; i >= 0; i--) {
     const d = new Date(today);
@@ -336,7 +336,7 @@ function LoginHistory({ loginDates }: { loginDates: string[] }) {
     days.push({
       date: dateStr,
       label: dayLabel,
-      active: loginDates.includes(dateStr),
+      count: loginCounts[dateStr] || 0,
     });
   }
 
@@ -348,9 +348,13 @@ function LoginHistory({ loginDates }: { loginDates: string[] }) {
           {days.map((day) => (
             <div
               key={day.date}
-              title={day.label}
+              title={`${day.label}: ${day.count} login${day.count !== 1 ? 's' : ''}`}
               className={`flex-1 h-2.5 rounded-sm ${
-                day.active ? 'bg-emerald-500' : 'bg-stone-100'
+                day.count > 3
+                  ? 'bg-red-500'
+                  : day.count > 0
+                    ? 'bg-emerald-500'
+                    : 'bg-stone-100'
               }`}
             />
           ))}

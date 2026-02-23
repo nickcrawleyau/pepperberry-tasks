@@ -25,14 +25,12 @@ export default async function AdminUsersPage() {
       .order('logged_in_at', { ascending: false }),
   ]);
 
-  // Group login dates by user (as YYYY-MM-DD strings in AEST)
-  const loginsByUser: Record<string, string[]> = {};
+  // Group login counts by user per day (YYYY-MM-DD in AEST)
+  const loginsByUser: Record<string, Record<string, number>> = {};
   (loginData || []).forEach((entry: { user_id: string; logged_in_at: string }) => {
     const dateStr = new Date(entry.logged_in_at).toLocaleDateString('en-CA', { timeZone: 'Australia/Sydney' });
-    if (!loginsByUser[entry.user_id]) loginsByUser[entry.user_id] = [];
-    if (!loginsByUser[entry.user_id].includes(dateStr)) {
-      loginsByUser[entry.user_id].push(dateStr);
-    }
+    if (!loginsByUser[entry.user_id]) loginsByUser[entry.user_id] = {};
+    loginsByUser[entry.user_id][dateStr] = (loginsByUser[entry.user_id][dateStr] || 0) + 1;
   });
 
   const users = (rawUsers || []).sort((a, b) => {
