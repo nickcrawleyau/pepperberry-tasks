@@ -249,13 +249,13 @@ function LoginForm() {
           </div>
         </form>
 
-        <p className="text-center text-xs text-stone-400 mt-4">
-          Sessions expire after 3 hours
-        </p>
-        <div className="flex items-center justify-center gap-1.5 mt-3">
+        <div className="flex items-center justify-center gap-1.5 mt-4">
           <span className={`w-2 h-2 rounded-full ${secure ? 'bg-emerald-500' : 'bg-stone-400'}`} />
           <span className="text-[11px] text-stone-400">End-to-End Encryption</span>
         </div>
+        <p className="text-center text-xs text-stone-400 mt-2">
+          Sessions expire after 3 hours
+        </p>
       </div>
     </div>
   );
