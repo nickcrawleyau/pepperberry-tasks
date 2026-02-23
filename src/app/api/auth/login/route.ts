@@ -4,7 +4,34 @@ import { supabaseAdmin } from '@/lib/supabase/admin';
 import { createSession, secondsUntilMidnightAEST, MAX_SESSION_SECONDS, COOKIE_NAME } from '@/lib/auth';
 import { sendPushToUser } from '@/lib/notifications';
 
+// Rate limiting: 3 failed attempts then 30-min lockout per IP
+const MAX_ATTEMPTS = 3;
+const LOCKOUT_MS = 30 * 60 * 1000;
+const failedAttempts = new Map<string, { count: number; lockedUntil: number }>();
+
+function getClientIp(request: NextRequest): string {
+  return request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+}
+
 export async function POST(request: NextRequest) {
+  const ip = getClientIp(request);
+  const now = Date.now();
+
+  // Check rate limit
+  const entry = failedAttempts.get(ip);
+  if (entry) {
+    if (entry.lockedUntil > now) {
+      const minsLeft = Math.ceil((entry.lockedUntil - now) / 60000);
+      return NextResponse.json(
+        { error: `Too many attempts. Try again in ${minsLeft} min` },
+        { status: 429 }
+      );
+    }
+    if (entry.lockedUntil <= now && entry.count >= MAX_ATTEMPTS) {
+      failedAttempts.delete(ip);
+    }
+  }
+
   const body = await request.json();
   const { name, pin } = body;
 
@@ -24,7 +51,12 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (error || !user) {
-    return NextResponse.json({ error: 'Invalid name or PIN' }, { status: 401 });
+    recordFailure(ip, now);
+    const remaining = MAX_ATTEMPTS - (failedAttempts.get(ip)?.count ?? 0);
+    return NextResponse.json(
+      { error: remaining > 0 ? `Invalid name or PIN (${remaining} attempt${remaining !== 1 ? 's' : ''} left)` : `Too many attempts. Try again in 30 min` },
+      { status: remaining > 0 ? 401 : 429 }
+    );
   }
 
   if (!user.is_active) {
@@ -35,8 +67,16 @@ export async function POST(request: NextRequest) {
   const pinValid = await bcrypt.compare(pin, user.pin_hash);
 
   if (!pinValid) {
-    return NextResponse.json({ error: 'Invalid name or PIN' }, { status: 401 });
+    recordFailure(ip, now);
+    const remaining = MAX_ATTEMPTS - (failedAttempts.get(ip)?.count ?? 0);
+    return NextResponse.json(
+      { error: remaining > 0 ? `Invalid name or PIN (${remaining} attempt${remaining !== 1 ? 's' : ''} left)` : `Too many attempts. Try again in 30 min` },
+      { status: remaining > 0 ? 401 : 429 }
+    );
   }
+
+  // Successful login — clear failures
+  failedAttempts.delete(ip);
 
   // Record last login time
   await supabaseAdmin
@@ -69,6 +109,15 @@ export async function POST(request: NextRequest) {
   });
 
   return response;
+}
+
+function recordFailure(ip: string, now: number) {
+  const entry = failedAttempts.get(ip);
+  const count = (entry?.count ?? 0) + 1;
+  failedAttempts.set(ip, {
+    count,
+    lockedUntil: count >= MAX_ATTEMPTS ? now + LOCKOUT_MS : 0,
+  });
 }
 
 async function notifyNickOfLogin(loginName: string) {
