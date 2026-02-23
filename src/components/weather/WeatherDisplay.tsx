@@ -92,6 +92,10 @@ export default function WeatherDisplay({ data }: WeatherDisplayProps) {
 
   const { current, daily, lastYearDaily, monthlyComparison } = data;
 
+  // Heavy rain warning: any forecast day in next 3 with 20mm+
+  const forecast3 = daily.filter((d) => d.isForecast).slice(0, 3);
+  const heavyRainDays = forecast3.filter((d) => d.precipitationSum >= 20);
+
   // Rainfall chart: combine this year + last year for scaling
   const historicalDays = daily.filter((d) => !d.isForecast);
   const allPrecipValues = [
@@ -115,6 +119,25 @@ export default function WeatherDisplay({ data }: WeatherDisplayProps) {
   const lastYearLabel = String(parseInt(currentYear) - 1);
   return (
     <div className="space-y-4">
+      {/* Heavy rain warning */}
+      {heavyRainDays.length > 0 && (
+        <div className="bg-amber-50 border border-amber-300 rounded-xl p-4 flex items-start gap-3">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-600 shrink-0 mt-0.5">
+            <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+            <line x1="12" y1="9" x2="12" y2="13" />
+            <line x1="12" y1="17" x2="12.01" y2="17" />
+          </svg>
+          <div>
+            <p className="text-sm font-medium text-amber-800">Heavy rain forecast</p>
+            <p className="text-xs text-amber-700 mt-0.5">
+              {heavyRainDays.map((d) => (
+                `${formatDayName(d.date)} ${Math.round(d.precipitationSum)} mm`
+              )).join(', ')}
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Current Conditions */}
       <div className="bg-white rounded-xl border border-stone-200 p-5">
         <div className="flex items-center justify-between">
