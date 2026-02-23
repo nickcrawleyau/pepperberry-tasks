@@ -208,6 +208,10 @@ export default function WeatherDisplay({ data }: WeatherDisplayProps) {
                 ? Math.max((lyPrecip / maxPrecip) * 100, 4)
                 : 0;
 
+              const precipLabel = day.precipitationSum >= 10
+                ? Math.round(day.precipitationSum).toString()
+                : day.precipitationSum.toFixed(1);
+
               return (
                 <button
                   key={day.date}
@@ -220,11 +224,17 @@ export default function WeatherDisplay({ data }: WeatherDisplayProps) {
                   {isToday && (
                     <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-px bg-stone-400 z-[5]" />
                   )}
+                  {/* Rainfall label for 10mm+ days */}
+                  {day.precipitationSum >= 10 && (
+                    <span className="text-[8px] text-sky-700 font-medium leading-none mb-0.5">
+                      {Math.round(day.precipitationSum)}
+                    </span>
+                  )}
                   {/* Tooltip */}
                   {selectedBar === i && (
                     <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-stone-800 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10">
-                      {formatDateShort(day.date)}: {day.precipitationSum.toFixed(1)} mm
-                      {lyPrecip > 0 && ` (LY: ${lyPrecip.toFixed(1)})`}
+                      {formatDateShort(day.date)}: {precipLabel} mm
+                      {lyPrecip > 0 && ` (LY: ${lyPrecip >= 10 ? Math.round(lyPrecip) : lyPrecip.toFixed(1)})`}
                     </div>
                   )}
                   {/* Last year bar (faint, behind) */}
