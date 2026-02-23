@@ -43,6 +43,9 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     }
     updates.pin_hash = await bcrypt.hash(body.pin, 10);
   }
+  if (body.phone !== undefined) {
+    updates.phone = body.phone?.trim() || null;
+  }
 
   if (Object.keys(updates).length === 0) {
     return NextResponse.json({ error: 'No fields to update' }, { status: 400 });

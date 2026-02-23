@@ -27,6 +27,7 @@ interface User {
   is_active: boolean;
   created_at: string;
   last_login: string | null;
+  phone: string | null;
 }
 
 interface UserManagementProps {
@@ -224,6 +225,14 @@ function UserRow({
           <div>
             <p className="text-sm font-medium text-stone-900">{user.name}</p>
             <p className="text-xs text-stone-500">{roleLabel}</p>
+            {user.role === 'admin' && user.phone && (
+              <a
+                href={`tel:${user.phone.replace(/\s/g, '')}`}
+                className="text-xs text-amber-600 hover:text-amber-500 transition"
+              >
+                {user.phone}
+              </a>
+            )}
             <p className="text-xs text-stone-400">
               {user.last_login
                 ? `Last login: ${formatLastLogin(user.last_login)}`
@@ -306,6 +315,7 @@ function AddUserForm({ onDone }: { onDone: (user: User | null) => void }) {
   const [pin, setPin] = useState('');
   const [role, setRole] = useState('tradesperson');
   const [tradeType, setTradeType] = useState('');
+  const [phone, setPhone] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -323,6 +333,7 @@ function AddUserForm({ onDone }: { onDone: (user: User | null) => void }) {
           pin,
           role,
           trade_type: role === 'tradesperson' ? tradeType || null : null,
+          phone: role === 'admin' ? phone.trim() || null : null,
         }),
       });
 
@@ -410,6 +421,19 @@ function AddUserForm({ onDone }: { onDone: (user: User | null) => void }) {
         )}
       </div>
 
+      {role === 'admin' && (
+        <div>
+          <label className="block text-xs font-medium text-stone-500 mb-1">Phone</label>
+          <input
+            type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="04XX XXX XXX"
+            className={inputClass}
+          />
+        </div>
+      )}
+
       {error && <p className="text-sm text-red-500">{error}</p>}
 
       <div className="flex gap-2">
@@ -442,6 +466,7 @@ function EditUserForm({
   const [name, setName] = useState(user.name);
   const [role, setRole] = useState(user.role);
   const [tradeType, setTradeType] = useState(user.trade_type || '');
+  const [phone, setPhone] = useState(user.phone || '');
   const [newPin, setNewPin] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -460,6 +485,9 @@ function EditUserForm({
       updates.trade_type = null;
     }
     if (newPin) updates.pin = newPin;
+    if (role === 'admin' && phone.trim() !== (user.phone || '')) {
+      updates.phone = phone.trim() || null;
+    }
 
     if (Object.keys(updates).length === 0) {
       onDone(null);
@@ -483,6 +511,7 @@ function EditUserForm({
         name: name.trim(),
         role,
         trade_type: role === 'tradesperson' ? tradeType || null : null,
+        phone: role === 'admin' ? phone.trim() || null : null,
       });
     } catch {
       setError('Something went wrong');
@@ -561,6 +590,19 @@ function EditUserForm({
           </div>
         )}
       </div>
+
+      {role === 'admin' && (
+        <div>
+          <label className="block text-xs font-medium text-stone-500 mb-1">Phone</label>
+          <input
+            type="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="04XX XXX XXX"
+            className={inputClass}
+          />
+        </div>
+      )}
 
       {error && <p className="text-sm text-red-500">{error}</p>}
 
