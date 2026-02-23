@@ -67,6 +67,15 @@ export const ACCEPTED_IMAGE_TYPES = [
   'image/webp',
 ];
 
+export const SHOPPING_CATEGORIES = ['hardware', 'hay', 'feed', 'other'] as const;
+
+export const SHOPPING_CATEGORY_LABELS: Record<string, string> = {
+  hardware: 'Hardware',
+  hay: 'Hay',
+  feed: 'Feed',
+  other: 'Other',
+};
+
 export const LOCATION_LABELS: Record<string, string> = {
   workshop: 'Workshop',
   house: 'House',

@@ -56,3 +56,13 @@ export interface TaskComment {
   created_at: string;
   user?: { name: string } | null;
 }
+
+export interface ShoppingItem {
+  id: string;
+  title: string;
+  category: 'hardware' | 'hay' | 'feed' | 'other';
+  added_by: string;
+  is_bought: boolean;
+  created_at: string;
+  adder?: { name: string } | null;
+}
