@@ -2,13 +2,13 @@
 
 ## Project Overview
 
-A property management web app for **Pepperberry** — a private home property in Coolangatta, NSW, Australia. The property includes multiple paddocks, a workshop, a house and driveway. The eastern paddocks are leased to **Regal Riding School**.
+A property management web app for **Pepperberry** — a private home property in Coolangatta, NSW, Australia. The property includes multiple paddocks, a workshop, a house and driveway. The eastern paddocks are leased to **Regal Riding**.
 
-The app lets the two owners (admins) assign and track jobs across the property, manage a shared shopping list, and monitor local weather. Tradies (fencers, plumbers, electricians, handymen, landscapers, housekeepers, animal carers) log in to see only their assigned work. Regal Riding staff see only riding-school-related tasks.
+The app lets the two owners (admins) assign and track jobs across the property, manage a shared shopping list, and monitor local weather. Tradies (fencers, plumbers, electricians, handymen, landscapers, housekeepers, animal carers) log in to see only their assigned work. Regal Riding staff see only their related tasks.
 
 ### Horses
 
-The eastern paddocks are leased for agistment — the agisted horses are a separate concern and not managed by the farm. Pepperberry owns 3 horses (PB horses). Staff from Regal Riding come to feed the PB horses. The `riding_school` role in the app exists solely for these staff to see and update tasks related to PB horse care (feeding, etc.).
+The eastern paddocks are leased for agistment — the agisted horses are a separate concern and not managed by the farm. Pepperberry owns 3 horses (PB horses). Staff from Regal Riding come to feed the PB horses. The `riding_school` role exists solely for these staff to see and update tasks related to PB horse care (feeding, etc.).
 
 ### Tradie Workflow
 
@@ -229,7 +229,7 @@ The `supabaseAdmin` client in `src/lib/supabase/admin.ts` is configured with `ca
 ### `admin` (Farm Owners — Nick & Anna)
 - See ALL jobs across all categories and locations
 - Create, edit, delete, and reassign any job
-- Manage users (add/remove tradies and riding school staff)
+- Manage users (add/remove tradies and Regal Riding staff)
 - Access admin dashboard with overview stats
 - Access all sections (weather, shopping, etc.)
 
@@ -242,12 +242,12 @@ Trade types: `fencer`, `plumber`, `electrician`, `handyman`, `landscaper`, `hous
 - Cannot see other tradies' jobs
 - Section access controlled by `allowed_sections` column
 
-### `riding_school` (Regal Riding Academy Staff — displayed as "Regal Riding" in UI)
+### `riding_school` (Regal Riding Staff)
 - See ONLY jobs with `category = 'riding_school'`
-- Update status on riding school jobs
-- Add comments and photos to riding school jobs
+- Update status on Regal Riding jobs
+- Add comments and photos to Regal Riding jobs
 - Cannot create or delete jobs
-- Cannot see non-riding-school jobs
+- Cannot see non-Regal Riding jobs
 
 ## Farm Locations
 
@@ -276,7 +276,7 @@ Use these exact string values in the `location` column:
 | `horses` | Horse care |
 | `donkeys` | Donkey care |
 | `fencing` | Fencing repairs and new fencing |
-| `riding_school` | Regal Riding related tasks |
+| `riding_school` | Regal Riding tasks |
 | `general` | Catch-all for anything else |
 
 ## Task Statuses
