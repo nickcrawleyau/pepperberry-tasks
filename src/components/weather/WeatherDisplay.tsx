@@ -113,11 +113,6 @@ export default function WeatherDisplay({ data }: WeatherDisplayProps) {
   // YTD comparison chart
   const currentYear = new Date().toLocaleDateString('en-CA', { timeZone: 'Australia/Sydney' }).slice(0, 4);
   const lastYearLabel = String(parseInt(currentYear) - 1);
-  const maxMonthly = Math.max(
-    ...monthlyComparison.map((m) => Math.max(m.thisYear, m.lastYear)),
-    1
-  );
-
   return (
     <div className="space-y-4">
       {/* Current Conditions */}
@@ -297,68 +292,48 @@ export default function WeatherDisplay({ data }: WeatherDisplayProps) {
       </div>
 
       {/* Year-to-Date Comparison */}
-      {monthlyComparison.length > 0 && (
-        <div className="bg-white rounded-xl border border-stone-200 p-5">
-          <div className="flex items-baseline justify-between mb-1">
-            <p className="text-xs font-medium text-stone-500">Rainfall Year-to-Date</p>
-            <div className="text-xs text-stone-400 text-right">
-              <span className="font-medium text-sky-600">{data.ytdThisYear} mm</span>
-              <span className="mx-1 text-stone-300">vs</span>
-              <span className="text-stone-400">{data.ytdLastYear} mm</span>
-            </div>
+      <div className="bg-white rounded-xl border border-stone-200 p-5">
+        <p className="text-xs font-medium text-stone-500 mb-3">Rainfall Year-to-Date</p>
+        <div className="flex items-end gap-6">
+          <div>
+            <p className="text-2xl font-semibold text-stone-900">{data.ytdThisYear} <span className="text-sm font-normal text-stone-400">mm</span></p>
+            <p className="text-xs text-stone-400">{currentYear}</p>
           </div>
-
-          {/* Monthly bar chart */}
-          <div className="mt-3">
-            <div className="flex items-end gap-2" style={{ height: 100 }}>
-              {monthlyComparison.map((m) => (
-                <div key={m.month} className="flex-1 flex flex-col items-center justify-end" style={{ height: '100%' }}>
-                  <div className="w-full flex gap-px justify-center items-end" style={{ height: '100%' }}>
-                    {/* Last year bar */}
-                    <div className="flex-1 flex flex-col justify-end h-full">
-                      {m.lastYear > 0 && (
-                        <div
-                          className="w-full rounded-t bg-stone-200"
-                          style={{ height: `${Math.max((m.lastYear / maxMonthly) * 100, 4)}%`, minHeight: 3 }}
-                        />
-                      )}
-                    </div>
-                    {/* This year bar */}
-                    <div className="flex-1 flex flex-col justify-end h-full">
-                      {m.thisYear > 0 && (
-                        <div
-                          className="w-full rounded-t bg-sky-500"
-                          style={{ height: `${Math.max((m.thisYear / maxMonthly) * 100, 4)}%`, minHeight: 3 }}
-                        />
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            {/* Month labels */}
-            <div className="flex gap-2 mt-1.5">
-              {monthlyComparison.map((m) => (
-                <div key={m.month} className="flex-1 text-center">
-                  <span className="text-[9px] text-stone-400">{m.month}</span>
-                </div>
-              ))}
-            </div>
+          <div>
+            <p className="text-2xl font-semibold text-stone-300">{data.ytdLastYear} <span className="text-sm font-normal text-stone-300">mm</span></p>
+            <p className="text-xs text-stone-300">{lastYearLabel}</p>
           </div>
-
-          {/* Legend */}
-          <div className="flex items-center gap-4 mt-3 text-[10px] text-stone-400">
-            <div className="flex items-center gap-1">
-              <div className="w-2.5 h-2.5 rounded-sm bg-sky-500" />
-              <span>{currentYear}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <div className="w-2.5 h-2.5 rounded-sm bg-stone-200" />
-              <span>{lastYearLabel}</span>
-            </div>
+          <div className="ml-auto text-right">
+            {data.ytdThisYear !== data.ytdLastYear && (
+              <p className={`text-sm font-medium ${data.ytdThisYear > data.ytdLastYear ? 'text-sky-600' : 'text-amber-600'}`}>
+                {data.ytdThisYear > data.ytdLastYear ? '+' : ''}{(data.ytdThisYear - data.ytdLastYear).toFixed(1)} mm
+              </p>
+            )}
+            <p className="text-[10px] text-stone-300">
+              {data.ytdLastYear > 0
+                ? `${Math.round((data.ytdThisYear / data.ytdLastYear) * 100)}% of last year`
+                : ''}
+            </p>
           </div>
         </div>
-      )}
+        {/* Monthly breakdown */}
+        {monthlyComparison.length > 0 && (
+          <div className="mt-4 border-t border-stone-100 pt-3">
+            <div className="grid grid-cols-3 gap-x-4 gap-y-2 text-xs">
+              {monthlyComparison.map((m) => (
+                <div key={m.month} className="flex items-baseline justify-between">
+                  <span className="text-stone-400">{m.month}</span>
+                  <span>
+                    <span className="text-stone-700 font-medium">{m.thisYear}</span>
+                    <span className="text-stone-300 mx-0.5">/</span>
+                    <span className="text-stone-300">{m.lastYear}</span>
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* 7-Day Forecast */}
       <div className="bg-white rounded-xl border border-stone-200 p-5">
