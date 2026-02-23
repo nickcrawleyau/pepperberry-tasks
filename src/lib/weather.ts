@@ -95,12 +95,6 @@ interface ArchiveResponse {
   };
 }
 
-function dateShift(dateStr: string, years: number): string {
-  const d = new Date(dateStr + 'T00:00:00');
-  d.setFullYear(d.getFullYear() + years);
-  return d.toISOString().slice(0, 10);
-}
-
 const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 export async function fetchWeatherData(): Promise<WeatherData> {
@@ -112,11 +106,6 @@ export async function fetchWeatherData(): Promise<WeatherData> {
   const forecastUrl = `https://api.open-meteo.com/v1/forecast?latitude=${LATITUDE}&longitude=${LONGITUDE}&daily=precipitation_sum,temperature_2m_max,temperature_2m_min,weather_code&past_days=30&forecast_days=7&timezone=${TIMEZONE}&current=temperature_2m,weather_code,relative_humidity_2m,wind_speed_10m,precipitation`;
 
   // Last year same 30-day window
-  const lyStart = dateShift(today, -1).replace(/\d{2}$/, (d) => {
-    const shifted = parseInt(d) - 30;
-    return shifted > 0 ? String(shifted).padStart(2, '0') : d;
-  });
-  // Compute properly: 30 days before the same date last year
   const todayDate = new Date(today + 'T00:00:00');
   const ly30Start = new Date(todayDate);
   ly30Start.setFullYear(ly30Start.getFullYear() - 1);
