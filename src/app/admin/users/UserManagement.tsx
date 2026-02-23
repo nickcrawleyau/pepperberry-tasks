@@ -204,7 +204,11 @@ function UserRow({
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="relative">
+          <div
+            className={`w-9 h-9 rounded-full flex items-center justify-center ${
+              isLoggedInToday(user.last_login) ? 'ring-2 ring-emerald-500' : ''
+            }`}
+          >
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium ${
                 user.role === 'admin'
@@ -216,9 +220,6 @@ function UserRow({
             >
               {user.name.charAt(0).toUpperCase()}
             </div>
-            {isLoggedInToday(user.last_login) && (
-              <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full" />
-            )}
           </div>
           <div>
             <p className="text-sm font-medium text-stone-900">{user.name}</p>
