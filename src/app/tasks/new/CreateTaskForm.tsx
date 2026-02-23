@@ -109,7 +109,7 @@ export default function CreateTaskForm({ users }: CreateTaskFormProps) {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || 'Failed to create task');
+        setError(data.error || 'Failed to create job');
         return;
       }
 
@@ -321,7 +321,7 @@ export default function CreateTaskForm({ users }: CreateTaskFormProps) {
 
             {occurrenceCount > 0 && (
               <p className="text-xs text-stone-500">
-                This will create {occurrenceCount} task{occurrenceCount !== 1 ? 's' : ''}
+                This will create {occurrenceCount} job{occurrenceCount !== 1 ? 's' : ''}
               </p>
             )}
           </>
@@ -341,8 +341,8 @@ export default function CreateTaskForm({ users }: CreateTaskFormProps) {
           {loading
             ? 'Creating...'
             : isRepeating
-              ? `Create ${occurrenceCount} Task${occurrenceCount !== 1 ? 's' : ''}`
-              : 'Create Task'}
+              ? `Create ${occurrenceCount} Job${occurrenceCount !== 1 ? 's' : ''}`
+              : 'Create Job'}
         </button>
         <button
           type="button"

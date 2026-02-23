@@ -55,7 +55,7 @@ export default async function EditTaskPage({
             <Link href="/dashboard">
               <img src="/PBLogo.png" alt="Pepperberry" className="w-7 h-7 object-contain" />
             </Link>
-            <h1 className="text-lg font-medium text-stone-900">Edit Task</h1>
+            <h1 className="text-lg font-medium text-stone-900">Edit Job</h1>
           </div>
         </div>
       </header>

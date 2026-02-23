@@ -122,7 +122,7 @@ export default function PhotoSection({
               >
                 <img
                   src={getPublicUrl(photo.storage_path)}
-                  alt="Task photo"
+                  alt="Job photo"
                   className="w-full h-full object-cover rounded-lg"
                   loading="lazy"
                 />
@@ -198,7 +198,7 @@ export default function PhotoSection({
           </button>
           <img
             src={viewingPhoto}
-            alt="Task photo full size"
+            alt="Job photo full size"
             className="max-w-full max-h-full object-contain rounded-lg"
           />
         </div>

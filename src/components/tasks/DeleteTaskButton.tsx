@@ -32,7 +32,7 @@ export default function DeleteTaskButton({ taskId }: { taskId: string }) {
   if (confirming) {
     return (
       <div className="flex items-center gap-2">
-        <span className="text-xs text-red-500">Delete this task?</span>
+        <span className="text-xs text-red-500">Delete this job?</span>
         <button
           onClick={handleDelete}
           disabled={loading}

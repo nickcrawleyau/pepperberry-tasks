@@ -36,8 +36,8 @@ export default async function DashboardPage() {
   const openCount = tasks.filter((t) => t.status !== 'done').length;
   const greeting =
     session.role === 'admin'
-      ? `${openCount} open task${openCount !== 1 ? 's' : ''}`
-      : `${openCount} task${openCount !== 1 ? 's' : ''} for you`;
+      ? `${openCount} open job${openCount !== 1 ? 's' : ''}`
+      : `${openCount} job${openCount !== 1 ? 's' : ''} for you`;
 
   return (
     <div className="min-h-screen bg-stone-100">
@@ -76,7 +76,7 @@ export default async function DashboardPage() {
                   <path d="M5 12h14" />
                   <path d="M12 5v14" />
                 </svg>
-                New Task
+                New Job
               </Link>
               <Link
                 href="/admin/users"
@@ -120,7 +120,7 @@ export default async function DashboardPage() {
               <path d="M9 11l3 3L22 4" />
               <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
             </svg>
-            Tasks
+            Jobs
           </Link>
           <Link
             href="/weather"

@@ -109,7 +109,7 @@ export default function TransferTask({ taskId, currentAssignedTo, users }: Trans
           onSubmit={handleTransfer}
           className="absolute right-0 top-full mt-2 w-72 bg-white rounded-xl border border-stone-200 shadow-lg p-4 space-y-3 z-50"
         >
-          <p className="text-sm font-medium text-stone-900">Transfer task</p>
+          <p className="text-sm font-medium text-stone-900">Transfer job</p>
 
           <div>
             <label className="block text-xs text-stone-500 mb-1">Transfer to</label>
@@ -132,7 +132,7 @@ export default function TransferTask({ taskId, currentAssignedTo, users }: Trans
             <textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              placeholder="Why is this task being transferred?"
+              placeholder="Why is this job being transferred?"
               rows={2}
               className="w-full rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-transparent transition resize-none"
             />
