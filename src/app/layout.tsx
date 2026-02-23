@@ -20,6 +20,9 @@ export const metadata: Metadata = {
   title: "Pepperberry",
   description: "Task management for Pepperberry, Coolongatta NSW",
   manifest: "/manifest.json",
+  icons: {
+    icon: "/PBFlavicon.jpg",
+  },
 };
 
 export default function RootLayout({
