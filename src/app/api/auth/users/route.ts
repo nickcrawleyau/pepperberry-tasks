@@ -14,5 +14,7 @@ export async function GET() {
     return NextResponse.json({ error: 'Failed to load users' }, { status: 500 });
   }
 
-  return NextResponse.json({ users });
+  return NextResponse.json({ users }, {
+    headers: { 'Cache-Control': 'no-store, max-age=0' },
+  });
 }
