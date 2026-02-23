@@ -167,6 +167,22 @@ export default function WeatherDisplay({ data }: WeatherDisplayProps) {
         </p>
       </div>
 
+      {/* Rain Radar */}
+      <div className="bg-white rounded-xl border border-stone-200 p-5">
+        <p className="text-xs font-medium text-stone-500 mb-3">Rain Radar — Wollongong 128km</p>
+        <div className="relative w-full overflow-hidden rounded-lg bg-stone-100" style={{ aspectRatio: '1 / 1' }}>
+          <img
+            src="https://radar.weather.gov.au/latest/IDR032.gif"
+            alt="Rain radar Wollongong 128km"
+            className="w-full h-full object-contain"
+            loading="lazy"
+          />
+        </div>
+        <p className="text-[10px] text-stone-300 mt-2">
+          Source: Bureau of Meteorology
+        </p>
+      </div>
+
       {/* Rainfall Chart */}
       <div className="bg-white rounded-xl border border-stone-200 p-5">
         <div className="flex items-baseline justify-between mb-1">
