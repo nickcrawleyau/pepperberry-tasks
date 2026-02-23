@@ -43,6 +43,34 @@ export default function PhotoSection({
     return `${supabaseUrl}/storage/v1/object/public/task-photos/${storagePath}`;
   }
 
+  function compressImage(file: File): Promise<Blob> {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => {
+        const MAX_DIM = 1920;
+        let { width, height } = img;
+        if (width > MAX_DIM || height > MAX_DIM) {
+          const ratio = Math.min(MAX_DIM / width, MAX_DIM / height);
+          width = Math.round(width * ratio);
+          height = Math.round(height * ratio);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) { reject(new Error('Canvas not supported')); return; }
+        ctx.drawImage(img, 0, 0, width, height);
+        canvas.toBlob(
+          (blob) => blob ? resolve(blob) : reject(new Error('Compression failed')),
+          'image/jpeg',
+          0.85
+        );
+      };
+      img.onerror = () => reject(new Error('Could not read image'));
+      img.src = URL.createObjectURL(file);
+    });
+  }
+
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file || uploading) return;
@@ -51,8 +79,10 @@ export default function PhotoSection({
     setUploading(true);
 
     try {
+      const compressed = await compressImage(file);
+
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('file', compressed, file.name.replace(/\.[^.]+$/, '.jpg'));
 
       const res = await fetch(`/api/tasks/${taskId}/photos`, {
         method: 'POST',
@@ -169,7 +199,7 @@ export default function PhotoSection({
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/jpeg,image/png,image/heic,image/heif,image/webp"
+            accept="image/*"
             capture="environment"
             onChange={handleFileChange}
             disabled={uploading}

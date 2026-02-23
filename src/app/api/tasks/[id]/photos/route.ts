@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { getSession } from '@/lib/auth';
-import { MAX_PHOTOS_PER_TASK, MAX_PHOTO_SIZE_BYTES, ACCEPTED_IMAGE_TYPES } from '@/lib/constants';
+import { MAX_PHOTOS_PER_TASK, MAX_PHOTO_SIZE_BYTES } from '@/lib/constants';
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -53,9 +53,9 @@ export async function POST(request: NextRequest, { params }: Params) {
     return NextResponse.json({ error: 'No file provided' }, { status: 400 });
   }
 
-  // Validate file type
-  if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
-    return NextResponse.json({ error: 'Invalid file type. Use JPEG, PNG, or WebP.' }, { status: 400 });
+  // Validate file type (accept any image/* since client compresses to JPEG)
+  if (!file.type.startsWith('image/')) {
+    return NextResponse.json({ error: 'Invalid file type. Please upload an image.' }, { status: 400 });
   }
 
   // Validate file size
