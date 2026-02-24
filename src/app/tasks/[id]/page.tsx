@@ -1,4 +1,4 @@
-import { getSession } from '@/lib/auth';
+import { getSession, getSessionExpiry } from '@/lib/auth';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
@@ -16,6 +16,8 @@ import DeleteSeriesButton from '@/components/tasks/DeleteSeriesButton';
 import PhotoSection from '@/components/tasks/PhotoSection';
 import ActivityLog from '@/components/tasks/ActivityLog';
 import TransferTask from '@/components/tasks/TransferTask';
+import SessionTimer from '@/components/SessionTimer';
+import LogoutButton from '@/components/LogoutButton';
 
 const PRIORITY_DOT: Record<string, string> = {
   low: 'bg-stone-500',
@@ -43,6 +45,7 @@ export default async function TaskDetailPage({
   if (!session) redirect('/');
 
   const { id } = await params;
+  const sessionExpiry = await getSessionExpiry();
 
   // Fetch task with related user names
   const { data: task, error } = await supabaseAdmin
@@ -131,14 +134,20 @@ export default async function TaskDetailPage({
                 <path d="m15 18-6-6 6-6" />
               </svg>
             </Link>
-            <div className="flex-1 flex items-center gap-2.5">
+            <div className="flex items-center gap-2.5 min-w-0">
               <Link href="/dashboard">
                 <img src="/PBLogo.png" alt="Pepperberry" className="w-7 h-7 object-contain" />
               </Link>
-              <h1 className="text-lg font-medium text-fw-text">
+              <h1 className="text-lg font-medium text-fw-text truncate">
                 Job Detail
               </h1>
             </div>
+            <div className="flex-1" />
+            <div className="hidden sm:block text-right shrink-0">
+              <p className="text-sm font-medium text-fw-text">{session.name}</p>
+              {sessionExpiry && <SessionTimer expiresAt={sessionExpiry} />}
+            </div>
+            <LogoutButton />
           </div>
           {session.role === 'admin' && (
             <div className="flex items-center gap-2 flex-wrap mt-3">
@@ -165,7 +174,12 @@ export default async function TaskDetailPage({
       <main className="max-w-2xl mx-auto px-5 py-6 space-y-6">
         {/* Title & Description */}
         <div>
-          <h2 className="text-xl font-medium text-fw-text leading-snug">
+          <h2 className={`text-xl font-medium leading-snug ${typedTask.status === 'done' ? 'text-fw-text/50 line-through' : 'text-fw-text'}`}>
+            {typedTask.status === 'done' && (
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="inline-block mr-1.5 -mt-0.5 text-fw-accent">
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+            )}
             {typedTask.title}
           </h2>
           {typedTask.description && (

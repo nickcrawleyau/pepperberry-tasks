@@ -1,8 +1,10 @@
-import { getSession } from '@/lib/auth';
+import { getSession, getSessionExpiry } from '@/lib/auth';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import EditTaskForm from './EditTaskForm';
+import SessionTimer from '@/components/SessionTimer';
+import LogoutButton from '@/components/LogoutButton';
 
 export default async function EditTaskPage({
   params,
@@ -12,6 +14,8 @@ export default async function EditTaskPage({
   const session = await getSession();
   if (!session) redirect('/');
   if (session.role !== 'admin') redirect('/dashboard');
+
+  const sessionExpiry = await getSessionExpiry();
 
   const { id } = await params;
 
@@ -51,12 +55,18 @@ export default async function EditTaskPage({
               <path d="m15 18-6-6 6-6" />
             </svg>
           </Link>
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2.5 min-w-0">
             <Link href="/dashboard">
               <img src="/PBLogo.png" alt="Pepperberry" className="w-7 h-7 object-contain" />
             </Link>
-            <h1 className="text-lg font-medium text-fw-text">Edit Job</h1>
+            <h1 className="text-lg font-medium text-fw-text truncate">Edit Job</h1>
           </div>
+          <div className="flex-1" />
+          <div className="hidden sm:block text-right shrink-0">
+            <p className="text-sm font-medium text-fw-text">{session.name}</p>
+            {sessionExpiry && <SessionTimer expiresAt={sessionExpiry} />}
+          </div>
+          <LogoutButton />
         </div>
       </header>
 

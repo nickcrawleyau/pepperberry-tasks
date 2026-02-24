@@ -1,13 +1,17 @@
-import { getSession } from '@/lib/auth';
+import { getSession, getSessionExpiry } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { fetchWeatherData } from '@/lib/weather';
 import WeatherDisplay from '@/components/weather/WeatherDisplay';
+import SessionTimer from '@/components/SessionTimer';
+import LogoutButton from '@/components/LogoutButton';
 
 export default async function WeatherPage() {
   const session = await getSession();
   if (!session) redirect('/');
   if (session.role !== 'admin' && !session.allowedSections?.includes('weather')) redirect('/dashboard');
+
+  const sessionExpiry = await getSessionExpiry();
 
   let weather;
   let error = false;
@@ -40,12 +44,12 @@ export default async function WeatherPage() {
               <path d="m15 18-6-6 6-6" />
             </svg>
           </Link>
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2.5 min-w-0">
             <Link href="/dashboard">
               <img src="/PBLogo.png" alt="Pepperberry" className="w-7 h-7 object-contain" />
             </Link>
-            <div>
-              <h1 className="text-lg font-medium text-fw-text">Weather</h1>
+            <div className="min-w-0">
+              <h1 className="text-lg font-medium text-fw-text truncate">Weather</h1>
               {weather && (
                 <p className="text-[10px] text-fw-text/40">
                   Open-Meteo &middot; Updated {new Date(weather.fetchedAt).toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Australia/Sydney' })}
@@ -53,6 +57,12 @@ export default async function WeatherPage() {
               )}
             </div>
           </div>
+          <div className="flex-1" />
+          <div className="hidden sm:block text-right shrink-0">
+            <p className="text-sm font-medium text-fw-text">{session.name}</p>
+            {sessionExpiry && <SessionTimer expiresAt={sessionExpiry} />}
+          </div>
+          <LogoutButton />
         </div>
       </header>
 

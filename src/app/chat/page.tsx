@@ -1,8 +1,10 @@
-import { getSession } from '@/lib/auth';
+import { getSession, getSessionExpiry } from '@/lib/auth';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import ChatView from '@/components/chat/ChatView';
+import SessionTimer from '@/components/SessionTimer';
+import LogoutButton from '@/components/LogoutButton';
 import { ChatMessage, Conversation } from '@/lib/types';
 
 export default async function ChatPage({
@@ -13,6 +15,8 @@ export default async function ChatPage({
   const session = await getSession();
   if (!session) redirect('/');
   if (session.role !== 'admin' && !session.allowedSections?.includes('chat')) redirect('/dashboard');
+
+  const sessionExpiry = await getSessionExpiry();
 
   // Fetch initial board messages, conversations, and active users in parallel
   const [{ data: messagesData }, { data: usersData }] = await Promise.all([
@@ -86,12 +90,18 @@ export default async function ChatPage({
               <path d="m15 18-6-6 6-6" />
             </svg>
           </Link>
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-2.5 min-w-0">
             <Link href="/dashboard">
               <img src="/PBLogo.png" alt="Pepperberry" className="w-7 h-7 object-contain" />
             </Link>
-            <h1 className="text-lg font-medium text-fw-text">Messages</h1>
+            <h1 className="text-lg font-medium text-fw-text truncate">Messages</h1>
           </div>
+          <div className="flex-1" />
+          <div className="hidden sm:block text-right shrink-0">
+            <p className="text-sm font-medium text-fw-text">{session.name}</p>
+            {sessionExpiry && <SessionTimer expiresAt={sessionExpiry} />}
+          </div>
+          <LogoutButton />
         </div>
       </header>
 

@@ -3,7 +3,7 @@ import { fetchTasks } from '@/lib/tasks';
 import { supabaseAdmin } from '@/lib/supabase/admin';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import LogoutButton from './LogoutButton';
+import LogoutButton from '@/components/LogoutButton';
 import TaskList from '@/components/tasks/TaskList';
 import DashboardStats from '@/components/dashboard/DashboardStats';
 import PushNotificationPrompt from '@/components/PushNotificationPrompt';
