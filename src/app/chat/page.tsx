@@ -107,7 +107,7 @@ export default async function ChatPage({
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-5 py-6">
+      <main className="max-w-2xl mx-auto px-5 py-6 overflow-hidden">
         <ChatView
           initialMessages={messages}
           initialConversations={conversations}

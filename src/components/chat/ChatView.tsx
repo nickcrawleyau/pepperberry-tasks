@@ -50,7 +50,7 @@ export default function ChatView({
   }, [tab]);
 
   return (
-    <div>
+    <div className="min-w-0 overflow-hidden">
       {/* Tabs */}
       <div className="flex gap-1 mb-4 bg-fw-surface rounded-lg p-1">
         <button
@@ -211,19 +211,19 @@ function BoardTab({
       </div>
 
       {/* Compose */}
-      <form onSubmit={handleSend} className="flex gap-2 pt-3 border-t border-fw-surface">
+      <form onSubmit={handleSend} className="flex gap-2 pt-3 border-t border-fw-surface min-w-0">
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           maxLength={MAX_CHAT_MESSAGE_LENGTH}
           placeholder="Write a message..."
-          className="flex-1 rounded-lg border border-fw-surface px-3 py-2 text-sm text-fw-text bg-fw-surface placeholder:text-fw-text/30 focus:outline-none focus:ring-2 focus:ring-fw-accent focus:border-transparent transition"
+          className="flex-1 min-w-0 rounded-lg border border-fw-surface px-3 py-2 text-sm text-fw-text bg-fw-surface placeholder:text-fw-text/30 focus:outline-none focus:ring-2 focus:ring-fw-accent focus:border-transparent transition"
         />
         <button
           type="submit"
           disabled={!input.trim() || sending}
-          className="px-4 py-2 rounded-lg bg-fw-accent text-white text-sm font-medium hover:bg-fw-hover active:bg-fw-hover transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-4 py-2 rounded-lg bg-fw-accent text-white text-sm font-medium hover:bg-fw-hover active:bg-fw-hover transition disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
         >
           {sending ? '...' : 'Send'}
         </button>
@@ -494,9 +494,9 @@ function DMThread({
                     : 'bg-fw-surface text-fw-text border border-fw-surface'
                 }`}
               >
-                <div className="flex items-baseline gap-2 mb-0.5">
-                  <span className="text-xs font-medium text-fw-text/70">{name}</span>
-                  <span className="text-[10px] text-fw-text/40">{timeAgo(msg.created_at)}</span>
+                <div className="flex items-baseline gap-2 mb-0.5 min-w-0">
+                  <span className="text-xs font-medium text-fw-text/70 truncate">{name}</span>
+                  <span className="text-[10px] text-fw-text/40 shrink-0">{timeAgo(msg.created_at)}</span>
                   {isAdmin && (
                     <button
                       onClick={() => handleDelete(msg.id)}
@@ -518,19 +518,19 @@ function DMThread({
       </div>
 
       {/* Compose */}
-      <form onSubmit={handleSend} className="flex gap-2 pt-3 border-t border-fw-surface">
+      <form onSubmit={handleSend} className="flex gap-2 pt-3 border-t border-fw-surface min-w-0">
         <input
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
           maxLength={MAX_CHAT_MESSAGE_LENGTH}
           placeholder="Write a message..."
-          className="flex-1 rounded-lg border border-fw-surface px-3 py-2 text-sm text-fw-text bg-fw-surface placeholder:text-fw-text/30 focus:outline-none focus:ring-2 focus:ring-fw-accent focus:border-transparent transition"
+          className="flex-1 min-w-0 rounded-lg border border-fw-surface px-3 py-2 text-sm text-fw-text bg-fw-surface placeholder:text-fw-text/30 focus:outline-none focus:ring-2 focus:ring-fw-accent focus:border-transparent transition"
         />
         <button
           type="submit"
           disabled={!input.trim() || sending}
-          className="px-4 py-2 rounded-lg bg-fw-accent text-white text-sm font-medium hover:bg-fw-hover active:bg-fw-hover transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-4 py-2 rounded-lg bg-fw-accent text-white text-sm font-medium hover:bg-fw-hover active:bg-fw-hover transition disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
         >
           {sending ? '...' : 'Send'}
         </button>
