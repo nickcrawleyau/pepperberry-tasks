@@ -68,7 +68,7 @@ export default function ReportProblem() {
 
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60">
-          <div className="w-full max-w-sm bg-fw-surface rounded-xl border border-fw-surface shadow-xl p-5 space-y-4">
+          <div className="w-full max-w-sm bg-fw-surface rounded-xl border border-fw-text/20 shadow-xl p-5 space-y-4">
             {sent ? (
               <div className="text-center py-4">
                 <svg

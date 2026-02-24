@@ -107,7 +107,7 @@ export default function TransferTask({ taskId, currentAssignedTo, users }: Trans
       {open && (
         <form
           onSubmit={handleTransfer}
-          className="absolute left-0 top-full mt-2 w-[calc(100vw-2.5rem)] max-w-72 bg-fw-surface rounded-xl border border-fw-surface shadow-lg p-4 space-y-3 z-50"
+          className="absolute left-0 top-full mt-2 w-[calc(100vw-2.5rem)] max-w-72 bg-fw-surface rounded-xl border border-fw-text/20 shadow-lg p-4 space-y-3 z-50"
         >
           <p className="text-sm font-medium text-fw-text">Transfer job</p>
 
