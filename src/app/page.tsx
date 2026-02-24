@@ -133,7 +133,7 @@ function LoginForm() {
   const nextPinIndex = pin.findIndex((d) => d === '');
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white px-4">
+    <div className="min-h-screen flex items-center justify-center bg-fw-bg px-4">
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-8">
