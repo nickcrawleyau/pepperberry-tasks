@@ -109,8 +109,8 @@ export default function WeatherDisplay({ data }: WeatherDisplayProps) {
     .slice(-historicalDays.length)
     .reduce((sum, d) => sum + d.precipitationSum, 0);
 
-  // 7-day forecast (future days only)
-  const forecast = daily.filter((d) => d.isForecast);
+  // 5-day forecast table (graph still uses full range)
+  const forecast = daily.filter((d) => d.isForecast).slice(0, 5);
 
   // Today entry
   const today = historicalDays.at(-1);
@@ -196,7 +196,7 @@ export default function WeatherDisplay({ data }: WeatherDisplayProps) {
 
       {/* 15-Day Forecast */}
       <div className="bg-fw-surface rounded-xl border border-fw-surface p-5">
-        <p className="text-xs font-medium text-fw-text/50 mb-3">15-Day Forecast</p>
+        <p className="text-xs font-medium text-fw-text/50 mb-3">5-Day Forecast</p>
         <div className="divide-y divide-fw-surface">
           {forecast.map((day) => (
             <div key={day.date} className="flex items-center py-2.5 first:pt-0 last:pb-0">
