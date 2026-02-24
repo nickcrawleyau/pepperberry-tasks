@@ -224,6 +224,16 @@ The `supabaseAdmin` client in `src/lib/supabase/admin.ts` is configured with `ca
 | is_bought | boolean | Default false |
 | created_at | timestamptz | Default `now()` |
 
+### `pin_reset_requests`
+| Column | Type | Notes |
+|--------|------|-------|
+| id | uuid | PK |
+| user_id | uuid | FK → `users.id`, cascade delete |
+| status | text | `pending`, `resolved` |
+| resolved_by | uuid | FK → `users.id`, nullable. Admin who reset the PIN |
+| resolved_at | timestamptz | Nullable |
+| requested_at | timestamptz | Default `now()` |
+
 ## User Roles & Permissions
 
 ### `admin` (Farm Owners — Nick & Anna)

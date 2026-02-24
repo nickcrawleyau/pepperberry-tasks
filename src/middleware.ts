@@ -4,7 +4,7 @@ import { jwtVerify } from 'jose';
 const SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
 const COOKIE_NAME = 'pb-session';
 
-const PUBLIC_PATHS = ['/', '/api/auth/login', '/api/auth/users', '/api/auth/check'];
+const PUBLIC_PATHS = ['/', '/api/auth/login', '/api/auth/users', '/api/auth/check', '/api/auth/forgot-pin'];
 const SET_PIN_PATHS = ['/set-pin', '/api/auth/set-pin'];
 
 export async function middleware(request: NextRequest) {

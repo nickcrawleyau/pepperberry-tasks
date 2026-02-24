@@ -42,6 +42,13 @@ export async function PATCH(request: NextRequest, { params }: Params) {
       return NextResponse.json({ error: 'PIN must be 4 digits' }, { status: 400 });
     }
     updates.pin_hash = await bcrypt.hash(body.pin, 10);
+
+    // Auto-resolve any pending PIN reset requests for this user
+    await supabaseAdmin
+      .from('pin_reset_requests')
+      .update({ status: 'resolved', resolved_by: session.userId, resolved_at: new Date().toISOString() })
+      .eq('user_id', id)
+      .eq('status', 'pending');
   }
   if (body.phone !== undefined) {
     updates.phone = body.phone?.trim() || null;

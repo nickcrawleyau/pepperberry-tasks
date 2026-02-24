@@ -26,6 +26,8 @@ function LoginForm() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [usersLoading, setUsersLoading] = useState(true);
+  const [forgotPinSent, setForgotPinSent] = useState(false);
+  const [forgotPinLoading, setForgotPinLoading] = useState(false);
   const pinRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   useEffect(() => {
@@ -173,6 +175,7 @@ function LoginForm() {
                     setSelectedUser(e.target.value);
                     setPin(['', '', '', '']);
                     setError('');
+                    setForgotPinSent(false);
                     if (e.target.value) setTimeout(() => pinRefs.current[0]?.focus(), 50);
                   }}
                   disabled={usersLoading}
@@ -227,6 +230,44 @@ function LoginForm() {
                     />
                   ))}
                 </div>
+              </div>
+            )}
+
+            {/* Forgot PIN */}
+            {selectedUser && !forgotPinSent && (
+              <div className="text-center">
+                <button
+                  type="button"
+                  disabled={forgotPinLoading}
+                  onClick={async () => {
+                    setForgotPinLoading(true);
+                    try {
+                      await fetch('/api/auth/forgot-pin', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ userId: selectedUser }),
+                      });
+                      setForgotPinSent(true);
+                    } catch {
+                      // silently handle
+                    } finally {
+                      setForgotPinLoading(false);
+                    }
+                  }}
+                  className="text-xs text-stone-400 hover:text-amber-500 transition disabled:opacity-50"
+                >
+                  {forgotPinLoading ? 'Sending...' : 'Forgot PIN?'}
+                </button>
+              </div>
+            )}
+
+            {/* Forgot PIN confirmation */}
+            {forgotPinSent && (
+              <div className="flex items-center gap-2 text-sm text-amber-400 bg-amber-900/20 rounded-lg px-4 py-2.5">
+                <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path d="M5 13l4 4L19 7" />
+                </svg>
+                <span>Your admin has been notified. They will reset your PIN.</span>
               </div>
             )}
 
