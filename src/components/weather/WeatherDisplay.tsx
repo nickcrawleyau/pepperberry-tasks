@@ -110,7 +110,9 @@ export default function WeatherDisplay({ data }: WeatherDisplayProps) {
     .reduce((sum, d) => sum + d.precipitationSum, 0);
 
   // 5-day forecast table (graph still uses full range)
-  const forecast = daily.filter((d) => d.isForecast).slice(0, 5);
+  const forecastDays = daily.filter((d) => d.isForecast);
+  const forecast = forecastDays.slice(0, 5);
+  const forecast10Total = forecastDays.slice(0, 10).reduce((sum, d) => sum + d.precipitationSum, 0);
 
   // Today entry
   const today = historicalDays.at(-1);
@@ -262,6 +264,21 @@ export default function WeatherDisplay({ data }: WeatherDisplayProps) {
                   <div className="border-t border-fw-text/10" />
                   <div className="border-t border-fw-text/10" />
                 </div>
+                {/* 10-day forecast total overlay */}
+                {forecastDays.length > 0 && (
+                  <div
+                    className="absolute inset-y-0 flex items-center justify-center pointer-events-none z-[6]"
+                    style={{
+                      left: `${(historicalDays.length / daily.length) * 100}%`,
+                      right: '0%',
+                    }}
+                  >
+                    <div className="text-center">
+                      <span className="text-2xl font-bold text-sky-300/60">{Math.round(forecast10Total)}</span>
+                      <span className="text-[10px] text-sky-300/40 ml-0.5">mm</span>
+                    </div>
+                  </div>
+                )}
                 {daily.map((day, i) => {
                   const height = day.precipitationSum > 0
                     ? Math.max((day.precipitationSum / maxPrecip) * 100, 4)
