@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import { supabaseAdmin } from '@/lib/supabase/admin';
-import { createSession, secondsUntilMidnightAEST, MAX_SESSION_SECONDS, COOKIE_NAME } from '@/lib/auth';
+import { createSession, COOKIE_NAME } from '@/lib/auth';
 import { sendPushToUser } from '@/lib/notifications';
 
 // Rate limiting: 3 failed attempts then 30-min lockout per IP
@@ -106,7 +106,6 @@ export async function POST(request: NextRequest) {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
-    maxAge: Math.min(secondsUntilMidnightAEST(), MAX_SESSION_SECONDS),
     path: '/',
   });
 
