@@ -21,7 +21,7 @@ export default function TaskFilters({
   counts,
 }: TaskFiltersProps) {
   return (
-    <div className="flex gap-1 bg-stone-100 rounded-lg p-1">
+    <div className="flex gap-1 bg-fw-bg rounded-lg p-1">
       {TABS.map((tab) => {
         const isActive = activeStatus === tab.key;
         const count = tab.key === 'all' ? counts.all : counts[tab.key] ?? 0;
@@ -32,8 +32,8 @@ export default function TaskFilters({
             className={`
               flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition
               ${isActive
-                ? 'bg-white text-stone-900 shadow-sm'
-                : 'text-stone-500 hover:text-stone-900'
+                ? 'bg-fw-surface text-fw-text shadow-sm'
+                : 'text-fw-text/50 hover:text-stone-900'
               }
             `}
           >
@@ -41,7 +41,7 @@ export default function TaskFilters({
             <span
               className={`
                 text-[10px] tabular-nums
-                ${isActive ? 'text-stone-500' : 'text-stone-500'}
+                ${isActive ? 'text-fw-text/50' : 'text-fw-text/50'}
               `}
             >
               {count}

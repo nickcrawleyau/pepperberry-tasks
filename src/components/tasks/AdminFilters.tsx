@@ -37,7 +37,7 @@ export default function AdminFilters({
   }
 
   const selectClass =
-    'appearance-none rounded-lg border border-stone-200 bg-stone-50 pl-3 pr-7 py-2 text-xs text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-600/50 focus:border-amber-600/50 transition min-w-0';
+    'appearance-none rounded-lg border border-fw-surface bg-fw-surface pl-3 pr-7 py-2 text-xs text-fw-text focus:outline-none focus:ring-2 focus:ring-fw-accent/50 focus:border-fw-accent/50 transition min-w-0';
 
   const hasActiveFilters =
     filters.priority || filters.category || filters.location || filters.assignedTo;
@@ -125,7 +125,7 @@ export default function AdminFilters({
                 assignedTo: '',
               })
             }
-            className="text-xs text-stone-500 hover:text-stone-700 transition px-2 py-2"
+            className="text-xs text-fw-text/50 hover:text-stone-700 transition px-2 py-2"
           >
             Clear
           </button>
@@ -139,7 +139,7 @@ function DropdownArrow() {
   return (
     <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
       <svg
-        className="h-3 w-3 text-stone-500"
+        className="h-3 w-3 text-fw-text/50"
         fill="none"
         stroke="currentColor"
         strokeWidth="2"

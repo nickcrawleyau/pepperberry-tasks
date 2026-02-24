@@ -46,10 +46,10 @@ export default function DashboardStats({ tasks }: DashboardStatsProps) {
   }
 
   const stats = [
-    { label: 'Open', value: openTasks.length, color: 'text-stone-900' },
-    { label: 'Overdue', value: overdue, color: overdue > 0 ? 'text-red-500' : 'text-stone-900' },
-    { label: 'Urgent / High', value: urgentHigh, color: urgentHigh > 0 ? 'text-orange-500' : 'text-stone-900' },
-    { label: 'Unassigned', value: unassigned, color: unassigned > 0 ? 'text-amber-600' : 'text-stone-900' },
+    { label: 'Open', value: openTasks.length, color: 'text-fw-text' },
+    { label: 'Overdue', value: overdue, color: overdue > 0 ? 'text-red-500' : 'text-fw-text' },
+    { label: 'Urgent / High', value: urgentHigh, color: urgentHigh > 0 ? 'text-orange-500' : 'text-fw-text' },
+    { label: 'Unassigned', value: unassigned, color: unassigned > 0 ? 'text-fw-accent' : 'text-fw-text' },
   ];
 
   return (
@@ -59,30 +59,30 @@ export default function DashboardStats({ tasks }: DashboardStatsProps) {
         {stats.map((s) => (
           <div
             key={s.label}
-            className="bg-white rounded-xl border border-stone-200 px-3 py-3 text-center"
+            className="bg-fw-surface rounded-xl border border-fw-surface px-3 py-3 text-center"
           >
             <p className={`text-2xl font-semibold ${s.color}`}>{s.value}</p>
-            <p className="text-[11px] text-stone-500 mt-0.5">{s.label}</p>
+            <p className="text-[11px] text-fw-text/50 mt-0.5">{s.label}</p>
           </div>
         ))}
       </div>
 
       {/* Worker workload */}
       {workload.length > 0 && (
-        <div className="bg-white rounded-xl border border-stone-200 px-4 py-3">
-          <p className="text-xs font-medium text-stone-500 mb-2.5">Workload</p>
+        <div className="bg-fw-surface rounded-xl border border-fw-surface px-4 py-3">
+          <p className="text-xs font-medium text-fw-text/50 mb-2.5">Workload</p>
           <div className="flex flex-wrap gap-2">
             {workload.map((w) => (
               <span
                 key={w.name}
                 className={`inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full border ${
                   w.name === 'Unassigned'
-                    ? 'border-stone-200 text-stone-500 italic'
-                    : 'border-stone-200 text-stone-700'
+                    ? 'border-fw-surface text-fw-text/50 italic'
+                    : 'border-fw-surface text-fw-text/80'
                 }`}
               >
                 {w.name}
-                <span className="text-stone-500 font-medium">{w.count}</span>
+                <span className="text-fw-text/50 font-medium">{w.count}</span>
               </span>
             ))}
           </div>

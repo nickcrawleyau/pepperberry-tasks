@@ -90,21 +90,21 @@ export default function EditTaskForm({ task, users }: EditTaskFormProps) {
   }
 
   const selectClass =
-    'w-full rounded-lg border border-stone-200 px-3 py-2.5 text-sm text-stone-900 bg-stone-50 focus:outline-none focus:ring-2 focus:ring-stone-300 focus:border-transparent transition';
+    'w-full rounded-lg border border-fw-surface px-3 py-2.5 text-sm text-fw-text bg-fw-surface focus:outline-none focus:ring-2 focus:ring-stone-300 focus:border-transparent transition';
   const inputClass =
-    'w-full rounded-lg border border-stone-200 px-3 py-2.5 text-sm text-stone-900 bg-stone-50 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-300 focus:border-transparent transition';
-  const labelClass = 'block text-xs font-medium text-stone-500 mb-1.5';
+    'w-full rounded-lg border border-fw-surface px-3 py-2.5 text-sm text-fw-text bg-fw-surface placeholder:text-fw-text/30 focus:outline-none focus:ring-2 focus:ring-stone-300 focus:border-transparent transition';
+  const labelClass = 'block text-xs font-medium text-fw-text/50 mb-1.5';
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       {task.recurrence_pattern && (
-        <div className="bg-amber-50 border border-amber-300 rounded-xl px-4 py-3 text-xs text-amber-600">
+        <div className="bg-fw-accent/10 border border-amber-300 rounded-xl px-4 py-3 text-xs text-fw-accent">
           This task is part of a repeating series ({RECURRENCE_LABELS[task.recurrence_pattern]?.toLowerCase()}).
           Changes apply to this instance only.
         </div>
       )}
 
-      <div className="bg-white rounded-xl border border-stone-200 p-5 space-y-5">
+      <div className="bg-fw-surface rounded-xl border border-fw-surface p-5 space-y-5">
         <div>
           <label htmlFor="title" className={labelClass}>Title *</label>
           <input
@@ -129,7 +129,7 @@ export default function EditTaskForm({ task, users }: EditTaskFormProps) {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-stone-200 p-5 space-y-5">
+      <div className="bg-fw-surface rounded-xl border border-fw-surface p-5 space-y-5">
         {/* Status & Priority */}
         <div className="grid grid-cols-2 gap-4">
           <div>
@@ -237,14 +237,14 @@ export default function EditTaskForm({ task, users }: EditTaskFormProps) {
         <button
           type="submit"
           disabled={loading}
-          className="flex-1 rounded-lg bg-amber-600 py-2.5 text-sm font-medium text-white hover:bg-amber-500 active:bg-amber-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 rounded-lg bg-fw-accent py-2.5 text-sm font-medium text-white hover:bg-fw-hover active:bg-fw-hover transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? 'Saving...' : 'Save Changes'}
         </button>
         <button
           type="button"
           onClick={() => router.push(`/tasks/${task.id}`)}
-          className="px-5 py-2.5 rounded-lg border border-stone-300 text-sm font-medium text-stone-700 hover:bg-stone-200 transition"
+          className="px-5 py-2.5 rounded-lg border border-fw-text/20 text-sm font-medium text-fw-text/80 hover:bg-fw-surface transition"
         >
           Cancel
         </button>

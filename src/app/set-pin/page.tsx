@@ -110,7 +110,7 @@ export default function SetPinPage() {
   const nextConfirmIndex = confirmPin.findIndex((d) => d === '');
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-stone-50 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-fw-surface px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
           <img
@@ -120,10 +120,10 @@ export default function SetPinPage() {
           />
         </div>
 
-        <div className="bg-stone-900 rounded-2xl border border-stone-700 p-8 shadow-xl shadow-black/20">
+        <div className="bg-fw-bg rounded-2xl border border-fw-surface p-8 shadow-xl shadow-black/20">
           <div className="text-center mb-6">
-            <h2 className="text-lg font-medium text-stone-100">Set Your PIN</h2>
-            <p className="text-xs text-stone-400 mt-1">
+            <h2 className="text-lg font-medium text-fw-text">Set Your PIN</h2>
+            <p className="text-xs text-fw-text/40 mt-1">
               {step === 'enter'
                 ? 'Choose a 4-digit PIN you\'ll use to sign in.'
                 : 'Enter your PIN again to confirm.'}
@@ -146,10 +146,10 @@ export default function SetPinPage() {
                     onPaste={i === 0 ? (e) => handlePaste(e, setPin, pinRefs) : undefined}
                     autoFocus={i === 0}
                     aria-label={`New PIN digit ${i + 1}`}
-                    className={`w-14 h-14 text-center text-xl rounded-lg border bg-stone-800 text-stone-100 focus:outline-none transition ${
+                    className={`w-14 h-14 text-center text-xl rounded-lg border bg-fw-surface text-fw-text focus:outline-none transition ${
                       i === nextPinIndex
                         ? 'border-emerald-400 ring-2 ring-emerald-400/50'
-                        : 'border-stone-700'
+                        : 'border-fw-surface'
                     }`}
                   />
                 ))}
@@ -158,7 +158,7 @@ export default function SetPinPage() {
               <button
                 type="submit"
                 disabled={!enterFull}
-                className="w-full rounded-lg bg-amber-600 py-3 text-sm font-medium text-white hover:bg-amber-500 active:bg-amber-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                className="w-full rounded-lg bg-fw-accent py-3 text-sm font-medium text-white hover:bg-fw-hover active:bg-fw-hover transition disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Next
               </button>
@@ -178,10 +178,10 @@ export default function SetPinPage() {
                     onKeyDown={(e) => handleKeyDown(i, e, confirmPin, confirmRefs)}
                     onPaste={i === 0 ? (e) => handlePaste(e, setConfirmPin, confirmRefs) : undefined}
                     aria-label={`Confirm PIN digit ${i + 1}`}
-                    className={`w-14 h-14 text-center text-xl rounded-lg border bg-stone-800 text-stone-100 focus:outline-none transition ${
+                    className={`w-14 h-14 text-center text-xl rounded-lg border bg-fw-surface text-fw-text focus:outline-none transition ${
                       i === nextConfirmIndex
                         ? 'border-emerald-400 ring-2 ring-emerald-400/50'
-                        : 'border-stone-700'
+                        : 'border-fw-surface'
                     }`}
                   />
                 ))}
@@ -201,7 +201,7 @@ export default function SetPinPage() {
                 <button
                   type="submit"
                   disabled={!confirmFull || loading}
-                  className="w-full rounded-lg bg-amber-600 py-3 text-sm font-medium text-white hover:bg-amber-500 active:bg-amber-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="w-full rounded-lg bg-fw-accent py-3 text-sm font-medium text-white hover:bg-fw-hover active:bg-fw-hover transition disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {loading ? (
                     <span className="inline-flex items-center gap-2">
@@ -224,7 +224,7 @@ export default function SetPinPage() {
                     setError('');
                     setTimeout(() => pinRefs.current[0]?.focus(), 50);
                   }}
-                  className="w-full rounded-lg border border-stone-700 py-2.5 text-xs font-medium text-stone-400 hover:text-stone-200 hover:border-stone-500 transition"
+                  className="w-full rounded-lg border border-fw-surface py-2.5 text-xs font-medium text-fw-text/40 hover:text-stone-200 hover:border-stone-500 transition"
                 >
                   Start Over
                 </button>

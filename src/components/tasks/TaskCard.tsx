@@ -8,14 +8,14 @@ import {
 } from '@/lib/constants';
 
 const STATUS_STYLES: Record<string, string> = {
-  todo: 'bg-stone-100 text-stone-700',
-  in_progress: 'bg-amber-50 text-amber-600',
-  done: 'bg-emerald-50 text-emerald-600',
+  todo: 'bg-fw-bg text-fw-text/80',
+  in_progress: 'bg-fw-accent/10 text-fw-accent',
+  done: 'bg-emerald-900/30 text-emerald-600',
 };
 
 const PRIORITY_STYLES: Record<string, string> = {
-  low: 'text-stone-500',
-  medium: 'text-stone-700',
+  low: 'text-fw-text/50',
+  medium: 'text-fw-text/80',
   high: 'text-orange-500',
   urgent: 'text-red-500 font-semibold',
 };
@@ -43,13 +43,13 @@ export default function TaskCard({ task }: { task: Task }) {
       href={`/tasks/${task.id}`}
       className={`block rounded-xl border p-5 transition ${
         isUrgent
-          ? 'bg-red-50 border-red-300 border-l-4 border-l-red-500 hover:border-red-400'
-          : 'bg-white border-stone-200 hover:border-stone-300'
+          ? 'bg-red-900/30 border-red-500/30 border-l-4 border-l-red-500 hover:border-red-400'
+          : 'bg-fw-surface border-fw-surface hover:border-stone-300'
       }`}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-medium text-stone-900 leading-snug">
+          <h3 className="text-sm font-medium text-fw-text leading-snug">
             {isUrgent && (
               <span className="inline-block bg-red-500 text-white text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded mr-1.5 align-middle">
                 Urgent
@@ -58,7 +58,7 @@ export default function TaskCard({ task }: { task: Task }) {
             {task.title}
           </h3>
           {task.description && (
-            <p className="mt-1 text-xs text-stone-500 line-clamp-2">
+            <p className="mt-1 text-xs text-fw-text/50 line-clamp-2">
               {task.description}
             </p>
           )}
@@ -75,22 +75,22 @@ export default function TaskCard({ task }: { task: Task }) {
           {PRIORITY_LABELS[task.priority]}
         </span>
 
-        <span className="text-stone-500">
+        <span className="text-fw-text/50">
           {LOCATION_LABELS[task.location] || task.location}
         </span>
 
-        <span className="text-stone-500">
+        <span className="text-fw-text/50">
           {CATEGORY_LABELS[task.category] || task.category}
         </span>
 
         {task.assigned_user?.name && (
-          <span className="text-stone-500">
+          <span className="text-fw-text/50">
             {task.assigned_user.name}
           </span>
         )}
 
         {task.due_date && (
-          <span className={overdue ? 'text-red-500 font-medium' : 'text-stone-500'}>
+          <span className={overdue ? 'text-red-500 font-medium' : 'text-fw-text/50'}>
             {task.recurrence_pattern && (
               <svg
                 xmlns="http://www.w3.org/2000/svg"

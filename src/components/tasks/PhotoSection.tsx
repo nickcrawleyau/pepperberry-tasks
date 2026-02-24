@@ -131,10 +131,10 @@ export default function PhotoSection({
 
   return (
     <div>
-      <p className="text-xs font-medium text-stone-500 mb-3">
+      <p className="text-xs font-medium text-fw-text/50 mb-3">
         Photos
         {photos.length > 0 && (
-          <span className="ml-1 text-stone-500 font-normal">
+          <span className="ml-1 text-fw-text/50 font-normal">
             ({photos.length}/{MAX_PHOTOS_PER_TASK})
           </span>
         )}
@@ -171,13 +171,13 @@ export default function PhotoSection({
           ))}
         </div>
       ) : (
-        <p className="text-xs text-stone-500 mb-4">No photos yet</p>
+        <p className="text-xs text-fw-text/50 mb-4">No photos yet</p>
       )}
 
       {/* Upload input */}
       {canUpload && (
         <label
-          className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-stone-300 text-sm font-medium text-stone-700 transition cursor-pointer hover:bg-stone-200 ${
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-fw-text/20 text-sm font-medium text-fw-text/80 transition cursor-pointer hover:bg-stone-200 ${
             uploading ? 'opacity-50 pointer-events-none' : ''
           }`}
         >

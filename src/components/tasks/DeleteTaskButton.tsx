@@ -42,7 +42,7 @@ export default function DeleteTaskButton({ taskId }: { taskId: string }) {
         </button>
         <button
           onClick={() => setConfirming(false)}
-          className="px-3 py-1.5 rounded-lg border border-stone-300 text-xs font-medium text-stone-700 hover:bg-stone-200 transition"
+          className="px-3 py-1.5 rounded-lg border border-fw-text/20 text-xs font-medium text-fw-text/80 hover:bg-stone-200 transition"
         >
           Cancel
         </button>
@@ -53,7 +53,7 @@ export default function DeleteTaskButton({ taskId }: { taskId: string }) {
   return (
     <button
       onClick={() => setConfirming(true)}
-      className="px-3 py-1.5 rounded-lg border border-red-200 text-xs font-medium text-red-500 hover:bg-red-50 transition"
+      className="px-3 py-1.5 rounded-lg border border-red-200 text-xs font-medium text-red-500 hover:bg-red-900/30 transition"
     >
       Delete
     </button>

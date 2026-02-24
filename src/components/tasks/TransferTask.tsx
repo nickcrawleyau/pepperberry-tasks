@@ -79,7 +79,7 @@ export default function TransferTask({ taskId, currentAssignedTo, users }: Trans
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="px-3 py-1.5 rounded-lg bg-amber-600 text-white text-xs font-bold uppercase tracking-wide hover:bg-amber-500 transition flex items-center gap-1.5"
+        className="px-3 py-1.5 rounded-lg bg-fw-accent text-white text-xs font-bold uppercase tracking-wide hover:bg-fw-hover transition flex items-center gap-1.5"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -107,16 +107,16 @@ export default function TransferTask({ taskId, currentAssignedTo, users }: Trans
       {open && (
         <form
           onSubmit={handleTransfer}
-          className="absolute right-0 top-full mt-2 w-72 bg-white rounded-xl border border-stone-200 shadow-lg p-4 space-y-3 z-50"
+          className="absolute right-0 top-full mt-2 w-72 bg-fw-surface rounded-xl border border-fw-surface shadow-lg p-4 space-y-3 z-50"
         >
-          <p className="text-sm font-medium text-stone-900">Transfer job</p>
+          <p className="text-sm font-medium text-fw-text">Transfer job</p>
 
           <div>
-            <label className="block text-xs text-stone-500 mb-1">Transfer to</label>
+            <label className="block text-xs text-fw-text/50 mb-1">Transfer to</label>
             <select
               value={selectedUser}
               onChange={(e) => setSelectedUser(e.target.value)}
-              className="w-full rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-sm text-stone-900 focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-transparent transition"
+              className="w-full rounded-lg border border-fw-surface bg-fw-surface px-3 py-2 text-sm text-fw-text focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-transparent transition"
             >
               <option value="">Select a user...</option>
               {availableUsers.map((u) => (
@@ -128,13 +128,13 @@ export default function TransferTask({ taskId, currentAssignedTo, users }: Trans
           </div>
 
           <div>
-            <label className="block text-xs text-stone-500 mb-1">Reason</label>
+            <label className="block text-xs text-fw-text/50 mb-1">Reason</label>
             <textarea
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               placeholder="Why is this job being transferred?"
               rows={2}
-              className="w-full rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-transparent transition resize-none"
+              className="w-full rounded-lg border border-fw-surface bg-fw-surface px-3 py-2 text-sm text-fw-text placeholder:text-fw-text/30 focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-transparent transition resize-none"
             />
           </div>
 
@@ -144,7 +144,7 @@ export default function TransferTask({ taskId, currentAssignedTo, users }: Trans
             <button
               type="submit"
               disabled={!selectedUser || !comment.trim() || loading}
-              className="flex-1 px-3 py-2 rounded-lg bg-amber-600 text-white text-sm font-medium hover:bg-amber-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-3 py-2 rounded-lg bg-fw-accent text-white text-sm font-medium hover:bg-fw-hover transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Transferring...' : 'Confirm'}
             </button>
@@ -156,7 +156,7 @@ export default function TransferTask({ taskId, currentAssignedTo, users }: Trans
                 setComment('');
                 setError('');
               }}
-              className="px-3 py-2 rounded-lg border border-stone-300 text-sm font-medium text-stone-700 hover:bg-stone-200 transition"
+              className="px-3 py-2 rounded-lg border border-fw-text/20 text-sm font-medium text-fw-text/80 hover:bg-stone-200 transition"
             >
               Cancel
             </button>

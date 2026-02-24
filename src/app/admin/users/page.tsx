@@ -40,12 +40,12 @@ export default async function AdminUsersPage() {
   });
 
   return (
-    <div className="min-h-screen bg-stone-100">
-      <header className="bg-white border-b border-stone-200 sticky top-0 z-30">
+    <div className="min-h-screen bg-fw-bg">
+      <header className="bg-fw-surface border-b border-fw-surface sticky top-0 z-30">
         <div className="max-w-2xl mx-auto px-5 py-4 flex items-center gap-4">
           <Link
             href="/dashboard"
-            className="text-stone-500 hover:text-stone-700 transition"
+            className="text-fw-text/50 hover:text-stone-700 transition"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -65,7 +65,7 @@ export default async function AdminUsersPage() {
             <Link href="/dashboard">
               <img src="/PBLogo.png" alt="Pepperberry" className="w-7 h-7 object-contain" />
             </Link>
-            <h1 className="text-lg font-medium text-stone-900">Manage Users</h1>
+            <h1 className="text-lg font-medium text-fw-text">Manage Users</h1>
           </div>
         </div>
       </header>

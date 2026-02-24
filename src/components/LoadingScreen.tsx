@@ -1,8 +1,8 @@
 export default function LoadingScreen() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-stone-100">
+    <div className="min-h-screen flex items-center justify-center bg-fw-bg">
       <svg
-        className="w-10 h-10 animate-spin text-amber-600"
+        className="w-10 h-10 animate-spin text-fw-accent"
         fill="none"
         viewBox="0 0 24 24"
       >

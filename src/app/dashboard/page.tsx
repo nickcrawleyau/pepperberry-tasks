@@ -33,6 +33,35 @@ export default async function DashboardPage() {
     users = data || [];
   }
 
+  // Fetch unread chat counts if user has chat access
+  const hasChat = session.role === 'admin' || session.allowedSections?.includes('chat');
+  let newBoardCount = 0;
+  let newDmCount = 0;
+
+  if (hasChat) {
+    const { data: userData } = await supabaseAdmin
+      .from('users')
+      .select('board_last_seen_at, dm_last_seen_at')
+      .eq('id', session.userId)
+      .single();
+
+    if (userData) {
+      const [{ count: boardCount }, { count: dmCount }] = await Promise.all([
+        supabaseAdmin
+          .from('chat_messages')
+          .select('*', { count: 'exact', head: true })
+          .gt('created_at', userData.board_last_seen_at),
+        supabaseAdmin
+          .from('direct_messages')
+          .select('*', { count: 'exact', head: true })
+          .eq('recipient_id', session.userId)
+          .gt('created_at', userData.dm_last_seen_at),
+      ]);
+      newBoardCount = boardCount || 0;
+      newDmCount = dmCount || 0;
+    }
+  }
+
   const openCount = tasks.filter((t) => t.status !== 'done').length;
   const greeting =
     session.role === 'admin'
@@ -40,14 +69,14 @@ export default async function DashboardPage() {
       : `${openCount} job${openCount !== 1 ? 's' : ''} for you`;
 
   return (
-    <div className="min-h-screen bg-stone-100">
+    <div className="min-h-screen bg-fw-bg">
       <KeyboardShortcuts role={session.role} />
-      <header className="bg-white border-b border-stone-200 sticky top-0 z-30">
+      <header className="bg-fw-surface border-b border-fw-surface sticky top-0 z-30">
         <div className="max-w-2xl mx-auto px-5 py-4 flex items-center justify-between">
           <img src="/PBLogo.png" alt="Pepperberry" className="w-9 h-9 sm:w-11 sm:h-11 object-contain" />
           <div className="flex items-center gap-3">
             <div className="text-right">
-              <p className="text-sm font-medium text-stone-900">{session.name}</p>
+              <p className="text-sm font-medium text-fw-text">{session.name}</p>
               {sessionExpiry && <SessionTimer expiresAt={sessionExpiry} />}
             </div>
             <PushNotificationPrompt />
@@ -59,7 +88,7 @@ export default async function DashboardPage() {
           {session.role === 'admin' && (
               <Link
                 href="/tasks/new"
-                className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-amber-600 text-white text-sm font-medium hover:bg-amber-500 active:bg-amber-700 transition"
+                className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-fw-accent text-white text-sm font-medium hover:bg-fw-hover active:bg-fw-hover transition"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -80,7 +109,7 @@ export default async function DashboardPage() {
           )}
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-600 text-white text-sm font-medium hover:bg-amber-500 active:bg-amber-700 transition"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-fw-accent text-white text-sm font-medium hover:bg-fw-hover active:bg-fw-hover transition"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -101,7 +130,7 @@ export default async function DashboardPage() {
           {(session.role === 'admin' || session.allowedSections?.includes('weather')) && (
             <Link
               href="/weather"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-600 text-white text-sm font-medium hover:bg-amber-500 active:bg-amber-700 transition"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-fw-accent text-white text-sm font-medium hover:bg-fw-hover active:bg-fw-hover transition"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -122,7 +151,7 @@ export default async function DashboardPage() {
           {(session.role === 'admin' || session.allowedSections?.includes('cart')) && (
             <Link
               href="/shopping"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-600 text-white text-sm font-medium hover:bg-amber-500 active:bg-amber-700 transition"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-fw-accent text-white text-sm font-medium hover:bg-fw-hover active:bg-fw-hover transition"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -142,10 +171,31 @@ export default async function DashboardPage() {
               Cart
             </Link>
           )}
+          {(session.role === 'admin' || session.allowedSections?.includes('chat')) && (
+            <Link
+              href="/chat"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-fw-accent text-white text-sm font-medium hover:bg-fw-hover active:bg-fw-hover transition"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              </svg>
+              Chat
+            </Link>
+          )}
           {session.role === 'admin' && (
             <Link
               href="/admin/users"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-amber-600 text-white text-sm font-medium hover:bg-amber-500 active:bg-amber-700 transition"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-fw-accent text-white text-sm font-medium hover:bg-fw-hover active:bg-fw-hover transition"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -171,11 +221,54 @@ export default async function DashboardPage() {
 
       <main className="max-w-2xl mx-auto px-5 py-6">
 
+        {/* Chat notifications */}
+        {(newBoardCount > 0 || newDmCount > 0) && (
+          <div className="space-y-2 mb-4">
+            {newBoardCount > 0 && (
+              <Link
+                href="/chat?tab=board"
+                className="flex items-center justify-between bg-fw-accent/10 border border-fw-accent/30 rounded-xl px-4 py-3 hover:bg-fw-accent/20 transition"
+              >
+                <div className="flex items-center gap-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-fw-accent">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                  </svg>
+                  <span className="text-sm font-medium text-fw-text">
+                    {newBoardCount} new board message{newBoardCount !== 1 ? 's' : ''}
+                  </span>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-fw-text/40">
+                  <path d="m9 18 6-6-6-6" />
+                </svg>
+              </Link>
+            )}
+            {newDmCount > 0 && (
+              <Link
+                href="/chat?tab=messages"
+                className="flex items-center justify-between bg-fw-accent/10 border border-fw-accent/30 rounded-xl px-4 py-3 hover:bg-fw-accent/20 transition"
+              >
+                <div className="flex items-center gap-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-fw-accent">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                    <polyline points="22,6 12,13 2,6" />
+                  </svg>
+                  <span className="text-sm font-medium text-fw-text">
+                    {newDmCount} new direct message{newDmCount !== 1 ? 's' : ''}
+                  </span>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-fw-text/40">
+                  <path d="m9 18 6-6-6-6" />
+                </svg>
+              </Link>
+            )}
+          </div>
+        )}
+
         {/* Summary stats (admin only) */}
         {session.role === 'admin' && <DashboardStats tasks={tasks} />}
 
         {/* Task count */}
-        <p className="text-sm text-stone-500 mb-4">{greeting}</p>
+        <p className="text-sm text-fw-text/50 mb-4">{greeting}</p>
 
         {/* Task list with role-aware filters and sorting */}
         <TaskList tasks={tasks} role={session.role} users={users} />

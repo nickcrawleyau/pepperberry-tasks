@@ -55,10 +55,10 @@ export default function CommentSection({ taskId, comments: initialComments }: Co
 
   return (
     <div>
-      <h3 className="text-sm font-medium text-stone-900 mb-3">
+      <h3 className="text-sm font-medium text-fw-text mb-3">
         Comments
         {comments.length > 0 && (
-          <span className="ml-1.5 text-stone-500 font-normal">
+          <span className="ml-1.5 text-fw-text/50 font-normal">
             ({comments.length})
           </span>
         )}
@@ -69,24 +69,24 @@ export default function CommentSection({ taskId, comments: initialComments }: Co
           {comments.map((comment) => (
             <div
               key={comment.id}
-              className="bg-stone-50 rounded-lg px-4 py-3"
+              className="bg-fw-surface rounded-lg px-4 py-3"
             >
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs font-medium text-stone-700">
+                <span className="text-xs font-medium text-fw-text/80">
                   {comment.user?.name || 'Unknown'}
                 </span>
-                <span className="text-[11px] text-stone-500">
+                <span className="text-[11px] text-fw-text/50">
                   {timeAgo(comment.created_at)}
                 </span>
               </div>
-              <p className="text-sm text-stone-900 leading-relaxed">
+              <p className="text-sm text-fw-text leading-relaxed">
                 {comment.content}
               </p>
             </div>
           ))}
         </div>
       ) : (
-        <p className="text-xs text-stone-500 mb-4">No comments yet</p>
+        <p className="text-xs text-fw-text/50 mb-4">No comments yet</p>
       )}
 
       <form onSubmit={handleSubmit} className="flex gap-2">
@@ -95,12 +95,12 @@ export default function CommentSection({ taskId, comments: initialComments }: Co
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="Add a comment..."
-          className="flex-1 rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-300 focus:border-transparent transition"
+          className="flex-1 rounded-lg border border-fw-surface bg-fw-surface px-3 py-2 text-sm text-fw-text placeholder:text-fw-text/30 focus:outline-none focus:ring-2 focus:ring-stone-300 focus:border-transparent transition"
         />
         <button
           type="submit"
           disabled={!content.trim() || loading}
-          className="px-4 py-2 rounded-lg bg-amber-600 text-white text-sm font-medium hover:bg-amber-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-4 py-2 rounded-lg bg-fw-accent text-white text-sm font-medium hover:bg-fw-hover transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? '...' : 'Post'}
         </button>

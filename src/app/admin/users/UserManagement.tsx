@@ -23,6 +23,7 @@ const TRADE_TYPES = [
 const SECTIONS = [
   { value: 'weather', label: 'Weather' },
   { value: 'cart', label: 'Cart' },
+  { value: 'chat', label: 'Chat' },
 ] as const;
 
 interface User {
@@ -57,7 +58,7 @@ export default function UserManagement({ initialUsers, currentUserId, loginsByUs
       {!showAddForm && (
         <button
           onClick={() => setShowAddForm(true)}
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-amber-600 text-white text-sm font-medium hover:bg-amber-500 transition"
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-fw-accent text-white text-sm font-medium hover:bg-fw-hover transition"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -210,8 +211,8 @@ function UserRow({
 
   return (
     <div
-      className={`bg-white rounded-xl border p-4 ${
-        isSelf ? 'border-emerald-400 border-2' : 'border-stone-200'
+      className={`bg-fw-surface rounded-xl border p-4 ${
+        isSelf ? 'border-emerald-400 border-2' : 'border-fw-surface'
       } ${!user.is_active ? 'opacity-50' : ''}`}
     >
       <div className="flex items-center justify-between">
@@ -224,27 +225,27 @@ function UserRow({
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium ${
                 user.role === 'admin'
-                  ? 'bg-stone-200 text-stone-700'
+                  ? 'bg-fw-surface text-fw-text/80'
                   : user.role === 'tradesperson'
-                    ? 'bg-amber-100 text-amber-700'
-                    : 'bg-emerald-100 text-emerald-700'
+                    ? 'bg-fw-accent/20 text-fw-accent'
+                    : 'bg-emerald-900/40 text-emerald-500'
               }`}
             >
               {user.name.charAt(0).toUpperCase()}
             </div>
           </div>
           <div>
-            <p className="text-sm font-medium text-stone-900">{user.name}</p>
-            <p className="text-xs text-stone-500">{roleLabel}</p>
+            <p className="text-sm font-medium text-fw-text">{user.name}</p>
+            <p className="text-xs text-fw-text/50">{roleLabel}</p>
             {user.phone && (
               <a
                 href={`tel:${user.phone.replace(/\s/g, '')}`}
-                className="text-xs text-amber-600 hover:text-amber-500 transition"
+                className="text-xs text-fw-accent hover:text-fw-accent transition"
               >
                 {user.phone}
               </a>
             )}
-            <p className="text-xs text-stone-400">
+            <p className="text-xs text-fw-text/40">
               {user.last_login
                 ? `Last login: ${formatLastLogin(user.last_login)}`
                 : 'Never logged in'}
@@ -256,7 +257,7 @@ function UserRow({
           <button
             onClick={onEdit}
             title="Edit user"
-            className="p-1.5 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-100 transition"
+            className="p-1.5 rounded-lg text-fw-text/40 hover:text-fw-text/80 hover:bg-fw-bg transition"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
@@ -267,7 +268,7 @@ function UserRow({
             <button
               onClick={onDeleteClick}
               title="Delete user"
-              className="p-1.5 rounded-lg text-stone-400 hover:text-red-600 hover:bg-red-50 transition"
+              className="p-1.5 rounded-lg text-fw-text/40 hover:text-red-600 hover:bg-red-900/30 transition"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M3 6h18" />
@@ -286,7 +287,7 @@ function UserRow({
             }`}
           >
             <span
-              className={`inline-block h-4 w-4 rounded-full bg-white shadow transition-transform ${
+              className={`inline-block h-4 w-4 rounded-full bg-fw-surface shadow transition-transform ${
                 user.is_active ? 'translate-x-6' : 'translate-x-1'
               }`}
             />
@@ -298,9 +299,9 @@ function UserRow({
       <LoginHistory loginCounts={loginCounts || {}} />
 
       {isDeleting && (
-        <div className="mt-3 pt-3 border-t border-stone-200">
-          <p className="text-xs text-stone-500 mb-2">
-            Delete <span className="text-stone-900 font-medium">{user.name}</span>? Their open tasks will be transferred to you.
+        <div className="mt-3 pt-3 border-t border-fw-surface">
+          <p className="text-xs text-fw-text/50 mb-2">
+            Delete <span className="text-fw-text font-medium">{user.name}</span>? Their open tasks will be transferred to you.
           </p>
           <div className="flex gap-2">
             <button
@@ -313,7 +314,7 @@ function UserRow({
             <button
               onClick={onDeleteCancel}
               disabled={deleteLoading}
-              className="px-3 py-1.5 rounded-lg border border-stone-300 text-xs font-medium text-stone-700 hover:bg-stone-200 transition"
+              className="px-3 py-1.5 rounded-lg border border-fw-text/20 text-xs font-medium text-fw-text/80 hover:bg-fw-surface transition"
             >
               Cancel
             </button>
@@ -341,9 +342,9 @@ function LoginHistory({ loginCounts }: { loginCounts: Record<string, number> }) 
   }
 
   return (
-    <div className="mt-2 pt-2 border-t border-stone-100">
+    <div className="mt-2 pt-2 border-t border-fw-surface">
       <div className="flex items-center gap-1">
-        <span className="text-[9px] text-stone-300 w-6 shrink-0">14d</span>
+        <span className="text-[9px] text-fw-text/30 w-6 shrink-0">14d</span>
         <div className="flex gap-0.5 flex-1">
           {days.map((day) => (
             <div
@@ -354,7 +355,7 @@ function LoginHistory({ loginCounts }: { loginCounts: Record<string, number> }) 
                   ? 'bg-red-500'
                   : day.count > 0
                     ? 'bg-emerald-500'
-                    : 'bg-stone-100'
+                    : 'bg-fw-bg'
               }`}
             />
           ))}
@@ -370,7 +371,7 @@ function AddUserForm({ onDone }: { onDone: (user: User | null) => void }) {
   const [role, setRole] = useState('tradesperson');
   const [tradeType, setTradeType] = useState('');
   const [phone, setPhone] = useState('');
-  const [allowedSections, setAllowedSections] = useState<string[]>(['weather', 'cart']);
+  const [allowedSections, setAllowedSections] = useState<string[]>(['weather', 'cart', 'chat']);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -389,7 +390,7 @@ function AddUserForm({ onDone }: { onDone: (user: User | null) => void }) {
           role,
           trade_type: role === 'tradesperson' ? tradeType || null : null,
           phone: phone.trim() || null,
-          allowed_sections: role === 'admin' ? ['weather', 'cart'] : allowedSections,
+          allowed_sections: role === 'admin' ? ['weather', 'cart', 'chat'] : allowedSections,
         }),
       });
 
@@ -407,20 +408,20 @@ function AddUserForm({ onDone }: { onDone: (user: User | null) => void }) {
   }
 
   const inputClass =
-    'w-full rounded-lg border border-stone-200 px-3 py-2 text-sm text-stone-900 bg-stone-50 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-300 focus:border-transparent transition';
+    'w-full rounded-lg border border-fw-surface px-3 py-2 text-sm text-fw-text bg-fw-surface placeholder:text-fw-text/30 focus:outline-none focus:ring-2 focus:ring-stone-300 focus:border-transparent transition';
   const selectClass =
-    'w-full rounded-lg border border-stone-200 px-3 py-2 text-sm text-stone-900 bg-stone-50 focus:outline-none focus:ring-2 focus:ring-stone-300 focus:border-transparent transition';
+    'w-full rounded-lg border border-fw-surface px-3 py-2 text-sm text-fw-text bg-fw-surface focus:outline-none focus:ring-2 focus:ring-stone-300 focus:border-transparent transition';
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white rounded-xl border border-stone-200 p-5 space-y-4"
+      className="bg-fw-surface rounded-xl border border-fw-surface p-5 space-y-4"
     >
-      <p className="text-sm font-medium text-stone-900">Add New User</p>
+      <p className="text-sm font-medium text-fw-text">Add New User</p>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs font-medium text-stone-500 mb-1">Name *</label>
+          <label className="block text-xs font-medium text-fw-text/50 mb-1">Name *</label>
           <input
             type="text"
             value={name}
@@ -431,7 +432,7 @@ function AddUserForm({ onDone }: { onDone: (user: User | null) => void }) {
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-stone-500 mb-1">PIN *</label>
+          <label className="block text-xs font-medium text-fw-text/50 mb-1">PIN *</label>
           <input
             type="text"
             inputMode="numeric"
@@ -447,7 +448,7 @@ function AddUserForm({ onDone }: { onDone: (user: User | null) => void }) {
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs font-medium text-stone-500 mb-1">Role *</label>
+          <label className="block text-xs font-medium text-fw-text/50 mb-1">Role *</label>
           <select
             value={role}
             onChange={(e) => setRole(e.target.value)}
@@ -460,7 +461,7 @@ function AddUserForm({ onDone }: { onDone: (user: User | null) => void }) {
         </div>
         {role === 'tradesperson' && (
           <div>
-            <label className="block text-xs font-medium text-stone-500 mb-1">Specialty</label>
+            <label className="block text-xs font-medium text-fw-text/50 mb-1">Specialty</label>
             <select
               value={tradeType}
               onChange={(e) => setTradeType(e.target.value)}
@@ -478,7 +479,7 @@ function AddUserForm({ onDone }: { onDone: (user: User | null) => void }) {
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-stone-500 mb-1">Phone</label>
+        <label className="block text-xs font-medium text-fw-text/50 mb-1">Phone</label>
         <input
           type="tel"
           value={phone}
@@ -490,10 +491,10 @@ function AddUserForm({ onDone }: { onDone: (user: User | null) => void }) {
 
       {role !== 'admin' && (
         <div>
-          <label className="block text-xs font-medium text-stone-500 mb-1">Sections</label>
+          <label className="block text-xs font-medium text-fw-text/50 mb-1">Sections</label>
           <div className="flex gap-4">
             {SECTIONS.map((s) => (
-              <label key={s.value} className="flex items-center gap-2 text-sm text-stone-700">
+              <label key={s.value} className="flex items-center gap-2 text-sm text-fw-text/80">
                 <input
                   type="checkbox"
                   checked={allowedSections.includes(s.value)}
@@ -504,7 +505,7 @@ function AddUserForm({ onDone }: { onDone: (user: User | null) => void }) {
                         : allowedSections.filter((v) => v !== s.value)
                     );
                   }}
-                  className="rounded border-stone-300 text-amber-600 focus:ring-amber-500"
+                  className="rounded border-fw-text/20 text-fw-accent focus:ring-fw-accent"
                 />
                 {s.label}
               </label>
@@ -519,14 +520,14 @@ function AddUserForm({ onDone }: { onDone: (user: User | null) => void }) {
         <button
           type="submit"
           disabled={loading || pin.length < 4}
-          className="px-4 py-2 rounded-lg bg-amber-600 text-white text-sm font-medium hover:bg-amber-500 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-4 py-2 rounded-lg bg-fw-accent text-white text-sm font-medium hover:bg-fw-hover transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? 'Adding...' : 'Add User'}
         </button>
         <button
           type="button"
           onClick={() => onDone(null)}
-          className="px-4 py-2 rounded-lg border border-stone-300 text-sm font-medium text-stone-700 hover:bg-stone-200 transition"
+          className="px-4 py-2 rounded-lg border border-fw-text/20 text-sm font-medium text-fw-text/80 hover:bg-fw-surface transition"
         >
           Cancel
         </button>
@@ -568,7 +569,7 @@ function EditUserForm({
     if (phone.trim() !== (user.phone || '')) {
       updates.phone = phone.trim() || null;
     }
-    const currentSections = user.allowed_sections || ['weather', 'cart'];
+    const currentSections = user.allowed_sections || ['weather', 'cart', 'chat'];
     if (JSON.stringify([...allowedSections].sort()) !== JSON.stringify([...currentSections].sort())) {
       updates.allowed_sections = allowedSections;
     }
@@ -596,7 +597,7 @@ function EditUserForm({
         role,
         trade_type: role === 'tradesperson' ? tradeType || null : null,
         phone: phone.trim() || null,
-        allowed_sections: role === 'admin' ? ['weather', 'cart'] : allowedSections,
+        allowed_sections: role === 'admin' ? ['weather', 'cart', 'chat'] : allowedSections,
       });
     } catch {
       setError('Something went wrong');
@@ -606,20 +607,20 @@ function EditUserForm({
   }
 
   const inputClass =
-    'w-full rounded-lg border border-stone-200 px-3 py-2 text-sm text-stone-900 bg-stone-50 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-300 focus:border-transparent transition';
+    'w-full rounded-lg border border-fw-surface px-3 py-2 text-sm text-fw-text bg-fw-surface placeholder:text-fw-text/30 focus:outline-none focus:ring-2 focus:ring-stone-300 focus:border-transparent transition';
   const selectClass =
-    'w-full rounded-lg border border-stone-200 px-3 py-2 text-sm text-stone-900 bg-stone-50 focus:outline-none focus:ring-2 focus:ring-stone-300 focus:border-transparent transition';
+    'w-full rounded-lg border border-fw-surface px-3 py-2 text-sm text-fw-text bg-fw-surface focus:outline-none focus:ring-2 focus:ring-stone-300 focus:border-transparent transition';
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-white rounded-xl border-2 border-stone-300 p-5 space-y-4"
+      className="bg-fw-surface rounded-xl border-2 border-fw-text/20 p-5 space-y-4"
     >
-      <p className="text-sm font-medium text-stone-900">Edit User</p>
+      <p className="text-sm font-medium text-fw-text">Edit User</p>
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs font-medium text-stone-500 mb-1">Name</label>
+          <label className="block text-xs font-medium text-fw-text/50 mb-1">Name</label>
           <input
             type="text"
             value={name}
@@ -629,8 +630,8 @@ function EditUserForm({
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-stone-500 mb-1">
-            Reset PIN <span className="text-stone-500 font-normal">(leave blank to keep)</span>
+          <label className="block text-xs font-medium text-fw-text/50 mb-1">
+            Reset PIN <span className="text-fw-text/50 font-normal">(leave blank to keep)</span>
           </label>
           <input
             type="text"
@@ -646,7 +647,7 @@ function EditUserForm({
 
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs font-medium text-stone-500 mb-1">Role</label>
+          <label className="block text-xs font-medium text-fw-text/50 mb-1">Role</label>
           <select
             value={role}
             onChange={(e) => setRole(e.target.value)}
@@ -659,7 +660,7 @@ function EditUserForm({
         </div>
         {role === 'tradesperson' && (
           <div>
-            <label className="block text-xs font-medium text-stone-500 mb-1">Specialty</label>
+            <label className="block text-xs font-medium text-fw-text/50 mb-1">Specialty</label>
             <select
               value={tradeType}
               onChange={(e) => setTradeType(e.target.value)}
@@ -677,7 +678,7 @@ function EditUserForm({
       </div>
 
       <div>
-        <label className="block text-xs font-medium text-stone-500 mb-1">Phone</label>
+        <label className="block text-xs font-medium text-fw-text/50 mb-1">Phone</label>
         <input
           type="tel"
           value={phone}
@@ -689,10 +690,10 @@ function EditUserForm({
 
       {role !== 'admin' && (
         <div>
-          <label className="block text-xs font-medium text-stone-500 mb-1">Sections</label>
+          <label className="block text-xs font-medium text-fw-text/50 mb-1">Sections</label>
           <div className="flex gap-4">
             {SECTIONS.map((s) => (
-              <label key={s.value} className="flex items-center gap-2 text-sm text-stone-700">
+              <label key={s.value} className="flex items-center gap-2 text-sm text-fw-text/80">
                 <input
                   type="checkbox"
                   checked={allowedSections.includes(s.value)}
@@ -703,7 +704,7 @@ function EditUserForm({
                         : allowedSections.filter((v) => v !== s.value)
                     );
                   }}
-                  className="rounded border-stone-300 text-amber-600 focus:ring-amber-500"
+                  className="rounded border-fw-text/20 text-fw-accent focus:ring-fw-accent"
                 />
                 {s.label}
               </label>
@@ -718,14 +719,14 @@ function EditUserForm({
         <button
           type="submit"
           disabled={loading}
-          className="px-4 py-2 rounded-lg bg-amber-600 text-white text-sm font-medium hover:bg-amber-500 transition disabled:opacity-50"
+          className="px-4 py-2 rounded-lg bg-fw-accent text-white text-sm font-medium hover:bg-fw-hover transition disabled:opacity-50"
         >
           {loading ? 'Saving...' : 'Save'}
         </button>
         <button
           type="button"
           onClick={() => onDone(null)}
-          className="px-4 py-2 rounded-lg border border-stone-300 text-sm font-medium text-stone-700 hover:bg-stone-200 transition"
+          className="px-4 py-2 rounded-lg border border-fw-text/20 text-sm font-medium text-fw-text/80 hover:bg-fw-surface transition"
         >
           Cancel
         </button>

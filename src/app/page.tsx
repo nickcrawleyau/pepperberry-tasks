@@ -146,8 +146,8 @@ function LoginForm() {
 
         {/* Logged out message */}
         {loggedOut && (
-          <div className="mb-4 flex items-center gap-2 rounded-lg bg-stone-800 border border-stone-700 px-4 py-3 text-sm text-stone-300">
-            <svg className="w-4 h-4 flex-shrink-0 text-stone-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <div className="mb-4 flex items-center gap-2 rounded-lg bg-fw-surface border border-fw-surface px-4 py-3 text-sm text-fw-text/30">
+            <svg className="w-4 h-4 flex-shrink-0 text-fw-text/40" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
               <polyline points="16 17 21 12 16 7" />
               <line x1="21" y1="12" x2="9" y2="12" />
@@ -159,11 +159,11 @@ function LoginForm() {
         {/* Login Form */}
         <form
           onSubmit={handleSubmit}
-          className="bg-stone-900 rounded-2xl border border-stone-700 p-8 shadow-2xl shadow-black/40"
+          className="bg-fw-bg rounded-2xl border border-fw-surface p-8 shadow-2xl shadow-black/60"
         >
           <div className="space-y-6">
             {/* Private notice */}
-            <p className="text-center text-xs text-stone-500 tracking-wide uppercase">Private and Confidential</p>
+            <p className="text-center text-xs text-white tracking-wide uppercase">Private and Confidential</p>
 
             {/* User Select */}
             <div>
@@ -179,7 +179,7 @@ function LoginForm() {
                     if (e.target.value) setTimeout(() => pinRefs.current[0]?.focus(), 50);
                   }}
                   disabled={usersLoading}
-                  className="w-full appearance-none rounded-lg border border-stone-700 bg-stone-800 px-4 py-3 text-sm text-stone-100 focus:outline-none focus:ring-2 focus:ring-amber-600/50 focus:border-amber-600/50 transition disabled:opacity-50"
+                  className="w-full appearance-none rounded-lg border border-fw-surface bg-fw-surface px-4 py-3 text-sm text-fw-text focus:outline-none focus:ring-2 focus:ring-fw-accent/50 focus:border-fw-accent/50 transition disabled:opacity-50"
                 >
                   <option value="">
                     {usersLoading ? 'Loading...' : 'Login as..'}
@@ -192,7 +192,7 @@ function LoginForm() {
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
                   <svg
-                    className="h-4 w-4 text-stone-400"
+                    className="h-4 w-4 text-fw-text/40"
                     fill="none"
                     stroke="currentColor"
                     strokeWidth="2"
@@ -204,38 +204,37 @@ function LoginForm() {
               </div>
             </div>
 
-            {/* PIN Input - only available after user selected */}
-            {selectedUser && (
-              <div>
-                <div className="flex gap-3 justify-center">
-                  {pin.map((digit, i) => (
-                    <input
-                      key={i}
-                      ref={(el) => { pinRefs.current[i] = el; }}
-                      type="password"
-                      inputMode="numeric"
-                      maxLength={1}
-                      value={digit}
-                      onChange={(e) => handlePinChange(i, e.target.value)}
-                      onKeyDown={(e) => handlePinKeyDown(i, e)}
-                      onPaste={i === 0 ? handlePinPaste : undefined}
-                      aria-label={`PIN digit ${i + 1}`}
-                      className={`w-14 h-14 text-center text-xl rounded-lg border bg-stone-800 text-stone-100 focus:outline-none transition ${
-                        i === nextPinIndex
-                          ? 'border-amber-500 ring-2 ring-amber-500/50'
-                          : digit
-                            ? 'border-stone-500'
-                            : 'border-stone-700'
-                      }`}
-                    />
-                  ))}
-                </div>
+            {/* PIN Input - always rendered, visibility toggled */}
+            <div className={selectedUser ? 'opacity-100 transition-opacity duration-200' : 'opacity-0 pointer-events-none'}>
+              <div className="flex gap-3 justify-center">
+                {pin.map((digit, i) => (
+                  <input
+                    key={i}
+                    ref={(el) => { pinRefs.current[i] = el; }}
+                    type="password"
+                    inputMode="numeric"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handlePinChange(i, e.target.value)}
+                    onKeyDown={(e) => handlePinKeyDown(i, e)}
+                    onPaste={i === 0 ? handlePinPaste : undefined}
+                    tabIndex={selectedUser ? 0 : -1}
+                    aria-label={`PIN digit ${i + 1}`}
+                    className={`w-14 h-14 text-center text-xl rounded-lg border bg-fw-surface text-fw-text focus:outline-none transition ${
+                      i === nextPinIndex
+                        ? 'border-fw-accent ring-2 ring-fw-accent/50'
+                        : digit
+                          ? 'border-stone-500'
+                          : 'border-fw-surface'
+                    }`}
+                  />
+                ))}
               </div>
-            )}
+            </div>
 
-            {/* Forgot PIN */}
-            {selectedUser && !forgotPinSent && (
-              <div className="text-center">
+            {/* Forgot PIN / confirmation / error — fixed-height container */}
+            <div className="min-h-[36px] flex items-center justify-center">
+              {selectedUser && !forgotPinSent && !error && !loading && (
                 <button
                   type="button"
                   disabled={forgotPinLoading}
@@ -254,44 +253,40 @@ function LoginForm() {
                       setForgotPinLoading(false);
                     }
                   }}
-                  className="text-xs text-stone-400 hover:text-amber-500 transition disabled:opacity-50"
+                  className="text-xs text-fw-text/40 hover:text-fw-accent transition disabled:opacity-50"
                 >
                   {forgotPinLoading ? 'Sending...' : 'Forgot PIN?'}
                 </button>
-              </div>
-            )}
+              )}
 
-            {/* Forgot PIN confirmation */}
-            {forgotPinSent && (
-              <div className="flex items-center gap-2 text-sm text-amber-400 bg-amber-900/20 rounded-lg px-4 py-2.5">
-                <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path d="M5 13l4 4L19 7" />
-                </svg>
-                <span>Your admin has been notified. They will reset your PIN.</span>
-              </div>
-            )}
+              {forgotPinSent && (
+                <div className="flex items-center gap-2 text-sm text-fw-accent bg-fw-accent/20 rounded-lg px-4 py-2.5">
+                  <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>Your admin has been notified. They will reset your PIN.</span>
+                </div>
+              )}
 
-            {/* Error */}
-            {error && (
-              <div className="flex items-center gap-2 text-sm text-red-400 bg-red-900/30 rounded-lg px-4 py-2.5">
-                <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="M12 8v4m0 4h.01" />
-                </svg>
-                <span>{error}</span>
-              </div>
-            )}
+              {error && (
+                <div className="flex items-center gap-2 text-sm text-red-400 bg-red-900/30 rounded-lg px-4 py-2.5">
+                  <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 8v4m0 4h.01" />
+                  </svg>
+                  <span>{error}</span>
+                </div>
+              )}
 
-            {/* Loading indicator */}
-            {loading && (
-              <div className="flex justify-center">
-                <svg className="w-5 h-5 animate-spin text-amber-500" fill="none" viewBox="0 0 24 24">
+              {loading && (
+                <svg className="w-5 h-5 animate-spin text-fw-accent" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
-              </div>
-            )}
-            <p className="text-center text-[10px] text-stone-500 pt-2">velvet-basalt</p>
+              )}
+            </div>
+            <p className="text-center text-[10px] text-fw-text/50 pt-2">version | velvet-basalt</p>
+            <p className="text-center text-[10px] text-fw-text/50">Property of Nick Crawley &copy;2026</p>
           </div>
         </form>
       </div>

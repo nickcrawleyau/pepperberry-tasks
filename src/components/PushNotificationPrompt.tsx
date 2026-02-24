@@ -73,7 +73,7 @@ export default function PushNotificationPrompt() {
       title={subscribed ? 'Notifications on' : 'Enable notifications'}
       className={`p-1.5 rounded-lg transition ${
         loading ? 'opacity-50 cursor-not-allowed' : ''
-      } ${subscribed ? 'text-emerald-600 hover:bg-emerald-50' : 'text-stone-400 hover:text-amber-600 hover:bg-amber-50'}`}
+      } ${subscribed ? 'text-emerald-600 hover:bg-emerald-50' : 'text-fw-text/40 hover:text-fw-accent hover:bg-amber-50'}`}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"

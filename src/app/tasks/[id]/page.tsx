@@ -109,13 +109,13 @@ export default async function TaskDetailPage({
     new Date(typedTask.due_date) < new Date(new Date().toDateString());
 
   return (
-    <div className="min-h-screen bg-stone-100">
-      <header className="bg-white border-b border-stone-200 sticky top-0 z-30">
+    <div className="min-h-screen bg-fw-bg">
+      <header className="bg-fw-surface border-b border-fw-surface sticky top-0 z-30">
         <div className="max-w-2xl mx-auto px-5 py-4">
           <div className="flex items-center gap-4">
             <Link
               href="/dashboard"
-              className="text-stone-500 hover:text-stone-700 transition"
+              className="text-fw-text/50 hover:text-stone-700 transition"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -135,7 +135,7 @@ export default async function TaskDetailPage({
               <Link href="/dashboard">
                 <img src="/PBLogo.png" alt="Pepperberry" className="w-7 h-7 object-contain" />
               </Link>
-              <h1 className="text-lg font-medium text-stone-900">
+              <h1 className="text-lg font-medium text-fw-text">
                 Job Detail
               </h1>
             </div>
@@ -149,7 +149,7 @@ export default async function TaskDetailPage({
               />
               <Link
                 href={`/tasks/${id}/edit`}
-                className="px-3 py-1.5 rounded-lg border border-stone-300 text-xs font-medium text-stone-700 hover:bg-stone-200 transition"
+                className="px-3 py-1.5 rounded-lg border border-fw-text/20 text-xs font-medium text-fw-text/80 hover:bg-stone-200 transition"
               >
                 Edit
               </Link>
@@ -165,82 +165,82 @@ export default async function TaskDetailPage({
       <main className="max-w-2xl mx-auto px-5 py-6 space-y-6">
         {/* Title & Description */}
         <div>
-          <h2 className="text-xl font-medium text-stone-900 leading-snug">
+          <h2 className="text-xl font-medium text-fw-text leading-snug">
             {typedTask.title}
           </h2>
           {typedTask.description && (
-            <p className="mt-2 text-sm text-stone-500 leading-relaxed">
+            <p className="mt-2 text-sm text-fw-text/50 leading-relaxed">
               {typedTask.description}
             </p>
           )}
         </div>
 
         {/* Status Updater */}
-        <div className="bg-white rounded-xl border border-stone-200 p-5">
-          <p className="text-xs font-medium text-stone-500 mb-2">Status</p>
+        <div className="bg-fw-surface rounded-xl border border-fw-surface p-5">
+          <p className="text-xs font-medium text-fw-text/50 mb-2">Status</p>
           <StatusUpdater taskId={typedTask.id} currentStatus={typedTask.status} />
         </div>
 
         {/* Details Grid */}
-        <div className="bg-white rounded-xl border border-stone-200 p-5">
+        <div className="bg-fw-surface rounded-xl border border-fw-surface p-5">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <p className="text-xs text-stone-500 mb-0.5">Priority</p>
+              <p className="text-xs text-fw-text/50 mb-0.5">Priority</p>
               <div className="flex items-center gap-1.5">
                 <span className={`w-2 h-2 rounded-full ${PRIORITY_DOT[typedTask.priority]}`} />
-                <span className="text-sm text-stone-900">
+                <span className="text-sm text-fw-text">
                   {PRIORITY_LABELS[typedTask.priority]}
                 </span>
               </div>
             </div>
 
             <div>
-              <p className="text-xs text-stone-500 mb-0.5">Category</p>
-              <p className="text-sm text-stone-900">
+              <p className="text-xs text-fw-text/50 mb-0.5">Category</p>
+              <p className="text-sm text-fw-text">
                 {CATEGORY_LABELS[typedTask.category] || typedTask.category}
               </p>
             </div>
 
             <div>
-              <p className="text-xs text-stone-500 mb-0.5">Location</p>
-              <p className="text-sm text-stone-900">
+              <p className="text-xs text-fw-text/50 mb-0.5">Location</p>
+              <p className="text-sm text-fw-text">
                 {LOCATION_LABELS[typedTask.location] || typedTask.location}
               </p>
             </div>
 
             <div>
-              <p className="text-xs text-stone-500 mb-0.5">Assigned to</p>
-              <p className="text-sm text-stone-900">
+              <p className="text-xs text-fw-text/50 mb-0.5">Assigned to</p>
+              <p className="text-sm text-fw-text">
                 {typedTask.assigned_user?.name || 'Unassigned'}
               </p>
             </div>
 
             <div>
-              <p className="text-xs text-stone-500 mb-0.5">Due date</p>
-              <p className={`text-sm ${isOverdue ? 'text-red-500 font-medium' : 'text-stone-700'}`}>
+              <p className="text-xs text-fw-text/50 mb-0.5">Due date</p>
+              <p className={`text-sm ${isOverdue ? 'text-red-500 font-medium' : 'text-fw-text/80'}`}>
                 {isOverdue && 'Overdue — '}
                 {formatDate(typedTask.due_date)}
               </p>
             </div>
 
             <div>
-              <p className="text-xs text-stone-500 mb-0.5">Created by</p>
-              <p className="text-sm text-stone-900">
+              <p className="text-xs text-fw-text/50 mb-0.5">Created by</p>
+              <p className="text-sm text-fw-text">
                 {typedTask.created_user?.name || 'Unknown'}
               </p>
             </div>
 
             <div>
-              <p className="text-xs text-stone-500 mb-0.5">Created</p>
-              <p className="text-sm text-stone-900">
+              <p className="text-xs text-fw-text/50 mb-0.5">Created</p>
+              <p className="text-sm text-fw-text">
                 {formatDate(typedTask.created_at)}
               </p>
             </div>
 
             {typedTask.recurrence_pattern && (
               <div>
-                <p className="text-xs text-stone-500 mb-0.5">Repeats</p>
-                <p className="text-sm text-stone-900">
+                <p className="text-xs text-fw-text/50 mb-0.5">Repeats</p>
+                <p className="text-sm text-fw-text">
                   {RECURRENCE_LABELS[typedTask.recurrence_pattern] || typedTask.recurrence_pattern}
                 </p>
               </div>
@@ -248,8 +248,8 @@ export default async function TaskDetailPage({
 
             {typedTask.completed_at && (
               <div>
-                <p className="text-xs text-stone-500 mb-0.5">Completed</p>
-                <p className="text-sm text-stone-900">
+                <p className="text-xs text-fw-text/50 mb-0.5">Completed</p>
+                <p className="text-sm text-fw-text">
                   {formatDate(typedTask.completed_at)}
                 </p>
               </div>
@@ -258,7 +258,7 @@ export default async function TaskDetailPage({
         </div>
 
         {/* Photos */}
-        <div className="bg-white rounded-xl border border-stone-200 p-5">
+        <div className="bg-fw-surface rounded-xl border border-fw-surface p-5">
           <PhotoSection
             taskId={typedTask.id}
             photos={typedPhotos}
@@ -269,12 +269,12 @@ export default async function TaskDetailPage({
         </div>
 
         {/* Activity Log */}
-        <div className="bg-white rounded-xl border border-stone-200 p-5">
+        <div className="bg-fw-surface rounded-xl border border-fw-surface p-5">
           <ActivityLog activities={typedActivities} />
         </div>
 
         {/* Comments */}
-        <div className="bg-white rounded-xl border border-stone-200 p-5">
+        <div className="bg-fw-surface rounded-xl border border-fw-surface p-5">
           <CommentSection taskId={typedTask.id} comments={typedComments} />
         </div>
       </main>
