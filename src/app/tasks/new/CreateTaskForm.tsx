@@ -122,9 +122,9 @@ export default function CreateTaskForm({ users }: CreateTaskFormProps) {
   }
 
   const selectClass =
-    'w-full rounded-lg border border-fw-surface px-3 py-2.5 text-sm text-fw-text bg-fw-surface focus:outline-none focus:ring-2 focus:ring-stone-300 focus:border-transparent transition';
+    'w-full rounded-lg border border-fw-surface px-3 py-2.5 text-sm text-fw-text bg-fw-surface focus:outline-none focus:ring-2 focus:ring-fw-accent focus:border-transparent transition';
   const inputClass =
-    'w-full rounded-lg border border-fw-surface px-3 py-2.5 text-sm text-fw-text bg-fw-surface placeholder:text-fw-text/30 focus:outline-none focus:ring-2 focus:ring-stone-300 focus:border-transparent transition';
+    'w-full rounded-lg border border-fw-surface px-3 py-2.5 text-sm text-fw-text bg-fw-surface placeholder:text-fw-text/30 focus:outline-none focus:ring-2 focus:ring-fw-accent focus:border-transparent transition';
   const labelClass = 'block text-xs font-medium text-fw-text/50 mb-1.5';
 
   return (

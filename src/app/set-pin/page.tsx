@@ -224,7 +224,7 @@ export default function SetPinPage() {
                     setError('');
                     setTimeout(() => pinRefs.current[0]?.focus(), 50);
                   }}
-                  className="w-full rounded-lg border border-fw-surface py-2.5 text-xs font-medium text-fw-text/40 hover:text-stone-200 hover:border-stone-500 transition"
+                  className="w-full rounded-lg border border-fw-surface py-2.5 text-xs font-medium text-fw-text/40 hover:text-fw-text/80 hover:border-fw-text/50 transition"
                 >
                   Start Over
                 </button>

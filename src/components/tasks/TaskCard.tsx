@@ -44,12 +44,12 @@ export default function TaskCard({ task }: { task: Task }) {
       className={`block rounded-xl border p-5 transition ${
         isUrgent
           ? 'bg-red-900/30 border-red-500/30 border-l-4 border-l-red-500 hover:border-red-400'
-          : 'bg-fw-surface border-fw-surface hover:border-stone-300'
+          : 'bg-fw-surface border-fw-surface hover:border-fw-text/30'
       }`}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-medium text-fw-text leading-snug">
+          <h3 className={`text-sm font-medium leading-snug ${task.status === 'done' ? 'line-through text-fw-text/50' : 'text-fw-text'}`}>
             {isUrgent && (
               <span className="inline-block bg-red-500 text-white text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded mr-1.5 align-middle">
                 Urgent

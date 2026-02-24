@@ -218,7 +218,7 @@ function BoardTab({
           onChange={(e) => setInput(e.target.value)}
           maxLength={MAX_CHAT_MESSAGE_LENGTH}
           placeholder="Write a message..."
-          className="flex-1 rounded-lg border border-fw-surface px-3 py-2 text-sm text-fw-text bg-fw-surface placeholder:text-fw-text/30 focus:outline-none focus:ring-2 focus:ring-stone-300 focus:border-transparent transition"
+          className="flex-1 rounded-lg border border-fw-surface px-3 py-2 text-sm text-fw-text bg-fw-surface placeholder:text-fw-text/30 focus:outline-none focus:ring-2 focus:ring-fw-accent focus:border-transparent transition"
         />
         <button
           type="submit"
@@ -292,7 +292,7 @@ function MessagesTab({
       {!showNewMessage && (
         <button
           onClick={() => setShowNewMessage(true)}
-          className="w-full mb-4 py-2.5 rounded-lg border border-dashed border-fw-text/20 text-sm text-fw-text/50 hover:border-stone-400 hover:text-fw-text/80 transition"
+          className="w-full mb-4 py-2.5 rounded-lg border border-dashed border-fw-text/20 text-sm text-fw-text/50 hover:border-fw-text/40 hover:text-fw-text/80 transition"
         >
           + New Message
         </button>
@@ -525,7 +525,7 @@ function DMThread({
           onChange={(e) => setInput(e.target.value)}
           maxLength={MAX_CHAT_MESSAGE_LENGTH}
           placeholder="Write a message..."
-          className="flex-1 rounded-lg border border-fw-surface px-3 py-2 text-sm text-fw-text bg-fw-surface placeholder:text-fw-text/30 focus:outline-none focus:ring-2 focus:ring-stone-300 focus:border-transparent transition"
+          className="flex-1 rounded-lg border border-fw-surface px-3 py-2 text-sm text-fw-text bg-fw-surface placeholder:text-fw-text/30 focus:outline-none focus:ring-2 focus:ring-fw-accent focus:border-transparent transition"
         />
         <button
           type="submit"

@@ -408,9 +408,9 @@ function AddUserForm({ onDone }: { onDone: (user: User | null) => void }) {
   }
 
   const inputClass =
-    'w-full rounded-lg border border-fw-surface px-3 py-2 text-sm text-fw-text bg-fw-surface placeholder:text-fw-text/30 focus:outline-none focus:ring-2 focus:ring-stone-300 focus:border-transparent transition';
+    'w-full rounded-lg border border-fw-surface px-3 py-2 text-sm text-fw-text bg-fw-surface placeholder:text-fw-text/30 focus:outline-none focus:ring-2 focus:ring-fw-accent focus:border-transparent transition';
   const selectClass =
-    'w-full rounded-lg border border-fw-surface px-3 py-2 text-sm text-fw-text bg-fw-surface focus:outline-none focus:ring-2 focus:ring-stone-300 focus:border-transparent transition';
+    'w-full rounded-lg border border-fw-surface px-3 py-2 text-sm text-fw-text bg-fw-surface focus:outline-none focus:ring-2 focus:ring-fw-accent focus:border-transparent transition';
 
   return (
     <form
@@ -607,9 +607,9 @@ function EditUserForm({
   }
 
   const inputClass =
-    'w-full rounded-lg border border-fw-surface px-3 py-2 text-sm text-fw-text bg-fw-surface placeholder:text-fw-text/30 focus:outline-none focus:ring-2 focus:ring-stone-300 focus:border-transparent transition';
+    'w-full rounded-lg border border-fw-surface px-3 py-2 text-sm text-fw-text bg-fw-surface placeholder:text-fw-text/30 focus:outline-none focus:ring-2 focus:ring-fw-accent focus:border-transparent transition';
   const selectClass =
-    'w-full rounded-lg border border-fw-surface px-3 py-2 text-sm text-fw-text bg-fw-surface focus:outline-none focus:ring-2 focus:ring-stone-300 focus:border-transparent transition';
+    'w-full rounded-lg border border-fw-surface px-3 py-2 text-sm text-fw-text bg-fw-surface focus:outline-none focus:ring-2 focus:ring-fw-accent focus:border-transparent transition';
 
   return (
     <form

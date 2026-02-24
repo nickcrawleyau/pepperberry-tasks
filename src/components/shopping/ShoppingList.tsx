@@ -64,12 +64,12 @@ export default function ShoppingList({ initialItems, admins }: ShoppingListProps
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Add item..."
-            className="flex-1 rounded-lg border border-fw-surface px-3 py-2 text-sm text-fw-text bg-fw-surface focus:outline-none focus:ring-2 focus:ring-stone-300 focus:border-transparent transition"
+            className="flex-1 rounded-lg border border-fw-surface px-3 py-2 text-sm text-fw-text bg-fw-surface focus:outline-none focus:ring-2 focus:ring-fw-accent focus:border-transparent transition"
           />
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value)}
-            className="rounded-lg border border-fw-surface px-2 py-2 text-sm text-fw-text/80 bg-fw-surface focus:outline-none focus:ring-2 focus:ring-stone-300 transition"
+            className="rounded-lg border border-fw-surface px-2 py-2 text-sm text-fw-text/80 bg-fw-surface focus:outline-none focus:ring-2 focus:ring-fw-accent transition"
           >
             {SHOPPING_CATEGORIES.map((c) => (
               <option key={c} value={c}>{SHOPPING_CATEGORY_LABELS[c]}</option>
@@ -78,7 +78,7 @@ export default function ShoppingList({ initialItems, admins }: ShoppingListProps
           <select
             value={assignedTo}
             onChange={(e) => setAssignedTo(e.target.value)}
-            className="rounded-lg border border-fw-surface px-2 py-2 text-sm text-fw-text/80 bg-fw-surface focus:outline-none focus:ring-2 focus:ring-stone-300 transition"
+            className="rounded-lg border border-fw-surface px-2 py-2 text-sm text-fw-text/80 bg-fw-surface focus:outline-none focus:ring-2 focus:ring-fw-accent transition"
           >
             {admins.map((a) => (
               <option key={a.id} value={a.id}>{a.name.split(' ')[0]}</option>

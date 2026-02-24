@@ -115,7 +115,7 @@ export default async function TaskDetailPage({
           <div className="flex items-center gap-4">
             <Link
               href="/dashboard"
-              className="text-fw-text/50 hover:text-stone-700 transition"
+              className="text-fw-text/50 hover:text-fw-text/80 transition"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -149,7 +149,7 @@ export default async function TaskDetailPage({
               />
               <Link
                 href={`/tasks/${id}/edit`}
-                className="px-3 py-1.5 rounded-lg border border-fw-text/20 text-xs font-medium text-fw-text/80 hover:bg-stone-200 transition"
+                className="px-3 py-1.5 rounded-lg border border-fw-text/20 text-xs font-medium text-fw-text/80 hover:bg-fw-bg transition"
               >
                 Edit
               </Link>

@@ -177,7 +177,7 @@ export default function PhotoSection({
       {/* Upload input */}
       {canUpload && (
         <label
-          className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-fw-text/20 text-sm font-medium text-fw-text/80 transition cursor-pointer hover:bg-stone-200 ${
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-fw-text/20 text-sm font-medium text-fw-text/80 transition cursor-pointer hover:bg-fw-bg ${
             uploading ? 'opacity-50 pointer-events-none' : ''
           }`}
         >

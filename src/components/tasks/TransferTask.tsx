@@ -107,7 +107,7 @@ export default function TransferTask({ taskId, currentAssignedTo, users }: Trans
       {open && (
         <form
           onSubmit={handleTransfer}
-          className="absolute right-0 top-full mt-2 w-72 bg-fw-surface rounded-xl border border-fw-surface shadow-lg p-4 space-y-3 z-50"
+          className="absolute left-0 top-full mt-2 w-[calc(100vw-2.5rem)] max-w-72 bg-fw-surface rounded-xl border border-fw-surface shadow-lg p-4 space-y-3 z-50"
         >
           <p className="text-sm font-medium text-fw-text">Transfer job</p>
 
@@ -116,7 +116,7 @@ export default function TransferTask({ taskId, currentAssignedTo, users }: Trans
             <select
               value={selectedUser}
               onChange={(e) => setSelectedUser(e.target.value)}
-              className="w-full rounded-lg border border-fw-surface bg-fw-surface px-3 py-2 text-sm text-fw-text focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-transparent transition"
+              className="w-full rounded-lg border border-fw-surface bg-fw-surface px-3 py-2 text-sm text-fw-text focus:outline-none focus:ring-2 focus:ring-fw-accent focus:border-transparent transition"
             >
               <option value="">Select a user...</option>
               {availableUsers.map((u) => (
@@ -134,7 +134,7 @@ export default function TransferTask({ taskId, currentAssignedTo, users }: Trans
               onChange={(e) => setComment(e.target.value)}
               placeholder="Why is this job being transferred?"
               rows={2}
-              className="w-full rounded-lg border border-fw-surface bg-fw-surface px-3 py-2 text-sm text-fw-text placeholder:text-fw-text/30 focus:outline-none focus:ring-2 focus:ring-amber-300 focus:border-transparent transition resize-none"
+              className="w-full rounded-lg border border-fw-surface bg-fw-surface px-3 py-2 text-sm text-fw-text placeholder:text-fw-text/30 focus:outline-none focus:ring-2 focus:ring-fw-accent focus:border-transparent transition resize-none"
             />
           </div>
 
@@ -156,7 +156,7 @@ export default function TransferTask({ taskId, currentAssignedTo, users }: Trans
                 setComment('');
                 setError('');
               }}
-              className="px-3 py-2 rounded-lg border border-fw-text/20 text-sm font-medium text-fw-text/80 hover:bg-stone-200 transition"
+              className="px-3 py-2 rounded-lg border border-fw-text/20 text-sm font-medium text-fw-text/80 hover:bg-fw-bg transition"
             >
               Cancel
             </button>

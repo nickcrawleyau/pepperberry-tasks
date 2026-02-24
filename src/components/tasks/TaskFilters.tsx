@@ -33,7 +33,7 @@ export default function TaskFilters({
               flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition
               ${isActive
                 ? 'bg-fw-surface text-fw-text shadow-sm'
-                : 'text-fw-text/50 hover:text-stone-900'
+                : 'text-fw-text/50 hover:text-fw-text'
               }
             `}
           >

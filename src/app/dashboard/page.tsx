@@ -9,6 +9,7 @@ import DashboardStats from '@/components/dashboard/DashboardStats';
 import PushNotificationPrompt from '@/components/PushNotificationPrompt';
 import KeyboardShortcuts from '@/components/KeyboardShortcuts';
 import SessionTimer from '@/components/SessionTimer';
+import ReportProblem from '@/components/ReportProblem';
 
 export default async function DashboardPage() {
   const session = await getSession();
@@ -216,6 +217,7 @@ export default async function DashboardPage() {
               Users
             </Link>
           )}
+          <ReportProblem />
         </div>
       </header>
 

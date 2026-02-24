@@ -35,7 +35,7 @@ export default async function EditTaskPage({
         <div className="max-w-2xl mx-auto px-5 py-4 flex items-center gap-4">
           <Link
             href={`/tasks/${id}`}
-            className="text-fw-text/50 hover:text-stone-700 transition"
+            className="text-fw-text/50 hover:text-fw-text/80 transition"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

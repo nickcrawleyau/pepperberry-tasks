@@ -125,7 +125,7 @@ export default function AdminFilters({
                 assignedTo: '',
               })
             }
-            className="text-xs text-fw-text/50 hover:text-stone-700 transition px-2 py-2"
+            className="text-xs text-fw-text/50 hover:text-fw-text/80 transition px-2 py-2"
           >
             Clear
           </button>
