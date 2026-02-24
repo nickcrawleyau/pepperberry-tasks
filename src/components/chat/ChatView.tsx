@@ -11,6 +11,7 @@ interface ChatViewProps {
   currentUserId: string;
   currentUserName: string;
   initialTab?: 'board' | 'messages';
+  isAdmin?: boolean;
 }
 
 function timeAgo(dateStr: string): string {
@@ -39,6 +40,7 @@ export default function ChatView({
   currentUserId,
   currentUserName,
   initialTab = 'board',
+  isAdmin = false,
 }: ChatViewProps) {
   const [tab, setTab] = useState<'board' | 'messages'>(initialTab);
 
@@ -78,6 +80,7 @@ export default function ChatView({
           initialMessages={initialMessages}
           currentUserId={currentUserId}
           currentUserName={currentUserName}
+          isAdmin={isAdmin}
         />
       ) : (
         <MessagesTab
@@ -85,6 +88,7 @@ export default function ChatView({
           users={users}
           currentUserId={currentUserId}
           currentUserName={currentUserName}
+          isAdmin={isAdmin}
         />
       )}
     </div>
@@ -97,10 +101,12 @@ function BoardTab({
   initialMessages,
   currentUserId,
   currentUserName,
+  isAdmin,
 }: {
   initialMessages: ChatMessage[];
   currentUserId: string;
   currentUserName: string;
+  isAdmin: boolean;
 }) {
   const [messages, setMessages] = useState<ChatMessage[]>([...initialMessages].reverse());
   const [input, setInput] = useState('');
@@ -151,6 +157,20 @@ function BoardTab({
     finally { setSending(false); }
   }
 
+  async function handleDelete(id: string) {
+    if (!confirm('Delete this message?')) return;
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      });
+      if (res.ok) {
+        setMessages((prev) => prev.filter((m) => m.id !== id));
+      }
+    } catch { /* ignore */ }
+  }
+
   return (
     <div className="flex flex-col" style={{ height: 'calc(100vh - 220px)' }}>
       {/* Messages */}
@@ -162,7 +182,7 @@ function BoardTab({
           const isMe = msg.user_id === currentUserId;
           const name = msg.user?.name || (isMe ? currentUserName : 'Unknown');
           return (
-            <div key={msg.id} className="flex items-start gap-2.5">
+            <div key={msg.id} className="flex items-start gap-2.5 group">
               <div className="w-7 h-7 rounded-full bg-fw-surface flex items-center justify-center text-xs font-medium text-fw-text/70 shrink-0">
                 {name.charAt(0).toUpperCase()}
               </div>
@@ -170,6 +190,17 @@ function BoardTab({
                 <div className="flex items-baseline gap-2">
                   <span className="text-sm font-medium text-fw-text">{name}</span>
                   <span className="text-xs text-fw-text/40">{timeAgo(msg.created_at)}</span>
+                  {isAdmin && (
+                    <button
+                      onClick={() => handleDelete(msg.id)}
+                      className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-500 transition ml-auto"
+                      title="Delete message"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                      </svg>
+                    </button>
+                  )}
                 </div>
                 <p className="text-sm text-fw-text/80 whitespace-pre-wrap break-words">{msg.content}</p>
               </div>
@@ -208,11 +239,13 @@ function MessagesTab({
   users,
   currentUserId,
   currentUserName,
+  isAdmin,
 }: {
   initialConversations: Conversation[];
   users: { id: string; name: string }[];
   currentUserId: string;
   currentUserName: string;
+  isAdmin: boolean;
 }) {
   const [conversations, setConversations] = useState(initialConversations);
   const [activeThread, setActiveThread] = useState<{ userId: string; userName: string } | null>(null);
@@ -240,6 +273,7 @@ function MessagesTab({
         partnerName={activeThread.userName}
         currentUserId={currentUserId}
         currentUserName={currentUserName}
+        isAdmin={isAdmin}
         onBack={() => {
           setActiveThread(null);
           // Refresh conversations when returning
@@ -338,12 +372,14 @@ function DMThread({
   partnerName,
   currentUserId,
   currentUserName,
+  isAdmin,
   onBack,
 }: {
   partnerId: string;
   partnerName: string;
   currentUserId: string;
   currentUserName: string;
+  isAdmin: boolean;
   onBack: () => void;
 }) {
   const [messages, setMessages] = useState<DirectMessage[]>([]);
@@ -403,6 +439,20 @@ function DMThread({
     finally { setSending(false); }
   }
 
+  async function handleDelete(id: string) {
+    if (!confirm('Delete this message?')) return;
+    try {
+      const res = await fetch(`/api/chat/dm/${partnerId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id }),
+      });
+      if (res.ok) {
+        setMessages((prev) => prev.filter((m) => m.id !== id));
+      }
+    } catch { /* ignore */ }
+  }
+
   return (
     <div className="flex flex-col" style={{ height: 'calc(100vh - 220px)' }}>
       {/* Thread header */}
@@ -435,7 +485,7 @@ function DMThread({
           return (
             <div
               key={msg.id}
-              className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
+              className={`flex ${isMe ? 'justify-end' : 'justify-start'} group`}
             >
               <div
                 className={`max-w-[80%] rounded-xl px-3 py-2 ${
@@ -447,6 +497,17 @@ function DMThread({
                 <div className="flex items-baseline gap-2 mb-0.5">
                   <span className="text-xs font-medium text-fw-text/70">{name}</span>
                   <span className="text-[10px] text-fw-text/40">{timeAgo(msg.created_at)}</span>
+                  {isAdmin && (
+                    <button
+                      onClick={() => handleDelete(msg.id)}
+                      className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-500 transition"
+                      title="Delete message"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                      </svg>
+                    </button>
+                  )}
                 </div>
                 <p className="text-sm whitespace-pre-wrap break-words">{msg.content}</p>
               </div>
