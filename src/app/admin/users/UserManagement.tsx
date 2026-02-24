@@ -23,7 +23,7 @@ const TRADE_TYPES = [
 const SECTIONS = [
   { value: 'weather', label: 'Weather' },
   { value: 'cart', label: 'Cart' },
-  { value: 'chat', label: 'News' },
+  { value: 'chat', label: 'Messages' },
 ] as const;
 
 interface User {
