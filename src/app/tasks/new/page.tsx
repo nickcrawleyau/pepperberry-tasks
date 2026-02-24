@@ -5,6 +5,7 @@ import Link from 'next/link';
 import CreateTaskForm from './CreateTaskForm';
 import SessionTimer from '@/components/SessionTimer';
 import LogoutButton from '@/components/LogoutButton';
+import UnreadBadges from '@/components/UnreadBadges';
 
 export default async function NewTaskPage() {
   const session = await getSession();
@@ -53,6 +54,7 @@ export default async function NewTaskPage() {
             <p className="text-sm font-medium text-fw-text">{session.name}</p>
             {sessionExpiry && <SessionTimer expiresAt={sessionExpiry} />}
           </div>
+          <UnreadBadges />
           <LogoutButton />
         </div>
       </header>

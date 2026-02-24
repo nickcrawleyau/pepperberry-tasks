@@ -5,6 +5,7 @@ import Link from 'next/link';
 import ShoppingList from '@/components/shopping/ShoppingList';
 import SessionTimer from '@/components/SessionTimer';
 import LogoutButton from '@/components/LogoutButton';
+import UnreadBadges from '@/components/UnreadBadges';
 import { ShoppingItem } from '@/lib/types';
 
 export default async function ShoppingPage() {
@@ -63,6 +64,7 @@ export default async function ShoppingPage() {
             <p className="text-sm font-medium text-fw-text">{session.name}</p>
             {sessionExpiry && <SessionTimer expiresAt={sessionExpiry} />}
           </div>
+          <UnreadBadges />
           <LogoutButton />
         </div>
       </header>

@@ -6,7 +6,7 @@ import Link from 'next/link';
 import LogoutButton from '@/components/LogoutButton';
 import TaskList from '@/components/tasks/TaskList';
 import DashboardStats from '@/components/dashboard/DashboardStats';
-import PushNotificationPrompt from '@/components/PushNotificationPrompt';
+import UnreadBadges from '@/components/UnreadBadges';
 import KeyboardShortcuts from '@/components/KeyboardShortcuts';
 import SessionTimer from '@/components/SessionTimer';
 import ReportProblem from '@/components/ReportProblem';
@@ -80,7 +80,7 @@ export default async function DashboardPage() {
               <p className="text-sm font-medium text-fw-text">{session.name}</p>
               {sessionExpiry && <SessionTimer expiresAt={sessionExpiry} />}
             </div>
-            <PushNotificationPrompt />
+            <UnreadBadges />
             <LogoutButton />
           </div>
         </div>

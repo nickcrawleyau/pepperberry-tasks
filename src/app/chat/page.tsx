@@ -5,6 +5,7 @@ import Link from 'next/link';
 import ChatView from '@/components/chat/ChatView';
 import SessionTimer from '@/components/SessionTimer';
 import LogoutButton from '@/components/LogoutButton';
+import UnreadBadges from '@/components/UnreadBadges';
 import { ChatMessage, Conversation } from '@/lib/types';
 
 export default async function ChatPage({
@@ -101,6 +102,7 @@ export default async function ChatPage({
             <p className="text-sm font-medium text-fw-text">{session.name}</p>
             {sessionExpiry && <SessionTimer expiresAt={sessionExpiry} />}
           </div>
+          <UnreadBadges />
           <LogoutButton />
         </div>
       </header>

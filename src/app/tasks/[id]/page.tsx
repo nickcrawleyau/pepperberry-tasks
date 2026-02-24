@@ -18,6 +18,7 @@ import ActivityLog from '@/components/tasks/ActivityLog';
 import TransferTask from '@/components/tasks/TransferTask';
 import SessionTimer from '@/components/SessionTimer';
 import LogoutButton from '@/components/LogoutButton';
+import UnreadBadges from '@/components/UnreadBadges';
 
 const PRIORITY_DOT: Record<string, string> = {
   low: 'bg-stone-500',
@@ -147,6 +148,7 @@ export default async function TaskDetailPage({
               <p className="text-sm font-medium text-fw-text">{session.name}</p>
               {sessionExpiry && <SessionTimer expiresAt={sessionExpiry} />}
             </div>
+            <UnreadBadges />
             <LogoutButton />
           </div>
           {session.role === 'admin' && (

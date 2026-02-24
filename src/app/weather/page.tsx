@@ -5,6 +5,7 @@ import { fetchWeatherData } from '@/lib/weather';
 import WeatherDisplay from '@/components/weather/WeatherDisplay';
 import SessionTimer from '@/components/SessionTimer';
 import LogoutButton from '@/components/LogoutButton';
+import UnreadBadges from '@/components/UnreadBadges';
 
 export default async function WeatherPage() {
   const session = await getSession();
@@ -62,6 +63,7 @@ export default async function WeatherPage() {
             <p className="text-sm font-medium text-fw-text">{session.name}</p>
             {sessionExpiry && <SessionTimer expiresAt={sessionExpiry} />}
           </div>
+          <UnreadBadges />
           <LogoutButton />
         </div>
       </header>

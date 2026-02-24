@@ -5,6 +5,7 @@ import Link from 'next/link';
 import EditTaskForm from './EditTaskForm';
 import SessionTimer from '@/components/SessionTimer';
 import LogoutButton from '@/components/LogoutButton';
+import UnreadBadges from '@/components/UnreadBadges';
 
 export default async function EditTaskPage({
   params,
@@ -66,6 +67,7 @@ export default async function EditTaskPage({
             <p className="text-sm font-medium text-fw-text">{session.name}</p>
             {sessionExpiry && <SessionTimer expiresAt={sessionExpiry} />}
           </div>
+          <UnreadBadges />
           <LogoutButton />
         </div>
       </header>
