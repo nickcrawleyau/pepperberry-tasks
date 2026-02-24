@@ -30,7 +30,10 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/set-pin', request.url));
     }
 
-    return NextResponse.next();
+    const response = NextResponse.next();
+    // Prevent browser from caching authenticated pages
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+    return response;
   } catch {
     // Invalid or expired token — redirect to login
     const response = NextResponse.redirect(new URL('/', request.url));
