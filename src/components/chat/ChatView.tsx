@@ -61,7 +61,7 @@ export default function ChatView({
               : 'text-fw-text/50 hover:text-fw-text/80'
           }`}
         >
-          Board
+          Chatboard
         </button>
         <button
           onClick={() => setTab('messages')}
@@ -182,7 +182,7 @@ function BoardTab({
           const isMe = msg.user_id === currentUserId;
           const name = msg.user?.name || (isMe ? currentUserName : 'Unknown');
           return (
-            <div key={msg.id} className="flex items-start gap-2.5 group">
+            <div key={msg.id} className="flex items-start gap-2.5">
               <div className="w-7 h-7 rounded-full bg-fw-surface flex items-center justify-center text-xs font-medium text-fw-text/70 shrink-0">
                 {name.charAt(0).toUpperCase()}
               </div>
@@ -485,7 +485,7 @@ function DMThread({
           return (
             <div
               key={msg.id}
-              className={`flex ${isMe ? 'justify-end' : 'justify-start'} group`}
+              className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}
             >
               <div
                 className={`max-w-[80%] rounded-xl px-3 py-2 ${
@@ -500,7 +500,7 @@ function DMThread({
                   {isAdmin && (
                     <button
                       onClick={() => handleDelete(msg.id)}
-                      className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-500 transition"
+                      className="text-red-400 hover:text-red-500 transition"
                       title="Delete message"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
