@@ -15,17 +15,21 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid subscription' }, { status: 400 });
   }
 
+  // Delete any existing subscription for this endpoint (may belong to another user)
+  // then insert fresh — prevents one user overwriting another's subscription
+  await supabaseAdmin
+    .from('push_subscriptions')
+    .delete()
+    .eq('endpoint', endpoint);
+
   const { error } = await supabaseAdmin
     .from('push_subscriptions')
-    .upsert(
-      {
-        user_id: session.userId,
-        endpoint,
-        p256dh: keys.p256dh,
-        auth: keys.auth,
-      },
-      { onConflict: 'endpoint' }
-    );
+    .insert({
+      user_id: session.userId,
+      endpoint,
+      p256dh: keys.p256dh,
+      auth: keys.auth,
+    });
 
   if (error) {
     console.error('Error saving push subscription:', error);

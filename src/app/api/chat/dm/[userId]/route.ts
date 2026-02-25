@@ -71,6 +71,18 @@ export async function POST(
     return NextResponse.json({ error: 'Cannot send message to yourself' }, { status: 400 });
   }
 
+  // Verify recipient exists and is active
+  const { data: recipient } = await supabaseAdmin
+    .from('users')
+    .select('id')
+    .eq('id', userId)
+    .eq('is_active', true)
+    .single();
+
+  if (!recipient) {
+    return NextResponse.json({ error: 'Recipient not found' }, { status: 404 });
+  }
+
   const { data, error } = await supabaseAdmin
     .from('direct_messages')
     .insert({
