@@ -170,11 +170,15 @@ function isFailedLoginsActive(sinceStr: string): boolean {
   return new Date(sinceStr).getTime() >= sevenDaysAgo;
 }
 
-/** Check if user logged in today in Sydney timezone */
-function isLoggedInToday(lastLogin: string | null): boolean {
+/** Check if user has an active session right now (same Sydney day + within 3h) */
+function isLoggedInNow(lastLogin: string | null): boolean {
   if (!lastLogin) return false;
-  const todaySydney = new Date().toLocaleDateString('en-CA', { timeZone: 'Australia/Sydney' });
-  const loginDaySydney = new Date(lastLogin).toLocaleDateString('en-CA', { timeZone: 'Australia/Sydney' });
+  const now = new Date();
+  const loginTime = new Date(lastLogin);
+  const threeHoursMs = 3 * 60 * 60 * 1000;
+  if (now.getTime() - loginTime.getTime() > threeHoursMs) return false;
+  const todaySydney = now.toLocaleDateString('en-CA', { timeZone: 'Australia/Sydney' });
+  const loginDaySydney = loginTime.toLocaleDateString('en-CA', { timeZone: 'Australia/Sydney' });
   return loginDaySydney === todaySydney;
 }
 
@@ -220,7 +224,7 @@ function UserRow({
         <div className="flex items-center gap-3">
           <div
             className={`w-9 h-9 rounded-full flex items-center justify-center ${
-              isLoggedInToday(user.last_login) ? 'ring-2 ring-emerald-500' : ''
+              isLoggedInNow(user.last_login) ? 'ring-2 ring-emerald-500' : ''
             }`}
           >
             <div
