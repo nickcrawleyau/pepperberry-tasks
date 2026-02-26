@@ -123,7 +123,7 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error('Error creating recurring tasks:', error);
-      return NextResponse.json({ error: 'Failed to create tasks' }, { status: 500 });
+      return NextResponse.json({ error: `Failed to create tasks: ${error.message}` }, { status: 500 });
     }
 
     // Insert subtasks for each task in the series
@@ -185,7 +185,7 @@ export async function POST(request: NextRequest) {
 
   if (error) {
     console.error('Error creating task:', error);
-    return NextResponse.json({ error: 'Failed to create task' }, { status: 500 });
+    return NextResponse.json({ error: `Failed to create task: ${error.message}` }, { status: 500 });
   }
 
   // Insert subtasks for one-off task
