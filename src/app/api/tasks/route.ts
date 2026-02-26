@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
     const { data: tasks, error } = await supabaseAdmin
       .from('tasks')
       .insert(rows)
-      .select('id')
+      .select('id, due_date')
       .order('due_date', { ascending: true });
 
     if (error) {
