@@ -24,6 +24,7 @@ export const LOCATIONS = [
   'Back_garden',
   'VegetablePatch',
   'front_gate',
+  'other',
 ] as const;
 
 export const STATUS_LABELS: Record<string, string> = {
@@ -67,10 +68,10 @@ export const AREA_LABELS: Record<string, string> = {
 };
 
 export const AREA_LOCATIONS: Record<string, readonly string[]> = {
-  garden: ['Front_garden', 'Back_garden', 'VegetablePatch'],
-  paddocks: ['Big_Paddock', 'Front_paddock', 'Back_paddock', 'riding_arena', 'stables', 'front_gate'],
-  house: ['house', 'workshop', 'driveway'],
-  animals: ['stables', 'Big_Paddock', 'Front_paddock', 'Back_paddock'],
+  garden: ['Front_garden', 'Back_garden', 'VegetablePatch', 'other'],
+  paddocks: ['Big_Paddock', 'Front_paddock', 'Back_paddock', 'driveway', 'stables', 'front_gate', 'other'],
+  house: ['house', 'workshop', 'driveway', 'other'],
+  animals: ['stables', 'Big_Paddock', 'Front_paddock', 'Back_paddock', 'other'],
 };
 
 export const AREA_CATEGORIES: Record<string, readonly string[]> = {
@@ -116,4 +117,5 @@ export const LOCATION_LABELS: Record<string, string> = {
   Back_garden: 'Back Garden',
   VegetablePatch: 'Veggie Patch',
   front_gate: 'Front Gate',
+  other: 'Other',
 };

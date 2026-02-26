@@ -6,10 +6,8 @@ import {
   AREAS,
   AREA_LABELS,
   AREA_LOCATIONS,
-  AREA_CATEGORIES,
   PRIORITIES,
   RECURRENCE_PATTERNS,
-  CATEGORY_LABELS,
   LOCATION_LABELS,
   PRIORITY_LABELS,
   RECURRENCE_LABELS,
@@ -100,19 +98,22 @@ export default function CreateTaskForm({ users }: CreateTaskFormProps) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState('medium');
-  const [category, setCategory] = useState('');
+  const [category] = useState('');
   const [location, setLocation] = useState('');
   const [assignedTo, setAssignedTo] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [recurrencePattern, setRecurrencePattern] = useState('');
   const [recurrenceStart, setRecurrenceStart] = useState(todayString());
-  const [recurrenceEnd, setRecurrenceEnd] = useState('');
+  const [recurrenceEnd, setRecurrenceEnd] = useState(() => {
+    const d = new Date();
+    d.setMonth(d.getMonth() + 1);
+    return d.toLocaleDateString('en-CA');
+  });
 
   // Step 4: subtasks
   const [subtasks, setSubtasks] = useState<string[]>([]);
 
   const filteredLocations = area ? AREA_LOCATIONS[area] || [] : [];
-  const filteredCategories = area ? AREA_CATEGORIES[area] || [] : [];
 
   const occurrenceCount = useMemo(() => {
     if (!isRepeating || !recurrencePattern || !recurrenceStart || !recurrenceEnd) return 0;
@@ -121,11 +122,8 @@ export default function CreateTaskForm({ users }: CreateTaskFormProps) {
 
   function handleAreaSelect(a: string) {
     setArea(a);
-    // Reset location/category if they don't belong to the new area
     const locs = AREA_LOCATIONS[a] || [];
-    const cats = AREA_CATEGORIES[a] || [];
     if (!locs.includes(location)) setLocation('');
-    if (!cats.includes(category)) setCategory('');
     setStep(3);
   }
 
@@ -155,7 +153,7 @@ export default function CreateTaskForm({ users }: CreateTaskFormProps) {
         title: title.trim(),
         description: description.trim() || null,
         priority,
-        category,
+        category: category || 'general',
         location,
         area,
         assigned_to: assignedTo || null,
@@ -193,7 +191,6 @@ export default function CreateTaskForm({ users }: CreateTaskFormProps) {
 
   const canSubmitDetails =
     title.trim() &&
-    category &&
     location &&
     (!isRepeating || (recurrencePattern && recurrenceStart && recurrenceEnd && occurrenceCount > 0));
 
@@ -340,24 +337,6 @@ export default function CreateTaskForm({ users }: CreateTaskFormProps) {
                 </select>
               </div>
               <div>
-                <label htmlFor="category" className={labelClass}>Category *</label>
-                <select
-                  id="category"
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                  required
-                  className={category ? selectFilled : selectDefault}
-                >
-                  <option value="">Select...</option>
-                  {filteredCategories.map((c) => (
-                    <option key={c} value={c}>{CATEGORY_LABELS[c]}</option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
                 <label htmlFor="location" className={labelClass}>Location *</label>
                 <select
                   id="location"
@@ -372,25 +351,26 @@ export default function CreateTaskForm({ users }: CreateTaskFormProps) {
                   ))}
                 </select>
               </div>
-              <div>
-                <label htmlFor="assigned_to" className={labelClass}>Assign to</label>
-                <select
-                  id="assigned_to"
-                  value={assignedTo}
-                  onChange={(e) => setAssignedTo(e.target.value)}
-                  className={assignedTo ? selectFilled : selectDefault}
-                >
-                  <option value="">Unassigned</option>
-                  {users
-                    .filter((u) => u.role !== 'admin')
-                    .map((u) => (
-                      <option key={u.id} value={u.id}>
-                        {u.name}
-                        {u.trade_type ? ` (${u.trade_type})` : ''}
-                      </option>
-                    ))}
-                </select>
-              </div>
+            </div>
+
+            <div>
+              <label htmlFor="assigned_to" className={labelClass}>Assign to</label>
+              <select
+                id="assigned_to"
+                value={assignedTo}
+                onChange={(e) => setAssignedTo(e.target.value)}
+                className={assignedTo ? selectFilled : selectDefault}
+              >
+                <option value="">Unassigned</option>
+                {users
+                  .filter((u) => u.role !== 'admin')
+                  .map((u) => (
+                    <option key={u.id} value={u.id}>
+                      {u.name}
+                      {u.trade_type ? ` (${u.trade_type})` : ''}
+                    </option>
+                  ))}
+              </select>
             </div>
           </div>
 

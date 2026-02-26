@@ -353,7 +353,7 @@ function UserRow({
       </div>
 
       {/* 14-day login history */}
-      <LoginHistory loginCounts={loginCounts || {}} />
+      <LoginHistory loginCounts={loginCounts || {}} hasFailedLogins={isFailedLoginsActive(user.failed_logins_since) && user.failed_login_count > 0} />
 
       {isDeleting && (
         <div className="mt-3 pt-3 border-t border-fw-surface">
@@ -382,7 +382,7 @@ function UserRow({
   );
 }
 
-function LoginHistory({ loginCounts }: { loginCounts: Record<string, number> }) {
+function LoginHistory({ loginCounts, hasFailedLogins }: { loginCounts: Record<string, number>; hasFailedLogins: boolean }) {
   // Build array of last 14 days (oldest first)
   const days: { date: string; label: string; count: number }[] = [];
   const today = new Date();
@@ -398,25 +398,40 @@ function LoginHistory({ loginCounts }: { loginCounts: Record<string, number> }) 
     });
   }
 
+  const maxCount = Math.max(...days.map((d) => d.count), 1);
+
   return (
     <div className="mt-2 pt-2 border-t border-fw-surface">
-      <div className="flex items-center gap-1">
-        <span className="text-[9px] text-fw-text/30 w-6 shrink-0">14d</span>
-        <div className="flex gap-0.5 flex-1">
-          {days.map((day) => (
+      <div className="flex items-end gap-0.5">
+        <span className="text-[9px] text-fw-text/30 w-6 shrink-0 pb-0.5">14d</span>
+        {days.map((day) => {
+          const heightPct = day.count > 0 ? Math.max((day.count / maxCount) * 100, 15) : 0;
+          const isHigh = day.count > 3;
+          return (
             <div
               key={day.date}
+              className="flex-1 flex flex-col items-center justify-end"
+              style={{ height: '28px' }}
               title={`${day.label}: ${day.count} login${day.count !== 1 ? 's' : ''}`}
-              className={`flex-1 h-2.5 rounded-sm ${
-                day.count > 3
-                  ? 'bg-red-500'
-                  : day.count > 0
-                    ? 'bg-emerald-500'
-                    : 'bg-fw-bg'
-              }`}
-            />
-          ))}
-        </div>
+            >
+              {day.count > 0 && (
+                <span className="text-[8px] text-fw-text/40 leading-none mb-0.5">{day.count}</span>
+              )}
+              <div
+                className={`w-full rounded-sm ${
+                  day.count === 0
+                    ? 'bg-fw-bg'
+                    : hasFailedLogins
+                      ? 'bg-red-900'
+                      : isHigh
+                        ? 'bg-emerald-700'
+                        : 'bg-emerald-500'
+                }`}
+                style={{ height: day.count > 0 ? `${heightPct}%` : '3px' }}
+              />
+            </div>
+          );
+        })}
       </div>
     </div>
   );
