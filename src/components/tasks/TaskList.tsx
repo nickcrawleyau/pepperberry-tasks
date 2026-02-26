@@ -78,7 +78,9 @@ export default function TaskList({ tasks, role, users = [] }: TaskListProps) {
   const filtered = useMemo(() => {
     let result = tasks;
 
-    if (activeStatus !== 'all') {
+    if (activeStatus === 'all') {
+      result = result.filter((t) => t.status !== 'done');
+    } else {
       result = result.filter((t) => t.status === activeStatus);
     }
 
@@ -107,15 +109,31 @@ export default function TaskList({ tasks, role, users = [] }: TaskListProps) {
   }, [tasks, activeStatus, adminFilters, isAdmin]);
 
   const buckets = useMemo((): TimeBucket[] => {
+    // Done tab: flat list sorted by completed_at descending
+    if (activeStatus === 'done') {
+      const sorted = [...filtered].sort((a, b) => {
+        const aTime = a.completed_at ? new Date(a.completed_at).getTime() : 0;
+        const bTime = b.completed_at ? new Date(b.completed_at).getTime() : 0;
+        return bTime - aTime;
+      });
+      if (sorted.length === 0) return [];
+      return [{ key: 'done', label: 'Completed', tasks: sorted }];
+    }
+
     const today = startOfToday();
-    const tomorrow = addDays(today, 1);
-    const in3days = addDays(today, 3);
-    const in2weeks = addDays(today, 14);
+    // Start of this week (Monday)
+    const dayOfWeek = today.getDay();
+    const diffToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+    const startOfThisWeek = addDays(today, -diffToMonday);
+    const startOfNextWeek = addDays(startOfThisWeek, 7);
+    const startOfWeekAfterNext = addDays(startOfThisWeek, 14);
+    // Start of next month
+    const startOfMonthAfterNext = new Date(today.getFullYear(), today.getMonth() + 2, 1);
 
     const overdue: Task[] = [];
-    const todayBucket: Task[] = [];
-    const next3: Task[] = [];
-    const within2w: Task[] = [];
+    const thisWeek: Task[] = [];
+    const nextWeek: Task[] = [];
+    const nextMonth: Task[] = [];
     const later: Task[] = [];
 
     for (const t of filtered) {
@@ -124,14 +142,14 @@ export default function TaskList({ tasks, role, users = [] }: TaskListProps) {
         continue;
       }
       const due = new Date(t.due_date + 'T00:00:00');
-      if (t.status !== 'done' && due < today) {
+      if (due < today) {
         overdue.push(t);
-      } else if (due >= today && due < tomorrow) {
-        todayBucket.push(t);
-      } else if (due >= tomorrow && due < in3days) {
-        next3.push(t);
-      } else if (due >= in3days && due < in2weeks) {
-        within2w.push(t);
+      } else if (due < startOfNextWeek) {
+        thisWeek.push(t);
+      } else if (due < startOfWeekAfterNext) {
+        nextWeek.push(t);
+      } else if (due < startOfMonthAfterNext) {
+        nextMonth.push(t);
       } else {
         later.push(t);
       }
@@ -139,15 +157,15 @@ export default function TaskList({ tasks, role, users = [] }: TaskListProps) {
 
     return [
       { key: 'overdue', label: 'Overdue', accent: 'text-red-500', tasks: sortTasks(overdue, isAdmin) },
-      { key: 'today', label: 'Today', tasks: sortTasks(todayBucket, isAdmin) },
-      { key: 'next3', label: 'Next 3 Days', tasks: sortTasks(next3, isAdmin) },
-      { key: 'within2w', label: 'Within 2 Weeks', tasks: sortTasks(within2w, isAdmin) },
+      { key: 'thisWeek', label: 'This Week', tasks: sortTasks(thisWeek, isAdmin) },
+      { key: 'nextWeek', label: 'Next Week', tasks: sortTasks(nextWeek, isAdmin) },
+      { key: 'nextMonth', label: 'Next Month', tasks: sortTasks(nextMonth, isAdmin) },
       { key: 'later', label: 'Later', tasks: sortTasks(later, isAdmin) },
     ].filter((b) => b.tasks.length > 0);
-  }, [filtered, isAdmin]);
+  }, [filtered, isAdmin, activeStatus]);
 
   const counts = {
-    all: tasks.length,
+    all: tasks.filter((t) => t.status !== 'done').length,
     todo: tasks.filter((t) => t.status === 'todo').length,
     in_progress: tasks.filter((t) => t.status === 'in_progress').length,
     done: tasks.filter((t) => t.status === 'done').length,

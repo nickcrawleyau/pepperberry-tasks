@@ -21,6 +21,7 @@ const TRADE_TYPES = [
 ] as const;
 
 const SECTIONS = [
+  { value: 'new_job', label: 'New Job' },
   { value: 'weather', label: 'Weather' },
   { value: 'cart', label: 'Cart' },
   { value: 'chat', label: 'Messages' },
@@ -53,14 +54,52 @@ export default function UserManagement({ initialUsers, currentUserId, loginsByUs
   const [editingId, setEditingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [logoutAllLoading, setLogoutAllLoading] = useState(false);
+  const [logoutAllDone, setLogoutAllDone] = useState(false);
+
+  async function handleLogoutAll() {
+    setLogoutAllLoading(true);
+    try {
+      const res = await fetch('/api/auth/logout-all', { method: 'POST' });
+      if (res.ok) {
+        setLogoutAllDone(true);
+        setTimeout(() => setLogoutAllDone(false), 3000);
+      }
+    } finally {
+      setLogoutAllLoading(false);
+    }
+  }
 
   return (
     <div className="space-y-6">
-      {/* Add User Button */}
-      {!showAddForm && (
+      {/* Action Buttons */}
+      <div className="flex items-center gap-2 flex-wrap">
+        {!showAddForm && (
+          <button
+            onClick={() => setShowAddForm(true)}
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-fw-accent text-white text-sm font-medium hover:bg-fw-hover transition"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M5 12h14" />
+              <path d="M12 5v14" />
+            </svg>
+            Add User
+          </button>
+        )}
         <button
-          onClick={() => setShowAddForm(true)}
-          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-fw-accent text-white text-sm font-medium hover:bg-fw-hover transition"
+          onClick={handleLogoutAll}
+          disabled={logoutAllLoading || logoutAllDone}
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-red-500/40 text-red-400 text-sm font-medium hover:bg-red-900/20 transition disabled:opacity-50"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -73,12 +112,13 @@ export default function UserManagement({ initialUsers, currentUserId, loginsByUs
             strokeLinecap="round"
             strokeLinejoin="round"
           >
-            <path d="M5 12h14" />
-            <path d="M12 5v14" />
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
           </svg>
-          Add User
+          {logoutAllDone ? 'All users logged out' : logoutAllLoading ? 'Logging out...' : 'Log out all users'}
         </button>
-      )}
+      </div>
 
       {/* Add User Form */}
       {showAddForm && (

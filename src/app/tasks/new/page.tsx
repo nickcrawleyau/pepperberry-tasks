@@ -10,7 +10,7 @@ import UnreadBadges from '@/components/UnreadBadges';
 export default async function NewTaskPage() {
   const session = await getSession();
   if (!session) redirect('/');
-  if (session.role !== 'admin') redirect('/dashboard');
+  if (session.role !== 'admin' && !session.allowedSections?.includes('new_job')) redirect('/dashboard');
 
   const sessionExpiry = await getSessionExpiry();
 

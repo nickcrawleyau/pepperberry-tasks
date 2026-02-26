@@ -42,8 +42,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
   }
 
-  if (session.role !== 'admin') {
-    return NextResponse.json({ error: 'Only admins can create tasks' }, { status: 403 });
+  if (session.role !== 'admin' && !session.allowedSections?.includes('new_job')) {
+    return NextResponse.json({ error: 'Not authorized to create tasks' }, { status: 403 });
   }
 
   const body = await request.json();
