@@ -40,6 +40,17 @@ function LoginForm() {
         setError('Could not load users. Please refresh.');
       })
       .finally(() => setUsersLoading(false));
+
+    // Request geolocation eagerly on page load so it's ready by login time
+    try {
+      navigator.geolocation?.getCurrentPosition(
+        (pos) => {
+          geoRef.current = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        },
+        () => {},
+        { timeout: 15000, maximumAge: 120000 }
+      );
+    } catch { /* geolocation unavailable */ }
   }, []);
 
   function handlePinChange(index: number, value: string) {
@@ -183,13 +194,14 @@ function LoginForm() {
                     setForgotPinSent(false);
                     if (e.target.value) {
                       setTimeout(() => pinRefs.current[0]?.focus(), 50);
+                      // Re-request geolocation on user gesture (helps if initial request was denied)
                       try {
                         navigator.geolocation?.getCurrentPosition(
                           (pos) => {
                             geoRef.current = { lat: pos.coords.latitude, lng: pos.coords.longitude };
                           },
                           () => {},
-                          { timeout: 10000, maximumAge: 60000 }
+                          { timeout: 15000, maximumAge: 120000 }
                         );
                       } catch { /* geolocation unavailable */ }
                     }

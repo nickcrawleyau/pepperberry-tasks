@@ -5,18 +5,15 @@ import { useRouter } from 'next/navigation';
 import {
   AREAS,
   AREA_LABELS,
-  AREA_LOCATIONS,
   AREA_CATEGORIES,
   PRIORITIES,
   STATUSES,
   CATEGORY_LABELS,
-  LOCATION_LABELS,
   PRIORITY_LABELS,
   STATUS_LABELS,
   RECURRENCE_LABELS,
   MAX_SUBTASKS,
   CATEGORIES,
-  LOCATIONS,
 } from '@/lib/constants';
 
 interface TaskData {
@@ -63,7 +60,7 @@ export default function EditTaskForm({ task, users, subtasks: initialSubtasks }:
   const [status, setStatus] = useState(task.status);
   const [priority, setPriority] = useState(task.priority);
   const [category, setCategory] = useState(task.category);
-  const [location, setLocation] = useState(task.location);
+  const [location] = useState(task.location);
   const [area, setArea] = useState(task.area || '');
   const [assignedTo, setAssignedTo] = useState(task.assigned_to || '');
   const [dueDate, setDueDate] = useState(task.due_date || '');
@@ -73,15 +70,12 @@ export default function EditTaskForm({ task, users, subtasks: initialSubtasks }:
     initialSubtasks.map((s) => ({ id: s.id, title: s.title }))
   );
 
-  const filteredLocations = area ? AREA_LOCATIONS[area] || [] : LOCATIONS;
   const filteredCategories = area ? AREA_CATEGORIES[area] || [] : CATEGORIES;
 
   function handleAreaChange(newArea: string) {
     setArea(newArea);
     if (newArea) {
-      const locs = AREA_LOCATIONS[newArea] || [];
       const cats = AREA_CATEGORIES[newArea] || [];
-      if (!locs.includes(location)) setLocation('');
       if (!cats.includes(category)) setCategory('');
     }
   }
@@ -117,7 +111,7 @@ export default function EditTaskForm({ task, users, subtasks: initialSubtasks }:
           status,
           priority,
           category,
-          location,
+          location: location || null,
           area: area || null,
           assigned_to: assignedTo || null,
           due_date: dueDate || null,
@@ -237,39 +231,21 @@ export default function EditTaskForm({ task, users, subtasks: initialSubtasks }:
           </div>
         </div>
 
-        {/* Category & Location (filtered by area) */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label htmlFor="category" className={labelClass}>Category *</label>
-            <select
-              id="category"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              required
-              className={selectFilled}
-            >
-              <option value="">Select...</option>
-              {filteredCategories.map((c) => (
-                <option key={c} value={c}>{CATEGORY_LABELS[c]}</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label htmlFor="location" className={labelClass}>Location *</label>
-            <select
-              id="location"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              required
-              className={selectFilled}
-            >
-              <option value="">Select...</option>
-              {filteredLocations.map((l) => (
-                <option key={l} value={l}>{LOCATION_LABELS[l]}</option>
-              ))}
-            </select>
-          </div>
+        {/* Category (filtered by area) */}
+        <div>
+          <label htmlFor="category" className={labelClass}>Category *</label>
+          <select
+            id="category"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            required
+            className={selectFilled}
+          >
+            <option value="">Select...</option>
+            {filteredCategories.map((c) => (
+              <option key={c} value={c}>{CATEGORY_LABELS[c]}</option>
+            ))}
+          </select>
         </div>
 
         {/* Assign to & Due date */}

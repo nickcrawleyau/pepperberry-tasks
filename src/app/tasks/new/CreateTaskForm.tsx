@@ -5,10 +5,8 @@ import { useRouter } from 'next/navigation';
 import {
   AREAS,
   AREA_LABELS,
-  AREA_LOCATIONS,
   PRIORITIES,
   RECURRENCE_PATTERNS,
-  LOCATION_LABELS,
   PRIORITY_LABELS,
   RECURRENCE_LABELS,
   MAX_SUBTASKS,
@@ -99,7 +97,7 @@ export default function CreateTaskForm({ users }: CreateTaskFormProps) {
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState('medium');
   const [category] = useState('');
-  const [location, setLocation] = useState('');
+  const [location] = useState('');
   const [assignedTo, setAssignedTo] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [recurrencePattern, setRecurrencePattern] = useState('');
@@ -113,8 +111,6 @@ export default function CreateTaskForm({ users }: CreateTaskFormProps) {
   // Step 4: subtasks
   const [subtasks, setSubtasks] = useState<string[]>([]);
 
-  const filteredLocations = area ? AREA_LOCATIONS[area] || [] : [];
-
   const occurrenceCount = useMemo(() => {
     if (!isRepeating || !recurrencePattern || !recurrenceStart || !recurrenceEnd) return 0;
     return countOccurrences(recurrencePattern, recurrenceStart, recurrenceEnd);
@@ -122,8 +118,6 @@ export default function CreateTaskForm({ users }: CreateTaskFormProps) {
 
   function handleAreaSelect(a: string) {
     setArea(a);
-    const locs = AREA_LOCATIONS[a] || [];
-    if (!locs.includes(location)) setLocation('');
     setStep(3);
   }
 
@@ -154,7 +148,7 @@ export default function CreateTaskForm({ users }: CreateTaskFormProps) {
         description: description.trim() || null,
         priority,
         category: category || 'general',
-        location,
+        location: location || null,
         area,
         assigned_to: assignedTo || null,
         subtasks: validSubtasks.map((s, i) => ({ title: s.trim(), sort_order: i })),
@@ -191,7 +185,6 @@ export default function CreateTaskForm({ users }: CreateTaskFormProps) {
 
   const canSubmitDetails =
     title.trim() &&
-    location &&
     (!isRepeating || (recurrencePattern && recurrenceStart && recurrenceEnd && occurrenceCount > 0));
 
   const selectBase =
@@ -322,35 +315,18 @@ export default function CreateTaskForm({ users }: CreateTaskFormProps) {
           </div>
 
           <div className="bg-fw-surface rounded-xl border border-fw-surface p-5 space-y-5">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="priority" className={labelClass}>Priority</label>
-                <select
-                  id="priority"
-                  value={priority}
-                  onChange={(e) => setPriority(e.target.value)}
-                  className={priority ? selectFilled : selectDefault}
-                >
-                  {PRIORITIES.map((p) => (
-                    <option key={p} value={p}>{PRIORITY_LABELS[p]}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label htmlFor="location" className={labelClass}>Location *</label>
-                <select
-                  id="location"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                  required
-                  className={location ? selectFilled : selectDefault}
-                >
-                  <option value="">Select...</option>
-                  {filteredLocations.map((l) => (
-                    <option key={l} value={l}>{LOCATION_LABELS[l]}</option>
-                  ))}
-                </select>
-              </div>
+            <div>
+              <label htmlFor="priority" className={labelClass}>Priority</label>
+              <select
+                id="priority"
+                value={priority}
+                onChange={(e) => setPriority(e.target.value)}
+                className={priority ? selectFilled : selectDefault}
+              >
+                {PRIORITIES.map((p) => (
+                  <option key={p} value={p}>{PRIORITY_LABELS[p]}</option>
+                ))}
+              </select>
             </div>
 
             <div>

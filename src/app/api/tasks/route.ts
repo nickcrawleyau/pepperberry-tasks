@@ -68,8 +68,8 @@ export async function POST(request: NextRequest) {
   if (!category || !CATEGORIES.includes(category)) {
     return NextResponse.json({ error: 'Valid category is required' }, { status: 400 });
   }
-  if (!location || !LOCATIONS.includes(location)) {
-    return NextResponse.json({ error: 'Valid location is required' }, { status: 400 });
+  if (location && !LOCATIONS.includes(location)) {
+    return NextResponse.json({ error: 'Invalid location' }, { status: 400 });
   }
   if (priority && !PRIORITIES.includes(priority)) {
     return NextResponse.json({ error: 'Invalid priority' }, { status: 400 });
