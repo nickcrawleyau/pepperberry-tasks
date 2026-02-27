@@ -67,7 +67,6 @@ export default function TaskList({ tasks, role, users = [] }: TaskListProps) {
   const [activeStatus, setActiveStatus] = useState('all');
   const [adminFilters, setAdminFilters] = useState<AdminFilterValues>({
     priority: '',
-    category: '',
     location: '',
     assignedTo: '',
   });
@@ -87,9 +86,6 @@ export default function TaskList({ tasks, role, users = [] }: TaskListProps) {
     if (isAdmin) {
       if (adminFilters.priority) {
         result = result.filter((t) => t.priority === adminFilters.priority);
-      }
-      if (adminFilters.category) {
-        result = result.filter((t) => t.category === adminFilters.category);
       }
       if (adminFilters.location) {
         result = result.filter((t) => t.location === adminFilters.location);

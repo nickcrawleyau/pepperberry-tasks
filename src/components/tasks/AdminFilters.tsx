@@ -3,8 +3,6 @@
 import {
   PRIORITIES,
   PRIORITY_LABELS,
-  CATEGORIES,
-  CATEGORY_LABELS,
   AREAS,
   AREA_LABELS,
   AREA_LOCATIONS,
@@ -13,7 +11,6 @@ import {
 
 export interface AdminFilterValues {
   priority: string;
-  category: string;
   location: string;
   assignedTo: string;
 }
@@ -42,7 +39,7 @@ export default function AdminFilters({
     'appearance-none rounded-lg border border-fw-surface bg-fw-surface pl-3 pr-7 py-2 text-xs text-fw-text focus:outline-none focus:ring-2 focus:ring-fw-accent/50 focus:border-fw-accent/50 transition min-w-0';
 
   const hasActiveFilters =
-    filters.priority || filters.category || filters.location || filters.assignedTo;
+    filters.priority || filters.location || filters.assignedTo;
 
   return (
     <div className="space-y-2">
@@ -58,23 +55,6 @@ export default function AdminFilters({
             {PRIORITIES.map((p) => (
               <option key={p} value={p}>
                 {PRIORITY_LABELS[p]}
-              </option>
-            ))}
-          </select>
-          <DropdownArrow />
-        </div>
-
-        {/* Category */}
-        <div className="relative">
-          <select
-            value={filters.category}
-            onChange={(e) => update('category', e.target.value)}
-            className={selectClass}
-          >
-            <option value="">Category</option>
-            {CATEGORIES.map((c) => (
-              <option key={c} value={c}>
-                {CATEGORY_LABELS[c]}
               </option>
             ))}
           </select>
@@ -126,7 +106,6 @@ export default function AdminFilters({
             onClick={() =>
               onFiltersChange({
                 priority: '',
-                category: '',
                 location: '',
                 assignedTo: '',
               })

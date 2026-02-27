@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { Task, TaskComment, TaskPhoto, TaskActivity, TaskSubtask } from '@/lib/types';
 import {
   PRIORITY_LABELS,
-  CATEGORY_LABELS,
   LOCATION_LABELS,
   RECURRENCE_LABELS,
   AREA_LABELS,
@@ -219,13 +218,6 @@ export default async function TaskDetailPage({
                   {PRIORITY_LABELS[typedTask.priority]}
                 </span>
               </div>
-            </div>
-
-            <div>
-              <p className="text-xs text-fw-text/50 mb-0.5">Category</p>
-              <p className="text-sm text-fw-text">
-                {CATEGORY_LABELS[typedTask.category] || typedTask.category}
-              </p>
             </div>
 
             {typedTask.area && (

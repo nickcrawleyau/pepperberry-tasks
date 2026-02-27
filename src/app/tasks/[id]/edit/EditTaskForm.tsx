@@ -5,15 +5,12 @@ import { useRouter } from 'next/navigation';
 import {
   AREAS,
   AREA_LABELS,
-  AREA_CATEGORIES,
   PRIORITIES,
   STATUSES,
-  CATEGORY_LABELS,
   PRIORITY_LABELS,
   STATUS_LABELS,
   RECURRENCE_LABELS,
   MAX_SUBTASKS,
-  CATEGORIES,
 } from '@/lib/constants';
 
 interface TaskData {
@@ -59,7 +56,7 @@ export default function EditTaskForm({ task, users, subtasks: initialSubtasks }:
   const [description, setDescription] = useState(task.description || '');
   const [status, setStatus] = useState(task.status);
   const [priority, setPriority] = useState(task.priority);
-  const [category, setCategory] = useState(task.category);
+  const [category] = useState(task.category);
   const [location] = useState(task.location);
   const [area, setArea] = useState(task.area || '');
   const [assignedTo, setAssignedTo] = useState(task.assigned_to || '');
@@ -70,14 +67,8 @@ export default function EditTaskForm({ task, users, subtasks: initialSubtasks }:
     initialSubtasks.map((s) => ({ id: s.id, title: s.title }))
   );
 
-  const filteredCategories = area ? AREA_CATEGORIES[area] || [] : CATEGORIES;
-
   function handleAreaChange(newArea: string) {
     setArea(newArea);
-    if (newArea) {
-      const cats = AREA_CATEGORIES[newArea] || [];
-      if (!cats.includes(category)) setCategory('');
-    }
   }
 
   function addSubtask() {
@@ -229,23 +220,6 @@ export default function EditTaskForm({ task, users, subtasks: initialSubtasks }:
               ))}
             </select>
           </div>
-        </div>
-
-        {/* Category (filtered by area) */}
-        <div>
-          <label htmlFor="category" className={labelClass}>Category *</label>
-          <select
-            id="category"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            required
-            className={selectFilled}
-          >
-            <option value="">Select...</option>
-            {filteredCategories.map((c) => (
-              <option key={c} value={c}>{CATEGORY_LABELS[c]}</option>
-            ))}
-          </select>
         </div>
 
         {/* Assign to & Due date */}

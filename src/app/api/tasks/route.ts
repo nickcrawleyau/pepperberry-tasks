@@ -65,8 +65,8 @@ export async function POST(request: NextRequest) {
   if (!title?.trim()) {
     return NextResponse.json({ error: 'Title is required' }, { status: 400 });
   }
-  if (!category || !CATEGORIES.includes(category)) {
-    return NextResponse.json({ error: 'Valid category is required' }, { status: 400 });
+  if (category && !CATEGORIES.includes(category)) {
+    return NextResponse.json({ error: 'Invalid category' }, { status: 400 });
   }
   if (location && !LOCATIONS.includes(location)) {
     return NextResponse.json({ error: 'Invalid location' }, { status: 400 });
@@ -105,8 +105,8 @@ export async function POST(request: NextRequest) {
       title: title.trim(),
       description: description?.trim() || null,
       priority: priority || 'medium',
-      category,
-      location,
+      category: category || 'general',
+      location: location || null,
       area: area || null,
       assigned_to: assigned_to || null,
       created_by: session.userId,
@@ -173,8 +173,8 @@ export async function POST(request: NextRequest) {
       title: title.trim(),
       description: description?.trim() || null,
       priority: priority || 'medium',
-      category,
-      location,
+      category: category || 'general',
+      location: location || null,
       area: area || null,
       assigned_to: assigned_to || null,
       created_by: session.userId,
