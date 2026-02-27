@@ -85,7 +85,7 @@ export default async function DashboardPage() {
           </div>
         </div>
         {/* Navigation buttons */}
-        <div className="max-w-2xl mx-auto px-5 pb-3 flex items-center gap-2 overflow-x-auto scrollbar-hide">
+        <div className="max-w-2xl mx-auto px-5 pb-3 flex items-center gap-2 flex-wrap">
           {(session.role === 'admin' || session.allowedSections?.includes('new_job')) && (
               <Link
                 href="/tasks/new"

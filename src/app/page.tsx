@@ -310,7 +310,7 @@ function LoginForm() {
                 </svg>
               )}
             </div>
-            <p className="text-center text-[10px] text-fw-text/50 pt-2">version | velvet-basalt</p>
+            <p className="text-center text-[10px] text-fw-text/50 pt-2">version | amber-fern</p>
             <p className="text-center text-[10px] text-fw-text/50">Property of Nick Crawley &copy;2026</p>
           </div>
         </form>

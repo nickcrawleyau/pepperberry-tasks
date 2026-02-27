@@ -199,9 +199,9 @@ export default function WeatherDisplay({ data }: WeatherDisplayProps) {
       {/* 15-Day Forecast */}
       <div className="bg-fw-surface rounded-xl border border-fw-surface p-5">
         <p className="text-xs font-medium text-fw-text/50 mb-3">5-Day Forecast</p>
-        <div className="divide-y divide-fw-surface overflow-x-auto">
+        <div className="divide-y divide-fw-surface">
           {forecast.map((day) => (
-            <div key={day.date} className="flex items-center py-2.5 first:pt-0 last:pb-0 min-w-[300px]">
+            <div key={day.date} className="flex items-center py-2.5 first:pt-0 last:pb-0">
               <span className="text-sm text-fw-text/80 w-10 shrink-0">
                 {formatDayName(day.date)}
               </span>
