@@ -101,16 +101,16 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     updates.priority = body.priority;
   }
   if (body.category !== undefined) {
-    if (!CATEGORIES.includes(body.category)) {
+    if (body.category && !CATEGORIES.includes(body.category)) {
       return NextResponse.json({ error: 'Invalid category' }, { status: 400 });
     }
-    updates.category = body.category;
+    updates.category = body.category || 'general';
   }
   if (body.location !== undefined) {
-    if (!LOCATIONS.includes(body.location)) {
+    if (body.location && !LOCATIONS.includes(body.location)) {
       return NextResponse.json({ error: 'Invalid location' }, { status: 400 });
     }
-    updates.location = body.location;
+    updates.location = body.location || null;
   }
   if (body.area !== undefined) {
     if (body.area && !AREAS.includes(body.area)) {
