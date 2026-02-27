@@ -155,7 +155,7 @@ export default async function TaskDetailPage({
               </h1>
             </div>
             <div className="flex-1" />
-            <div className="text-right shrink-0">
+            <div className="text-right">
               <p className="text-sm font-medium text-fw-text hidden sm:block">{session.name}</p>
               {sessionExpiry && <SessionTimer expiresAt={sessionExpiry} />}
             </div>

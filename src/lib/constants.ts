@@ -29,6 +29,7 @@ export const LOCATIONS = [
   'animals_girls',
   'animals_regal',
   'animals_donkeys',
+  'animals_dolly',
   'animals_other',
 ] as const;
 
@@ -76,7 +77,7 @@ export const AREA_LOCATIONS: Record<string, readonly string[]> = {
   garden: ['garden_front', 'garden_back', 'garden_veggie', 'garden_trees', 'garden_other'],
   paddocks: ['paddock_big', 'paddock_front', 'paddock_back', 'paddock_other'],
   house: ['house_inside', 'house_patio', 'house_carport', 'house_gym', 'house_other'],
-  animals: ['animals_girls', 'animals_regal', 'animals_donkeys', 'animals_other'],
+  animals: ['animals_girls', 'animals_regal', 'animals_donkeys', 'animals_dolly', 'animals_other'],
 };
 
 export const AREA_CATEGORIES: Record<string, readonly string[]> = {
@@ -127,5 +128,6 @@ export const LOCATION_LABELS: Record<string, string> = {
   animals_girls: 'The Girls',
   animals_regal: 'Regal',
   animals_donkeys: 'Donkeys',
+  animals_dolly: 'Dolly',
   animals_other: 'Other',
 };

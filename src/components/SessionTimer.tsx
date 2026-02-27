@@ -21,7 +21,12 @@ export default function SessionTimer({ expiresAt }: { expiresAt: number }) {
 
   return (
     <span className="text-[10px] text-white/70">
-      {remaining > 0 ? `Session expires in ${label}` : 'Expired'}
+      {remaining > 0 ? (
+        <>
+          <span className="hidden sm:inline">Session expires in </span>
+          {label}
+        </>
+      ) : 'Expired'}
     </span>
   );
 }
