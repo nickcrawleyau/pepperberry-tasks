@@ -362,9 +362,7 @@ export default function CreateTaskForm({ users }: CreateTaskFormProps) {
                 className={assignedTo ? selectFilled : selectDefault}
               >
                 <option value="">Unassigned</option>
-                {users
-                  .filter((u) => u.role !== 'admin')
-                  .map((u) => (
+                {users.map((u) => (
                     <option key={u.id} value={u.id}>
                       {u.name}
                       {u.trade_type ? ` (${u.trade_type})` : ''}
