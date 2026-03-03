@@ -60,7 +60,7 @@ export default async function NewTaskPage() {
       </header>
 
       <main className="max-w-2xl mx-auto px-5 py-6">
-        <CreateTaskForm users={users || []} />
+        <CreateTaskForm users={users || []} currentUserId={session.userId} />
       </main>
     </div>
   );

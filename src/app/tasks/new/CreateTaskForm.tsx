@@ -22,6 +22,7 @@ interface UserOption {
 
 interface CreateTaskFormProps {
   users: UserOption[];
+  currentUserId: string;
 }
 
 function todayString(): string {
@@ -104,7 +105,7 @@ const AREA_ICONS: Record<string, React.ReactNode> = {
   ),
 };
 
-export default function CreateTaskForm({ users }: CreateTaskFormProps) {
+export default function CreateTaskForm({ users, currentUserId }: CreateTaskFormProps) {
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -123,7 +124,7 @@ export default function CreateTaskForm({ users }: CreateTaskFormProps) {
   const [priority, setPriority] = useState('medium');
   const [category] = useState('');
   const [location] = useState('');
-  const [assignedTo, setAssignedTo] = useState('');
+  const [assignedTo, setAssignedTo] = useState(currentUserId);
   const [dueDate, setDueDate] = useState('');
   const [recurrencePattern, setRecurrencePattern] = useState('');
   const [recurrenceStart, setRecurrenceStart] = useState(todayString());
