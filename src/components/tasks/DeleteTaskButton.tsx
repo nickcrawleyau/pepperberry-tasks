@@ -2,9 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useToast } from '@/components/ui/ToastProvider';
 
 export default function DeleteTaskButton({ taskId }: { taskId: string }) {
   const router = useRouter();
+  const { toast } = useToast();
   const [confirming, setConfirming] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -22,6 +24,7 @@ export default function DeleteTaskButton({ taskId }: { taskId: string }) {
     try {
       const res = await fetch(`/api/tasks/${taskId}`, { method: 'DELETE' });
       if (res.ok) {
+        toast('Job deleted');
         router.push('/dashboard');
       }
     } finally {
@@ -53,7 +56,7 @@ export default function DeleteTaskButton({ taskId }: { taskId: string }) {
   return (
     <button
       onClick={() => setConfirming(true)}
-      className="px-3 py-1.5 rounded-lg border border-red-200 text-xs font-medium text-red-500 hover:bg-red-900/30 transition"
+      className="px-3 py-1.5 rounded-lg border border-red-500/40 text-xs font-medium text-red-500 hover:bg-red-900/30 transition"
     >
       Delete
     </button>

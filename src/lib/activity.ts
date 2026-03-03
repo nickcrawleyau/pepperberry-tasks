@@ -16,3 +16,27 @@ export function logActivity(
       if (error) console.error('Failed to log activity:', error);
     });
 }
+
+/**
+ * Log activity for multiple tasks at once. Fire-and-forget.
+ */
+export function logActivityBatch(
+  taskIds: string[],
+  userId: string,
+  action: string,
+  detail: string
+) {
+  if (taskIds.length === 0) return;
+  const rows = taskIds.map((taskId) => ({
+    task_id: taskId,
+    user_id: userId,
+    action,
+    detail,
+  }));
+  supabaseAdmin
+    .from('task_activity')
+    .insert(rows)
+    .then(({ error }) => {
+      if (error) console.error('Failed to batch log activity:', error);
+    });
+}

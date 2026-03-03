@@ -19,6 +19,10 @@ export const LOCATIONS = [
   'veggie_beds',
   'workshop',
   'paddocks',
+  'ranger',
+  'defender',
+  'gsa',
+  'mtb',
   'other',
 ] as const;
 
@@ -44,22 +48,28 @@ export const CATEGORY_LABELS: Record<string, string> = {
   general: 'General',
 };
 
-export const RECURRENCE_PATTERNS = ['daily', 'weekly', 'fortnightly', 'monthly'] as const;
+export const RECURRENCE_PATTERNS = ['daily', 'weekly', 'fortnightly', 'monthly', 'two_monthly', 'quarterly', 'six_monthly', 'annual'] as const;
 
 export const RECURRENCE_LABELS: Record<string, string> = {
   daily: 'Daily',
   weekly: 'Weekly',
   fortnightly: 'Fortnightly',
   monthly: 'Monthly',
+  two_monthly: 'Two Monthly',
+  quarterly: 'Quarterly',
+  six_monthly: '6 Monthly',
+  annual: 'Annual',
 };
 
-export const AREAS = ['garden', 'paddocks', 'house', 'animals'] as const;
+export const AREAS = ['garden', 'paddocks', 'house', 'animals', 'cars_bikes', 'equipment'] as const;
 
 export const AREA_LABELS: Record<string, string> = {
   garden: 'Garden',
   paddocks: 'Paddocks',
   house: 'House',
   animals: 'Animals',
+  cars_bikes: 'Cars & Bikes',
+  equipment: 'Equipment',
 };
 
 export const AREA_LOCATIONS: Record<string, readonly string[]> = {
@@ -67,6 +77,8 @@ export const AREA_LOCATIONS: Record<string, readonly string[]> = {
   paddocks: ['paddocks', 'other'],
   house: ['house', 'driveway', 'workshop', 'other'],
   animals: ['paddocks', 'house', 'other'],
+  cars_bikes: ['ranger', 'defender', 'gsa', 'mtb', 'other'],
+  equipment: ['workshop', 'house', 'paddocks', 'other'],
 };
 
 export const AREA_CATEGORIES: Record<string, readonly string[]> = {
@@ -74,11 +86,14 @@ export const AREA_CATEGORIES: Record<string, readonly string[]> = {
   paddocks: ['fencing', 'riding_school', 'maintenance', 'general'],
   house: ['maintenance', 'general'],
   animals: ['horses', 'donkeys', 'riding_school'],
+  cars_bikes: ['maintenance', 'general'],
+  equipment: ['maintenance', 'general'],
 };
 
 export const MAX_SUBTASKS = 5;
 
 export const MAX_PHOTOS_PER_TASK = 5;
+export const MAX_PHOTOS_PER_LOGBOOK_ENTRY = 5;
 export const MAX_PHOTO_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
 export const ACCEPTED_IMAGE_TYPES = [
   'image/jpeg',
@@ -107,5 +122,9 @@ export const LOCATION_LABELS: Record<string, string> = {
   veggie_beds: 'Veggie Beds',
   workshop: 'Workshop',
   paddocks: 'Paddocks',
+  ranger: 'Ranger',
+  defender: 'Defender',
+  gsa: 'GSA',
+  mtb: 'MTB',
   other: 'Other',
 };

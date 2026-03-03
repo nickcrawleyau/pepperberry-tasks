@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { STATUS_LABELS } from '@/lib/constants';
+import { useToast } from '@/components/ui/ToastProvider';
 
 const STATUSES = ['todo', 'in_progress', 'done'] as const;
 
@@ -25,6 +26,7 @@ interface StatusUpdaterProps {
 
 export default function StatusUpdater({ taskId, currentStatus }: StatusUpdaterProps) {
   const router = useRouter();
+  const { toast } = useToast();
   const [status, setStatus] = useState(currentStatus);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -44,6 +46,11 @@ export default function StatusUpdater({ taskId, currentStatus }: StatusUpdaterPr
       });
 
       if (res.ok) {
+        toast('Status updated');
+        if (newStatus === 'done') {
+          router.push('/dashboard');
+          return;
+        }
         setStatus(newStatus);
         router.refresh();
       } else {

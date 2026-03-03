@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { ShoppingItem } from '@/lib/types';
 import { SHOPPING_CATEGORIES, SHOPPING_CATEGORY_LABELS } from '@/lib/constants';
+import { useToast } from '@/components/ui/ToastProvider';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 interface ShoppingListProps {
   initialItems: ShoppingItem[];
@@ -18,12 +20,15 @@ const CATEGORY_COLORS: Record<string, string> = {
 };
 
 export default function ShoppingList({ initialItems, admins, isAdmin }: ShoppingListProps) {
+  const { toast } = useToast();
   const [items, setItems] = useState<ShoppingItem[]>(initialItems);
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState<string>('other');
   const [assignedTo, setAssignedTo] = useState<string>(admins[0]?.id || '');
   const [filter, setFilter] = useState<string>('all');
   const [adding, setAdding] = useState(false);
+  const [deletingItemId, setDeletingItemId] = useState<string | null>(null);
+  const [clearBoughtOpen, setClearBoughtOpen] = useState(false);
 
   const unbought = items.filter((i) => !i.is_bought);
   const bought = items.filter((i) => i.is_bought);
@@ -44,6 +49,7 @@ export default function ShoppingList({ initialItems, admins, isAdmin }: Shopping
         const item = await res.json();
         setItems((prev) => [item, ...prev]);
         setTitle('');
+        toast('Item added');
       }
     } finally {
       setAdding(false);
@@ -59,23 +65,26 @@ export default function ShoppingList({ initialItems, admins, isAdmin }: Shopping
     if (res.ok) {
       const updated = await res.json();
       setItems((prev) => prev.map((i) => (i.id === id ? updated : i)));
+      toast(updated.is_bought ? 'Marked as bought' : 'Unmarked');
     }
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Delete this item permanently?')) return;
     const res = await fetch(`/api/shopping/${id}`, { method: 'DELETE' });
     if (res.ok) {
       setItems((prev) => prev.filter((i) => i.id !== id));
+      toast('Item deleted');
     }
+    setDeletingItemId(null);
   }
 
   async function handleClearBought() {
-    if (!confirm(`Remove all ${bought.length} bought items?`)) return;
     for (const item of bought) {
       await fetch(`/api/shopping/${item.id}`, { method: 'DELETE' });
     }
     setItems((prev) => prev.filter((i) => !i.is_bought));
+    toast('Cleared bought items');
+    setClearBoughtOpen(false);
   }
 
   return (
@@ -146,7 +155,7 @@ export default function ShoppingList({ initialItems, admins, isAdmin }: Shopping
       {/* Items list */}
       <div className="bg-fw-surface rounded-xl border border-fw-text/10 divide-y divide-fw-text/10">
         {filtered.length === 0 && (
-          <p className="p-8 text-center text-sm text-fw-text/40">No items yet</p>
+          <p className="p-8 text-center text-sm text-fw-text/50">No items yet</p>
         )}
 
         {filtered.map((item) => (
@@ -165,7 +174,7 @@ export default function ShoppingList({ initialItems, admins, isAdmin }: Shopping
             </button>
             <div className="flex-1 min-w-0">
               <p className="text-sm text-fw-text truncate">{item.title}</p>
-              <p className="text-[10px] text-fw-text/40">
+              <p className="text-xs text-fw-text/50">
                 {item.adder?.name}
                 {item.assignee?.name && <> &middot; <span className="text-fw-accent font-medium">{item.assignee.name.split(' ')[0]}</span></>}
               </p>
@@ -181,12 +190,12 @@ export default function ShoppingList({ initialItems, admins, isAdmin }: Shopping
       {bought.length > 0 && (
         <div>
           <div className="flex items-center justify-between mb-2">
-            <p className="text-xs font-medium text-fw-text/40">Bought ({bought.length})</p>
+            <p className="text-xs font-medium text-fw-text/50">Bought ({bought.length})</p>
             {isAdmin && (
               <button
                 type="button"
-                onClick={handleClearBought}
-                className="text-xs text-fw-text/40 hover:text-red-400 transition"
+                onClick={() => setClearBoughtOpen(true)}
+                className="text-xs text-fw-text/50 hover:text-red-400 transition"
               >
                 Clear all
               </button>
@@ -211,8 +220,8 @@ export default function ShoppingList({ initialItems, admins, isAdmin }: Shopping
                 {isAdmin && (
                   <button
                     type="button"
-                    onClick={() => handleDelete(item.id)}
-                    className="p-2.5 -m-1 text-fw-text/30 hover:text-red-400 transition"
+                    onClick={() => setDeletingItemId(item.id)}
+                    className="p-2.5 -m-1 text-fw-text/40 hover:text-red-400 transition"
                     aria-label="Delete item"
                   >
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -225,6 +234,25 @@ export default function ShoppingList({ initialItems, admins, isAdmin }: Shopping
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        open={!!deletingItemId}
+        title="Delete item?"
+        message="This item will be permanently removed."
+        confirmLabel="Delete"
+        destructive
+        onConfirm={() => deletingItemId && handleDelete(deletingItemId)}
+        onCancel={() => setDeletingItemId(null)}
+      />
+      <ConfirmDialog
+        open={clearBoughtOpen}
+        title="Clear bought items?"
+        message={`Remove all ${bought.length} bought items?`}
+        confirmLabel="Clear all"
+        destructive
+        onConfirm={handleClearBought}
+        onCancel={() => setClearBoughtOpen(false)}
+      />
     </div>
   );
 }

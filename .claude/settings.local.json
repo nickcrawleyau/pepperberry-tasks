@@ -66,7 +66,18 @@
       "Bash(cd \"/c/Users/nickc/OneDrive - Formuly/Coding/PBApp/pepperberry-tasks\" && git add src/app/page.tsx && git commit -m \"$\\(cat <<'EOF'\nAdd release name velvet-basalt to login page\n\nCo-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>\nEOF\n\\)\" && git push origin main && npx vercel --prod 2>&1)",
       "Bash(find \"/c/Users/nickc/OneDrive - Formuly/Coding/PBApp/pepperberry-tasks/src/app/api/shopping\" -name \"route.ts\" -type f 2>/dev/null | xargs -I {} sh -c 'echo \"=== {} ===\" && cat \"{}\"' 2>/dev/null)",
       "Bash(cd \"/c/Users/nickc/OneDrive - Formuly/Coding/PBApp/pepperberry-tasks\" && mv supabase/migrations/20260224_add_shopping_rls.sql supabase/migrations/20260224000000_add_shopping_rls.sql && npx supabase migration repair --status applied 20260224000000 --linked 2>&1)",
-      "Bash(cd \"C:\\\\Users\\\\nickc\\\\OneDrive - Formuly\\\\Coding\\\\PBApp\\\\pepperberry-tasks\" && git push origin main && npx vercel --prod 2>&1)"
+      "Bash(cd \"C:\\\\Users\\\\nickc\\\\OneDrive - Formuly\\\\Coding\\\\PBApp\\\\pepperberry-tasks\" && git push origin main && npx vercel --prod 2>&1)",
+      "WebFetch(domain:forum.iobroker.net)",
+      "Bash(xargs wc -l)",
+      "Bash(xargs cat)",
+      "Bash(source .env.local)",
+      "WebFetch(domain:www.hunterirrigation.com)",
+      "WebFetch(domain:hydrawiser.readthedocs.io)",
+      "WebFetch(domain:www.npmjs.com)",
+      "Bash(printf 'nick.crawley.au@gmail.com')",
+      "Bash(printf '100Hydra')",
+      "WebFetch(domain:community.home-assistant.io)",
+      "Bash(npm run build)"
     ]
   }
 }

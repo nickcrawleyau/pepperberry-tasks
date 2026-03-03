@@ -61,14 +61,14 @@ export default function AdminFilters({
           <DropdownArrow />
         </div>
 
-        {/* Location */}
+        {/* Sub-category */}
         <div className="relative">
           <select
             value={filters.location}
             onChange={(e) => update('location', e.target.value)}
             className={selectClass}
           >
-            <option value="">Location</option>
+            <option value="">Sub-category</option>
             {AREAS.map((a) => (
               <optgroup key={a} label={AREA_LABELS[a]}>
                 {AREA_LOCATIONS[a].map((l) => (

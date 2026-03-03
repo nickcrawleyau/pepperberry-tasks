@@ -29,7 +29,7 @@ export default async function WeatherPage() {
         <div className="max-w-2xl mx-auto px-5 py-4 flex items-center gap-4">
           <Link
             href="/dashboard"
-            className="text-fw-text/50 hover:text-fw-text/80 transition p-2 -m-2"
+            className="flex items-center gap-1 text-fw-text/50 hover:text-fw-text/80 transition p-2 -m-2"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -44,6 +44,7 @@ export default async function WeatherPage() {
             >
               <path d="m15 18-6-6 6-6" />
             </svg>
+            <span className="text-xs">Home</span>
           </Link>
           <div className="flex items-center gap-2.5 min-w-0">
             <Link href="/dashboard">
@@ -52,8 +53,8 @@ export default async function WeatherPage() {
             <div className="min-w-0">
               <h1 className="text-lg font-medium text-fw-text truncate">Weather</h1>
               {weather && (
-                <p className="text-[10px] text-fw-text/40">
-                  Open-Meteo &middot; Updated {new Date(weather.fetchedAt).toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Australia/Sydney' })}
+                <p className="text-xs text-fw-text/50">
+                  Weather at Coolangatta NSW &middot; Updated {new Date(weather.fetchedAt).toLocaleTimeString('en-AU', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: 'Australia/Sydney' })}
                 </p>
               )}
             </div>
@@ -85,7 +86,7 @@ export default async function WeatherPage() {
               />
             </svg>
             <p className="text-sm font-medium text-fw-text/80 mb-1">Weather data unavailable</p>
-            <p className="text-xs text-fw-text/40">Please try again later.</p>
+            <p className="text-xs text-fw-text/50">Please try again later.</p>
           </div>
         ) : (
           <WeatherDisplay data={weather} />

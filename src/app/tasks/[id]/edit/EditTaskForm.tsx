@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useToast } from '@/components/ui/ToastProvider';
 import {
   AREAS,
   AREA_LABELS,
@@ -25,6 +26,7 @@ interface TaskData {
   assigned_to: string | null;
   due_date: string | null;
   recurrence_pattern: string | null;
+  recurrence_group_id: string | null;
 }
 
 interface SubtaskData {
@@ -49,6 +51,7 @@ interface EditTaskFormProps {
 
 export default function EditTaskForm({ task, users, subtasks: initialSubtasks }: EditTaskFormProps) {
   const router = useRouter();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -61,6 +64,7 @@ export default function EditTaskForm({ task, users, subtasks: initialSubtasks }:
   const [area, setArea] = useState(task.area || '');
   const [assignedTo, setAssignedTo] = useState(task.assigned_to || '');
   const [dueDate, setDueDate] = useState(task.due_date || '');
+  const [applyToAll, setApplyToAll] = useState(false);
 
   // Subtask editing: track existing (with id) and new ones
   const [subtasks, setSubtasks] = useState<{ id?: string; title: string }[]>(
@@ -93,23 +97,28 @@ export default function EditTaskForm({ task, users, subtasks: initialSubtasks }:
     setLoading(true);
 
     try {
+      const payload = {
+        title: title.trim(),
+        description: description.trim() || null,
+        status,
+        priority,
+        category,
+        location: location || null,
+        area: area || null,
+        assigned_to: assignedTo || null,
+        due_date: dueDate || null,
+        subtasks: subtasks
+          .filter((s) => s.title.trim())
+          .map((s, i) => ({ id: s.id, title: s.title.trim(), sort_order: i })),
+        ...(applyToAll && task.recurrence_group_id
+          ? { apply_to_series: true }
+          : {}),
+      };
+
       const res = await fetch(`/api/tasks/${task.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: title.trim(),
-          description: description.trim() || null,
-          status,
-          priority,
-          category,
-          location: location || null,
-          area: area || null,
-          assigned_to: assignedTo || null,
-          due_date: dueDate || null,
-          subtasks: subtasks
-            .filter((s) => s.title.trim())
-            .map((s, i) => ({ id: s.id, title: s.title.trim(), sort_order: i })),
-        }),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -119,6 +128,7 @@ export default function EditTaskForm({ task, users, subtasks: initialSubtasks }:
         return;
       }
 
+      toast('Changes saved');
       router.push(`/tasks/${task.id}`);
     } catch {
       setError('Something went wrong. Please try again.');
@@ -132,15 +142,40 @@ export default function EditTaskForm({ task, users, subtasks: initialSubtasks }:
   const selectDefault = `${selectBase} border border-fw-text/20`;
   const selectFilled = `${selectBase} border border-fw-accent`;
   const inputClass =
-    'w-full rounded-lg border border-fw-text/20 px-3 py-2.5 text-sm text-fw-text bg-fw-surface placeholder:text-fw-text/30 focus:outline-none focus:ring-2 focus:ring-fw-accent focus:border-transparent transition';
+    'w-full rounded-lg border border-fw-text/20 px-3 py-2.5 text-sm text-fw-text bg-fw-surface placeholder:text-fw-text/50 focus:outline-none focus:ring-2 focus:ring-fw-accent focus:border-transparent transition';
   const labelClass = 'block text-xs font-medium text-fw-text/50 mb-1.5';
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      {task.recurrence_pattern && (
-        <div className="bg-fw-accent/10 border border-amber-300 rounded-xl px-4 py-3 text-xs text-fw-accent">
-          This task is part of a repeating series ({RECURRENCE_LABELS[task.recurrence_pattern]?.toLowerCase()}).
-          Changes apply to this instance only.
+      {task.recurrence_pattern && task.recurrence_group_id && (
+        <div className="bg-fw-surface rounded-xl border border-fw-surface p-4 space-y-3">
+          <p className="text-xs text-fw-text/50">
+            This job repeats {RECURRENCE_LABELS[task.recurrence_pattern]?.toLowerCase()}. Apply changes to:
+          </p>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => setApplyToAll(false)}
+              className={`px-3 py-2.5 rounded-lg text-xs font-medium transition text-center ${
+                !applyToAll
+                  ? 'bg-fw-accent/20 border border-fw-accent text-fw-accent'
+                  : 'border border-fw-text/20 text-fw-text/70 hover:border-fw-accent'
+              }`}
+            >
+              This job only
+            </button>
+            <button
+              type="button"
+              onClick={() => setApplyToAll(true)}
+              className={`px-3 py-2.5 rounded-lg text-xs font-medium transition text-center ${
+                applyToAll
+                  ? 'bg-fw-accent/20 border border-fw-accent text-fw-accent'
+                  : 'border border-fw-text/20 text-fw-text/70 hover:border-fw-accent'
+              }`}
+            >
+              All in series
+            </button>
+          </div>
         </div>
       )}
 
@@ -264,7 +299,7 @@ export default function EditTaskForm({ task, users, subtasks: initialSubtasks }:
 
         {subtasks.map((st, i) => (
           <div key={st.id || `new-${i}`} className="flex items-center gap-2">
-            <span className="text-xs text-fw-text/30 w-5 text-center">{i + 1}</span>
+            <span className="text-xs text-fw-text/50 w-5 text-center">{i + 1}</span>
             <input
               type="text"
               value={st.title}
@@ -275,7 +310,7 @@ export default function EditTaskForm({ task, users, subtasks: initialSubtasks }:
             <button
               type="button"
               onClick={() => removeSubtask(i)}
-              className="p-1.5 text-fw-text/30 hover:text-red-500 transition"
+              className="p-1.5 text-fw-text/40 hover:text-red-500 transition"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M18 6 6 18" /><path d="m6 6 12 12" />

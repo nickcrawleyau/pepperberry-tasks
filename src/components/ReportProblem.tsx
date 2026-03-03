@@ -112,12 +112,12 @@ export default function ReportProblem() {
                   placeholder="What's the problem?"
                   rows={4}
                   maxLength={500}
-                  className="w-full rounded-lg border border-fw-text/20 bg-fw-bg px-3 py-2 text-sm text-fw-text placeholder:text-fw-text/30 focus:outline-none focus:ring-2 focus:ring-fw-accent focus:border-transparent transition resize-none"
+                  className="w-full rounded-lg border border-fw-text/20 bg-fw-bg px-3 py-2 text-sm text-fw-text placeholder:text-fw-text/50 focus:outline-none focus:ring-2 focus:ring-fw-accent focus:border-transparent transition resize-none"
                   autoFocus
                 />
 
                 <div className="flex items-center justify-between">
-                  <span className="text-[11px] text-fw-text/30">{content.length}/500</span>
+                  <span className="text-xs text-fw-text/50">{content.length}/500</span>
                   {error && <p className="text-xs text-red-500">{error}</p>}
                 </div>
 

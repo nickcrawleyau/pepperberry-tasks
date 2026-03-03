@@ -19,7 +19,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
   // Fetch the task to check permissions
   const { data: task, error: fetchError } = await supabaseAdmin
     .from('tasks')
-    .select('id, assigned_to, category, title, created_by, status, priority')
+    .select('id, assigned_to, category, title, created_by, status, priority, recurrence_group_id')
     .eq('id', id)
     .single();
 
@@ -129,32 +129,90 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     return NextResponse.json({ error: 'No fields to update' }, { status: 400 });
   }
 
-  const { error: updateError } = await supabaseAdmin
-    .from('tasks')
-    .update(updates)
-    .eq('id', id);
+  // Apply to series: update all tasks in the recurrence group (except status/due_date which are per-instance)
+  if (body.apply_to_series && task.recurrence_group_id) {
+    const seriesUpdates = { ...updates };
+    // Status and due_date are per-instance — don't apply to the whole series
+    delete seriesUpdates.status;
+    delete seriesUpdates.completed_at;
+    delete seriesUpdates.due_date;
 
-  if (updateError) {
-    return NextResponse.json({ error: 'Failed to update task' }, { status: 500 });
-  }
+    if (Object.keys(seriesUpdates).length > 0) {
+      const { error: seriesError } = await supabaseAdmin
+        .from('tasks')
+        .update(seriesUpdates)
+        .eq('recurrence_group_id', task.recurrence_group_id);
 
-  // Handle subtask updates if provided
-  if (body.subtasks !== undefined && Array.isArray(body.subtasks)) {
-    if (body.subtasks.length > MAX_SUBTASKS) {
-      return NextResponse.json({ error: `Maximum ${MAX_SUBTASKS} sub-tasks allowed` }, { status: 400 });
+      if (seriesError) {
+        return NextResponse.json({ error: 'Failed to update series' }, { status: 500 });
+      }
     }
 
-    // Delete all existing subtasks and re-insert
-    await supabaseAdmin.from('task_subtasks').delete().eq('task_id', id);
+    // Still apply status/due_date to this instance only
+    const instanceUpdates: Record<string, unknown> = {};
+    if (updates.status !== undefined) instanceUpdates.status = updates.status;
+    if (updates.completed_at !== undefined) instanceUpdates.completed_at = updates.completed_at;
+    if (updates.due_date !== undefined) instanceUpdates.due_date = updates.due_date;
 
-    const validSubtasks = body.subtasks.filter((s: { title: string }) => s.title?.trim());
-    if (validSubtasks.length > 0) {
-      const subtaskRows = validSubtasks.map((s: { title: string; sort_order?: number }, i: number) => ({
-        task_id: id,
-        title: s.title.trim(),
-        sort_order: s.sort_order ?? i,
-      }));
-      await supabaseAdmin.from('task_subtasks').insert(subtaskRows);
+    if (Object.keys(instanceUpdates).length > 0) {
+      await supabaseAdmin.from('tasks').update(instanceUpdates).eq('id', id);
+    }
+
+    // Handle subtasks for series: update all tasks in the group
+    if (body.subtasks !== undefined && Array.isArray(body.subtasks)) {
+      if (body.subtasks.length > MAX_SUBTASKS) {
+        return NextResponse.json({ error: `Maximum ${MAX_SUBTASKS} sub-tasks allowed` }, { status: 400 });
+      }
+
+      const { data: seriesTasks } = await supabaseAdmin
+        .from('tasks')
+        .select('id')
+        .eq('recurrence_group_id', task.recurrence_group_id);
+
+      if (seriesTasks) {
+        const validSubtasks = body.subtasks.filter((s: { title: string }) => s.title?.trim());
+        for (const st of seriesTasks) {
+          await supabaseAdmin.from('task_subtasks').delete().eq('task_id', st.id);
+          if (validSubtasks.length > 0) {
+            const subtaskRows = validSubtasks.map((s: { title: string; sort_order?: number }, i: number) => ({
+              task_id: st.id,
+              title: s.title.trim(),
+              sort_order: s.sort_order ?? i,
+            }));
+            await supabaseAdmin.from('task_subtasks').insert(subtaskRows);
+          }
+        }
+      }
+    }
+  } else {
+    // Single task update
+    const { error: updateError } = await supabaseAdmin
+      .from('tasks')
+      .update(updates)
+      .eq('id', id);
+
+    if (updateError) {
+      return NextResponse.json({ error: 'Failed to update task' }, { status: 500 });
+    }
+
+    // Handle subtask updates if provided
+    if (body.subtasks !== undefined && Array.isArray(body.subtasks)) {
+      if (body.subtasks.length > MAX_SUBTASKS) {
+        return NextResponse.json({ error: `Maximum ${MAX_SUBTASKS} sub-tasks allowed` }, { status: 400 });
+      }
+
+      // Delete all existing subtasks and re-insert
+      await supabaseAdmin.from('task_subtasks').delete().eq('task_id', id);
+
+      const validSubtasks = body.subtasks.filter((s: { title: string }) => s.title?.trim());
+      if (validSubtasks.length > 0) {
+        const subtaskRows = validSubtasks.map((s: { title: string; sort_order?: number }, i: number) => ({
+          task_id: id,
+          title: s.title.trim(),
+          sort_order: s.sort_order ?? i,
+        }));
+        await supabaseAdmin.from('task_subtasks').insert(subtaskRows);
+      }
     }
   }
 

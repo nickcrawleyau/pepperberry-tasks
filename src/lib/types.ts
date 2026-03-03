@@ -6,6 +6,13 @@ export interface User {
   is_active: boolean;
   must_set_pin: boolean;
   last_login: string | null;
+  phone: string | null;
+  allowed_sections: string[] | null;
+  board_last_seen_at: string | null;
+  dm_last_seen_at: string | null;
+  failed_login_count: number;
+  failed_logins_since: string | null;
+  force_logout_at: string | null;
   created_at: string;
 }
 
@@ -104,4 +111,24 @@ export interface Conversation {
   user_name: string;
   last_message: string;
   last_message_at: string;
+}
+
+export interface LogbookEntry {
+  id: string;
+  entry_date: string;
+  note: string;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+  author?: { name: string } | null;
+  photos?: LogbookPhoto[];
+}
+
+export interface LogbookPhoto {
+  id: string;
+  entry_id: string;
+  storage_path: string;
+  uploaded_by: string;
+  created_at: string;
+  uploader?: { name: string } | null;
 }

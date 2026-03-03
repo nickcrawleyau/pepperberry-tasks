@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { ChatMessage, DirectMessage, Conversation } from '@/lib/types';
 import { MAX_CHAT_MESSAGE_LENGTH } from '@/lib/constants';
+import { useToast } from '@/components/ui/ToastProvider';
+import ConfirmDialog from '@/components/ui/ConfirmDialog';
 
 interface ChatViewProps {
   initialMessages: ChatMessage[];
@@ -58,7 +60,7 @@ export default function ChatView({
           className={`flex-1 py-2.5 text-sm font-medium rounded-md transition ${
             tab === 'board'
               ? 'bg-fw-surface text-fw-text'
-              : 'text-fw-text/40 hover:text-fw-text/70'
+              : 'text-fw-text/50 hover:text-fw-text/70'
           }`}
         >
           Chatboard
@@ -68,7 +70,7 @@ export default function ChatView({
           className={`flex-1 py-2.5 text-sm font-medium rounded-md transition ${
             tab === 'messages'
               ? 'bg-fw-surface text-fw-text'
-              : 'text-fw-text/40 hover:text-fw-text/70'
+              : 'text-fw-text/50 hover:text-fw-text/70'
           }`}
         >
           Messages
@@ -108,9 +110,11 @@ function BoardTab({
   currentUserName: string;
   isAdmin: boolean;
 }) {
+  const { toast } = useToast();
   const [messages, setMessages] = useState<ChatMessage[]>([...initialMessages].reverse());
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -158,7 +162,6 @@ function BoardTab({
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Delete this message?')) return;
     try {
       const res = await fetch('/api/chat', {
         method: 'DELETE',
@@ -167,8 +170,10 @@ function BoardTab({
       });
       if (res.ok) {
         setMessages((prev) => prev.filter((m) => m.id !== id));
+        toast('Message deleted');
       }
     } catch { /* ignore */ }
+    setDeletingId(null);
   }
 
   return (
@@ -176,7 +181,7 @@ function BoardTab({
       {/* Messages */}
       <div ref={containerRef} className="flex-1 overflow-y-auto space-y-3 pb-4">
         {messages.length === 0 && (
-          <p className="text-sm text-fw-text/40 text-center py-8">No messages yet. Start the conversation!</p>
+          <p className="text-sm text-fw-text/50 text-center py-8">No messages yet. Start the conversation!</p>
         )}
         {messages.map((msg) => {
           const isMe = msg.user_id === currentUserId;
@@ -189,10 +194,10 @@ function BoardTab({
               <div className="flex-1 min-w-0">
                 <div className="flex items-baseline gap-2">
                   <span className="text-sm font-medium text-fw-text">{name}</span>
-                  <span className="text-xs text-fw-text/40">{timeAgo(msg.created_at)}</span>
+                  <span className="text-xs text-fw-text/50">{timeAgo(msg.created_at)}</span>
                   {isAdmin && (
                     <button
-                      onClick={() => handleDelete(msg.id)}
+                      onClick={() => setDeletingId(msg.id)}
                       className="text-red-400 hover:text-red-500 transition ml-auto p-2.5 -m-2"
                       title="Delete message"
                     >
@@ -219,7 +224,7 @@ function BoardTab({
           maxLength={MAX_CHAT_MESSAGE_LENGTH}
           placeholder="Write a message..."
           enterKeyHint="send"
-          className="flex-1 min-w-0 rounded-lg border border-fw-surface px-3 py-2.5 text-sm text-fw-text bg-fw-surface placeholder:text-fw-text/30 focus:outline-none focus:ring-2 focus:ring-fw-accent focus:border-transparent transition"
+          className="flex-1 min-w-0 rounded-lg border border-fw-surface px-3 py-2.5 text-sm text-fw-text bg-fw-surface placeholder:text-fw-text/50 focus:outline-none focus:ring-2 focus:ring-fw-accent focus:border-transparent transition"
         />
         <button
           type="submit"
@@ -229,6 +234,16 @@ function BoardTab({
           {sending ? '...' : 'Send'}
         </button>
       </form>
+
+      <ConfirmDialog
+        open={!!deletingId}
+        title="Delete message?"
+        message="This message will be permanently removed."
+        confirmLabel="Delete"
+        destructive
+        onConfirm={() => deletingId && handleDelete(deletingId)}
+        onCancel={() => setDeletingId(null)}
+      />
     </div>
   );
 }
@@ -306,7 +321,7 @@ function MessagesTab({
             <p className="text-sm font-medium text-fw-text">Send to</p>
             <button
               onClick={() => setShowNewMessage(false)}
-              className="text-fw-text/40 hover:text-fw-text/70 transition"
+              className="text-fw-text/50 hover:text-fw-text/70 transition"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M18 6 6 18" /><path d="m6 6 12 12" />
@@ -330,7 +345,7 @@ function MessagesTab({
               </button>
             ))}
             {users.length === 0 && (
-              <p className="text-sm text-fw-text/40 py-2">No other users available</p>
+              <p className="text-sm text-fw-text/50 py-2">No other users available</p>
             )}
           </div>
         </div>
@@ -339,7 +354,7 @@ function MessagesTab({
       {/* Conversation list */}
       <div className="space-y-2">
         {conversations.length === 0 && !showNewMessage && (
-          <p className="text-sm text-fw-text/40 text-center py-8">No conversations yet</p>
+          <p className="text-sm text-fw-text/50 text-center py-8">No conversations yet</p>
         )}
         {conversations.map((conv) => (
           <button
@@ -354,7 +369,7 @@ function MessagesTab({
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
                   <span className="text-sm font-medium text-fw-text">{conv.user_name}</span>
-                  <span className="text-xs text-fw-text/40">{timeAgo(conv.last_message_at)}</span>
+                  <span className="text-xs text-fw-text/50">{timeAgo(conv.last_message_at)}</span>
                 </div>
                 <p className="text-xs text-fw-text/50 truncate">{conv.last_message}</p>
               </div>
@@ -383,10 +398,12 @@ function DMThread({
   isAdmin: boolean;
   onBack: () => void;
 }) {
+  const { toast } = useToast();
   const [messages, setMessages] = useState<DirectMessage[]>([]);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = useCallback(() => {
@@ -441,7 +458,6 @@ function DMThread({
   }
 
   async function handleDelete(id: string) {
-    if (!confirm('Delete this message?')) return;
     try {
       const res = await fetch(`/api/chat/dm/${partnerId}`, {
         method: 'DELETE',
@@ -450,8 +466,10 @@ function DMThread({
       });
       if (res.ok) {
         setMessages((prev) => prev.filter((m) => m.id !== id));
+        toast('Message deleted');
       }
     } catch { /* ignore */ }
+    setDeletingId(null);
   }
 
   return (
@@ -460,11 +478,12 @@ function DMThread({
       <div className="flex items-center gap-3 pb-3 mb-3 border-b border-fw-surface">
         <button
           onClick={onBack}
-          className="text-fw-text/50 hover:text-fw-text/80 transition p-2 -m-2"
+          className="text-fw-text/50 hover:text-fw-text/80 transition p-2 -m-2 flex items-center gap-1"
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="m15 18-6-6 6-6" />
           </svg>
+          <span className="text-xs">Messages</span>
         </button>
         <div className="w-8 h-8 rounded-full bg-fw-surface flex items-center justify-center text-sm font-medium text-fw-text/70">
           {partnerName.charAt(0).toUpperCase()}
@@ -475,10 +494,10 @@ function DMThread({
       {/* Messages */}
       <div className="flex-1 overflow-y-auto space-y-3 pb-4">
         {loading && (
-          <p className="text-sm text-fw-text/40 text-center py-8">Loading...</p>
+          <p className="text-sm text-fw-text/50 text-center py-8">Loading...</p>
         )}
         {!loading && messages.length === 0 && (
-          <p className="text-sm text-fw-text/40 text-center py-8">No messages yet. Say hello!</p>
+          <p className="text-sm text-fw-text/50 text-center py-8">No messages yet. Say hello!</p>
         )}
         {messages.map((msg) => {
           const isMe = msg.sender_id === currentUserId;
@@ -497,10 +516,10 @@ function DMThread({
               >
                 <div className="flex items-baseline gap-2 mb-0.5 min-w-0">
                   <span className="text-xs font-medium text-fw-text/70 truncate">{name}</span>
-                  <span className="text-[10px] text-fw-text/40 shrink-0">{timeAgo(msg.created_at)}</span>
+                  <span className="text-xs text-fw-text/50 shrink-0">{timeAgo(msg.created_at)}</span>
                   {isAdmin && (
                     <button
-                      onClick={() => handleDelete(msg.id)}
+                      onClick={() => setDeletingId(msg.id)}
                       className="text-red-400 hover:text-red-500 transition p-1.5 -m-1.5"
                       title="Delete message"
                     >
@@ -527,7 +546,7 @@ function DMThread({
           maxLength={MAX_CHAT_MESSAGE_LENGTH}
           placeholder="Write a message..."
           enterKeyHint="send"
-          className="flex-1 min-w-0 rounded-lg border border-fw-surface px-3 py-2.5 text-sm text-fw-text bg-fw-surface placeholder:text-fw-text/30 focus:outline-none focus:ring-2 focus:ring-fw-accent focus:border-transparent transition"
+          className="flex-1 min-w-0 rounded-lg border border-fw-surface px-3 py-2.5 text-sm text-fw-text bg-fw-surface placeholder:text-fw-text/50 focus:outline-none focus:ring-2 focus:ring-fw-accent focus:border-transparent transition"
         />
         <button
           type="submit"
@@ -537,6 +556,16 @@ function DMThread({
           {sending ? '...' : 'Send'}
         </button>
       </form>
+
+      <ConfirmDialog
+        open={!!deletingId}
+        title="Delete message?"
+        message="This message will be permanently removed."
+        confirmLabel="Delete"
+        destructive
+        onConfirm={() => deletingId && handleDelete(deletingId)}
+        onCancel={() => setDeletingId(null)}
+      />
     </div>
   );
 }

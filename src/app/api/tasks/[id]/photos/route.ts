@@ -54,7 +54,8 @@ export async function POST(request: NextRequest, { params }: Params) {
   }
 
   // Validate file type (accept any image/* since client compresses to JPEG)
-  if (!file.type.startsWith('image/')) {
+  const contentType = file.type || 'image/jpeg';
+  if (!contentType.startsWith('image/')) {
     return NextResponse.json({ error: 'Invalid file type. Please upload an image.' }, { status: 400 });
   }
 
@@ -62,6 +63,10 @@ export async function POST(request: NextRequest, { params }: Params) {
   if (file.size > MAX_PHOTO_SIZE_BYTES) {
     return NextResponse.json({ error: 'File too large (max 5MB)' }, { status: 400 });
   }
+
+  // Convert File to Buffer for reliable Supabase upload in serverless env
+  const arrayBuffer = await file.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
 
   // Upload to Supabase Storage
   const ALLOWED_EXTS = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'heic'];
@@ -71,8 +76,8 @@ export async function POST(request: NextRequest, { params }: Params) {
 
   const { error: uploadError } = await supabaseAdmin.storage
     .from('task-photos')
-    .upload(storagePath, file, {
-      contentType: file.type,
+    .upload(storagePath, buffer, {
+      contentType,
       upsert: false,
     });
 

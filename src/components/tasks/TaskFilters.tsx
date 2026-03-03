@@ -40,8 +40,8 @@ export default function TaskFilters({
             {tab.label}
             <span
               className={`
-                text-[10px] tabular-nums
-                ${isActive ? 'text-fw-accent' : 'text-fw-text/30'}
+                text-xs tabular-nums
+                ${isActive ? 'text-fw-accent' : 'text-fw-text/50'}
               `}
             >
               {count}

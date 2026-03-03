@@ -129,7 +129,7 @@ export default async function TaskDetailPage({
           <div className="flex items-center gap-4">
             <Link
               href="/dashboard"
-              className="text-fw-text/50 hover:text-fw-text/80 transition p-2 -m-2"
+              className="flex items-center gap-1 text-fw-text/50 hover:text-fw-text/80 transition p-2 -m-2"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -144,6 +144,7 @@ export default async function TaskDetailPage({
               >
                 <path d="m15 18-6-6 6-6" />
               </svg>
+              <span className="text-xs">Jobs</span>
             </Link>
             <div className="flex items-center gap-2.5 min-w-0">
               <Link href="/dashboard">
@@ -230,7 +231,7 @@ export default async function TaskDetailPage({
             )}
 
             <div>
-              <p className="text-xs text-fw-text/50 mb-0.5">Location</p>
+              <p className="text-xs text-fw-text/50 mb-0.5">Sub-category</p>
               <p className="text-sm text-fw-text">
                 {LOCATION_LABELS[typedTask.location] || typedTask.location}
               </p>

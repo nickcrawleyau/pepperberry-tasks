@@ -39,7 +39,7 @@ export default function OfflineIndicator() {
           <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75 animate-ping" />
           <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
         </span>
-        <span className="text-[10px] font-medium text-fw-text/50">Online</span>
+        <span className="text-xs font-medium text-fw-text/50">Online</span>
       </div>
     </div>
   );

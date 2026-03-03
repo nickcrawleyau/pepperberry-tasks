@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { Task } from '@/lib/types';
 import TaskCard from './TaskCard';
+import SwipeableTaskCard from './SwipeableTaskCard';
 import TaskFilters from './TaskFilters';
 import AdminFilters, { AdminFilterValues } from './AdminFilters';
 
@@ -71,11 +72,59 @@ export default function TaskList({ tasks, role, users = [] }: TaskListProps) {
     assignedTo: '',
   });
   const [collapsedBuckets, setCollapsedBuckets] = useState<Record<string, boolean>>({});
+  const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set());
+  const [openCardId, setOpenCardId] = useState<string | null>(null);
 
   const isAdmin = role === 'admin';
 
+  const handleDelete = useCallback(async (taskId: string) => {
+    setDeletedIds((prev) => new Set(prev).add(taskId));
+    setOpenCardId(null);
+    try {
+      const res = await fetch(`/api/tasks/${taskId}`, { method: 'DELETE' });
+      if (!res.ok) {
+        setDeletedIds((prev) => {
+          const next = new Set(prev);
+          next.delete(taskId);
+          return next;
+        });
+      }
+    } catch {
+      setDeletedIds((prev) => {
+        const next = new Set(prev);
+        next.delete(taskId);
+        return next;
+      });
+    }
+  }, []);
+
+  const handleMarkDone = useCallback(async (taskId: string) => {
+    // Optimistic: remove from active view
+    setDeletedIds((prev) => new Set(prev).add(taskId));
+    try {
+      const res = await fetch(`/api/tasks/${taskId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'done' }),
+      });
+      if (!res.ok) {
+        setDeletedIds((prev) => {
+          const next = new Set(prev);
+          next.delete(taskId);
+          return next;
+        });
+      }
+    } catch {
+      setDeletedIds((prev) => {
+        const next = new Set(prev);
+        next.delete(taskId);
+        return next;
+      });
+    }
+  }, []);
+
   const filtered = useMemo(() => {
-    let result = tasks;
+    let result = tasks.filter((t) => !deletedIds.has(t.id));
 
     if (activeStatus === 'all') {
       result = result.filter((t) => t.status !== 'done');
@@ -102,7 +151,7 @@ export default function TaskList({ tasks, role, users = [] }: TaskListProps) {
     }
 
     return result;
-  }, [tasks, activeStatus, adminFilters, isAdmin]);
+  }, [tasks, activeStatus, adminFilters, isAdmin, deletedIds]);
 
   const buckets = useMemo((): TimeBucket[] => {
     // Done tab: flat list sorted by completed_at descending
@@ -123,12 +172,14 @@ export default function TaskList({ tasks, role, users = [] }: TaskListProps) {
     const startOfThisWeek = addDays(today, -diffToMonday);
     const startOfNextWeek = addDays(startOfThisWeek, 7);
     const startOfWeekAfterNext = addDays(startOfThisWeek, 14);
-    // Start of next month
+    // Calendar month boundaries
+    const startOfNextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
     const startOfMonthAfterNext = new Date(today.getFullYear(), today.getMonth() + 2, 1);
 
     const overdue: Task[] = [];
     const thisWeek: Task[] = [];
     const nextWeek: Task[] = [];
+    const thisMonth: Task[] = [];
     const nextMonth: Task[] = [];
     const later: Task[] = [];
 
@@ -144,6 +195,8 @@ export default function TaskList({ tasks, role, users = [] }: TaskListProps) {
         thisWeek.push(t);
       } else if (due < startOfWeekAfterNext) {
         nextWeek.push(t);
+      } else if (due < startOfNextMonth) {
+        thisMonth.push(t);
       } else if (due < startOfMonthAfterNext) {
         nextMonth.push(t);
       } else {
@@ -155,16 +208,18 @@ export default function TaskList({ tasks, role, users = [] }: TaskListProps) {
       { key: 'overdue', label: 'Overdue', accent: 'text-red-500', tasks: sortTasks(overdue, isAdmin) },
       { key: 'thisWeek', label: 'This Week', tasks: sortTasks(thisWeek, isAdmin) },
       { key: 'nextWeek', label: 'Next Week', tasks: sortTasks(nextWeek, isAdmin) },
+      { key: 'thisMonth', label: 'This Month', tasks: sortTasks(thisMonth, isAdmin) },
       { key: 'nextMonth', label: 'Next Month', tasks: sortTasks(nextMonth, isAdmin) },
       { key: 'later', label: 'Later', tasks: sortTasks(later, isAdmin) },
     ].filter((b) => b.tasks.length > 0);
   }, [filtered, isAdmin, activeStatus]);
 
+  const liveTasks = tasks.filter((t) => !deletedIds.has(t.id));
   const counts = {
-    all: tasks.filter((t) => t.status !== 'done').length,
-    todo: tasks.filter((t) => t.status === 'todo').length,
-    in_progress: tasks.filter((t) => t.status === 'in_progress').length,
-    done: tasks.filter((t) => t.status === 'done').length,
+    all: liveTasks.filter((t) => t.status !== 'done').length,
+    todo: liveTasks.filter((t) => t.status === 'todo').length,
+    in_progress: liveTasks.filter((t) => t.status === 'in_progress').length,
+    done: liveTasks.filter((t) => t.status === 'done').length,
   };
 
   function toggleBucket(key: string) {
@@ -207,7 +262,7 @@ export default function TaskList({ tasks, role, users = [] }: TaskListProps) {
                 />
               </svg>
               <p className="text-sm font-medium text-fw-text/80 mb-1">All caught up!</p>
-              <p className="text-xs text-fw-text/40">No jobs right now. Enjoy the quiet.</p>
+              <p className="text-xs text-fw-text/50">No jobs right now. Enjoy the quiet.</p>
             </div>
           ) : (
             <div className="text-center py-16">
@@ -225,7 +280,7 @@ export default function TaskList({ tasks, role, users = [] }: TaskListProps) {
                 />
               </svg>
               <p className="text-sm font-medium text-fw-text/80 mb-1">No jobs match your filters</p>
-              <p className="text-xs text-fw-text/40">Try adjusting your filters to see more jobs.</p>
+              <p className="text-xs text-fw-text/50">Try adjusting your filters to see more jobs.</p>
             </div>
           )
         ) : (
@@ -253,15 +308,28 @@ export default function TaskList({ tasks, role, users = [] }: TaskListProps) {
                 <span className={`text-xs font-semibold uppercase tracking-wider ${bucket.accent || 'text-fw-text/50'}`}>
                   {bucket.label}
                 </span>
-                <span className="text-xs text-fw-text/30">
+                <span className="text-xs text-fw-text/50">
                   {bucket.tasks.length}
                 </span>
               </button>
               {!collapsedBuckets[bucket.key] && (
                 <div className="space-y-2">
-                  {bucket.tasks.map((task) => (
-                    <TaskCard key={task.id} task={task} />
-                  ))}
+                  {bucket.tasks.map((task) =>
+                    isAdmin ? (
+                      <SwipeableTaskCard
+                        key={task.id}
+                        task={task}
+                        onDelete={handleDelete}
+                        onMarkDone={handleMarkDone}
+                        isOpen={openCardId === task.id}
+                        onOpenChange={(open) =>
+                          setOpenCardId(open ? task.id : null)
+                        }
+                      />
+                    ) : (
+                      <TaskCard key={task.id} task={task} />
+                    )
+                  )}
                 </div>
               )}
             </div>

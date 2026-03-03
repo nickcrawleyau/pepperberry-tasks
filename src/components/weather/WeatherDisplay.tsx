@@ -149,14 +149,14 @@ export default function WeatherDisplay({ data }: WeatherDisplayProps) {
               {Math.round(current.temperature)}°
             </span>
             <p className="text-sm text-fw-text/50 mt-1">{current.condition.description}</p>
-            <p className="text-xs text-fw-text/40 mt-0.5">{getWeatherSummary(current.temperature, current.windSpeed, current.humidity, current.condition.description)}</p>
+            <p className="text-xs text-fw-text/50 mt-0.5">{getWeatherSummary(current.temperature, current.windSpeed, current.humidity, current.condition.description)}</p>
           </div>
           {today && (
             <div className="text-right text-sm text-fw-text/50">
               <p>
                 <span className="text-fw-text font-medium">{Math.round(today.temperatureMax)}°</span>
                 {' / '}
-                <span className="text-fw-text/40">{Math.round(today.temperatureMin)}°</span>
+                <span className="text-fw-text/50">{Math.round(today.temperatureMin)}°</span>
               </p>
             </div>
           )}
@@ -169,7 +169,7 @@ export default function WeatherDisplay({ data }: WeatherDisplayProps) {
             <span className="text-fw-text/80 font-medium">{current.humidity}%</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-fw-text/40 shrink-0">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-fw-text/50 shrink-0">
               <path d="M17.7 7.7a2.5 2.5 0 111.8 4.3H2" />
               <path d="M9.6 4.6A2 2 0 1111 8H2" />
               <path d="M12.6 19.4A2 2 0 1014 16H2" />
@@ -205,16 +205,16 @@ export default function WeatherDisplay({ data }: WeatherDisplayProps) {
               <span className="text-sm text-fw-text/80 w-10 shrink-0">
                 {formatDayName(day.date)}
               </span>
-              <span className="text-fw-text/40 w-7 shrink-0">
+              <span className="text-fw-text/50 w-7 shrink-0">
                 <WeatherIcon type={day.condition.icon} size={18} />
               </span>
-              <span className="text-xs text-fw-text/40 flex-1 ml-1 truncate">
+              <span className="text-xs text-fw-text/50 flex-1 ml-1 truncate">
                 {day.condition.description}
               </span>
               <span className="text-sm text-fw-text font-medium w-8 text-right">
                 {Math.round(day.temperatureMax)}°
               </span>
-              <span className="text-sm text-fw-text/40 w-8 text-right">
+              <span className="text-sm text-fw-text/50 w-8 text-right">
                 {Math.round(day.temperatureMin)}°
               </span>
               {day.precipitationProbability != null && day.precipitationProbability > 0 ? (
@@ -223,7 +223,7 @@ export default function WeatherDisplay({ data }: WeatherDisplayProps) {
                 <span className="w-8" />
               )}
               <span className={`text-xs w-14 text-right font-medium ${
-                day.precipitationSum > 0 ? 'text-sky-400' : 'text-fw-text/30'
+                day.precipitationSum > 0 ? 'text-sky-400' : 'text-fw-text/50'
               }`}>
                 {day.precipitationSum > 0 ? `${day.precipitationSum.toFixed(1)} mm` : '—'}
               </span>
@@ -236,10 +236,10 @@ export default function WeatherDisplay({ data }: WeatherDisplayProps) {
       <div className="bg-fw-surface rounded-xl border border-fw-surface p-5">
         <div className="flex items-baseline justify-between mb-1">
           <p className="text-xs font-medium text-fw-text/50">Rainfall</p>
-          <div className="text-xs text-fw-text/40 text-right">
+          <div className="text-xs text-fw-text/50 text-right">
             <span>30-day: <span className="font-medium text-fw-text/70">{totalRainfall30.toFixed(1)} mm</span></span>
             {totalRainfallLastYear30 > 0 && (
-              <span className="ml-2 text-fw-text/30">
+              <span className="ml-2 text-fw-text/50">
                 (last yr: {totalRainfallLastYear30.toFixed(1)} mm)
               </span>
             )}
@@ -251,9 +251,9 @@ export default function WeatherDisplay({ data }: WeatherDisplayProps) {
           <div className="flex">
             {/* Y axis labels */}
             <div className="flex flex-col justify-between shrink-0 pr-1.5" style={{ height: 120 }}>
-              <span className="text-[9px] text-fw-text/40 leading-none">{Math.round(maxPrecip)} mm</span>
-              <span className="text-[9px] text-fw-text/40 leading-none">{Math.round(maxPrecip / 2)}</span>
-              <span className="text-[9px] text-fw-text/40 leading-none">0</span>
+              <span className="text-[10px] text-fw-text/50 leading-none">{Math.round(maxPrecip)} mm</span>
+              <span className="text-[10px] text-fw-text/50 leading-none">{Math.round(maxPrecip / 2)}</span>
+              <span className="text-[10px] text-fw-text/50 leading-none">0</span>
             </div>
             {/* Bars */}
             <div className="flex-1">
@@ -306,7 +306,7 @@ export default function WeatherDisplay({ data }: WeatherDisplayProps) {
                     >
                       {/* Today marker line */}
                       {isToday && (
-                        <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-px bg-stone-400 z-[5]" />
+                        <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-px bg-fw-accent z-[5]" />
                       )}
                       {/* Rainfall label for 10mm+ days */}
                       {day.precipitationSum >= 10 && (
@@ -333,7 +333,7 @@ export default function WeatherDisplay({ data }: WeatherDisplayProps) {
                         <div
                           className={`w-full rounded-t transition-colors relative ${
                             isToday
-                              ? 'bg-sky-500'
+                              ? 'bg-fw-accent'
                               : day.isForecast
                                 ? 'bg-sky-300'
                                 : 'bg-sky-600'
@@ -354,7 +354,7 @@ export default function WeatherDisplay({ data }: WeatherDisplayProps) {
                   return (
                     <div key={day.date} className="flex-1 text-center">
                       {showLabel && (
-                        <span className="text-[9px] text-fw-text/40 leading-none">
+                        <span className="text-[10px] text-fw-text/50 leading-none">
                           {formatDateShort(day.date)}
                         </span>
                       )}
@@ -367,13 +367,13 @@ export default function WeatherDisplay({ data }: WeatherDisplayProps) {
         </div>
 
         {/* Legend */}
-        <div className="flex items-center gap-3 mt-3 text-[10px] text-fw-text/40 flex-wrap">
+        <div className="flex items-center gap-3 mt-3 text-xs text-fw-text/50 flex-wrap">
           <div className="flex items-center gap-1">
             <div className="w-2.5 h-2.5 rounded-sm bg-sky-600" />
             <span>Recorded</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-2.5 h-2.5 rounded-sm bg-sky-500" />
+            <div className="w-2.5 h-2.5 rounded-sm bg-fw-accent" />
             <span>Today</span>
           </div>
           <div className="flex items-center gap-1">
@@ -404,7 +404,7 @@ export default function WeatherDisplay({ data }: WeatherDisplayProps) {
               allowFullScreen
             />
           ) : (
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-fw-text/40">
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-fw-text/50">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="10" />
                 <polygon points="10 8 16 12 10 16 10 8" fill="currentColor" stroke="none" />
@@ -413,7 +413,7 @@ export default function WeatherDisplay({ data }: WeatherDisplayProps) {
             </div>
           )}
         </div>
-        <p className="text-[10px] text-fw-text/30 mt-2">
+        <p className="text-xs text-fw-text/50 mt-2">
           Source: Windy.com / BOM
         </p>
       </div>
@@ -423,12 +423,12 @@ export default function WeatherDisplay({ data }: WeatherDisplayProps) {
         <p className="text-xs font-medium text-fw-text/50 mb-3">Rainfall Year-to-Date</p>
         <div className="flex items-end gap-6">
           <div>
-            <p className="text-2xl font-semibold text-fw-text">{data.ytdThisYear} <span className="text-sm font-normal text-fw-text/40">mm</span></p>
-            <p className="text-xs text-fw-text/40">{currentYear}</p>
+            <p className="text-2xl font-semibold text-fw-text">{data.ytdThisYear} <span className="text-sm font-normal text-fw-text/50">mm</span></p>
+            <p className="text-xs text-fw-text/50">{currentYear}</p>
           </div>
           <div>
-            <p className="text-2xl font-semibold text-fw-text/30">{data.ytdLastYear} <span className="text-sm font-normal text-fw-text/30">mm</span></p>
-            <p className="text-xs text-fw-text/30">{lastYearLabel}</p>
+            <p className="text-2xl font-semibold text-fw-text/50">{data.ytdLastYear} <span className="text-sm font-normal text-fw-text/50">mm</span></p>
+            <p className="text-xs text-fw-text/50">{lastYearLabel}</p>
           </div>
           <div className="ml-auto text-right">
             {data.ytdThisYear !== data.ytdLastYear && (
@@ -436,7 +436,7 @@ export default function WeatherDisplay({ data }: WeatherDisplayProps) {
                 {data.ytdThisYear > data.ytdLastYear ? '+' : ''}{(data.ytdThisYear - data.ytdLastYear).toFixed(1)} mm
               </p>
             )}
-            <p className="text-[10px] text-fw-text/30">
+            <p className="text-xs text-fw-text/50">
               {data.ytdLastYear > 0
                 ? `${Math.round((data.ytdThisYear / data.ytdLastYear) * 100)}% of last year`
                 : ''}
@@ -449,11 +449,11 @@ export default function WeatherDisplay({ data }: WeatherDisplayProps) {
             <div className="grid grid-cols-3 gap-x-4 gap-y-2 text-xs">
               {monthlyComparison.map((m) => (
                 <div key={m.month} className="flex items-baseline justify-between">
-                  <span className="text-fw-text/40">{m.month}</span>
+                  <span className="text-fw-text/50">{m.month}</span>
                   <span>
                     <span className="text-fw-text/80 font-medium">{m.thisYear}</span>
-                    <span className="text-fw-text/30 mx-0.5">/</span>
-                    <span className="text-fw-text/30">{m.lastYear}</span>
+                    <span className="text-fw-text/50 mx-0.5">/</span>
+                    <span className="text-fw-text/50">{m.lastYear}</span>
                   </span>
                 </div>
               ))}

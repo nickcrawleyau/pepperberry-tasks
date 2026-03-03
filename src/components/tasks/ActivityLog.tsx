@@ -55,7 +55,7 @@ export default function ActivityLog({ activities }: ActivityLogProps) {
             </div>
             <div className="min-w-0 flex-1">
               <p className="text-sm text-fw-text/80">{a.detail}</p>
-              <p className="text-[11px] text-fw-text/40 mt-0.5">
+              <p className="text-xs text-fw-text/50 mt-0.5">
                 {a.user?.name || 'Unknown'} &middot; {formatTime(a.created_at)}
               </p>
             </div>

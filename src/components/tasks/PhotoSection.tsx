@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { TaskPhoto } from '@/lib/types';
 import { MAX_PHOTOS_PER_TASK } from '@/lib/constants';
+import { useToast } from '@/components/ui/ToastProvider';
 
 interface PhotoSectionProps {
   taskId: string;
@@ -21,6 +22,7 @@ export default function PhotoSection({
   supabaseUrl,
 }: PhotoSectionProps) {
   const router = useRouter();
+  const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [photos, setPhotos] = useState(initialPhotos);
   const [uploading, setUploading] = useState(false);
@@ -45,32 +47,52 @@ export default function PhotoSection({
 
   function compressImage(file: File): Promise<Blob> {
     return new Promise((resolve, reject) => {
+      function tryCompress(img: HTMLImageElement, maxDim: number, quality: number) {
+        try {
+          let { width, height } = img;
+          if (width > maxDim || height > maxDim) {
+            const ratio = Math.min(maxDim / width, maxDim / height);
+            width = Math.round(width * ratio);
+            height = Math.round(height * ratio);
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) { reject(new Error('Canvas not supported')); return; }
+          ctx.drawImage(img, 0, 0, width, height);
+          canvas.toBlob(
+            (blob) => {
+              if (!blob) { reject(new Error('Compression failed - no blob')); return; }
+              if (blob.size > 2 * 1024 * 1024) {
+                if (quality > 0.3) {
+                  tryCompress(img, maxDim, quality - 0.15);
+                } else if (maxDim > 800) {
+                  tryCompress(img, maxDim - 400, 0.6);
+                } else {
+                  resolve(blob);
+                }
+                return;
+              }
+              resolve(blob);
+            },
+            'image/jpeg',
+            quality
+          );
+        } catch (err) {
+          reject(new Error('Compress error: ' + (err instanceof Error ? err.message : String(err))));
+        }
+      }
+
       const img = new Image();
       const objectUrl = URL.createObjectURL(file);
       img.onload = () => {
         URL.revokeObjectURL(objectUrl);
-        const MAX_DIM = 1920;
-        let { width, height } = img;
-        if (width > MAX_DIM || height > MAX_DIM) {
-          const ratio = Math.min(MAX_DIM / width, MAX_DIM / height);
-          width = Math.round(width * ratio);
-          height = Math.round(height * ratio);
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) { reject(new Error('Canvas not supported')); return; }
-        ctx.drawImage(img, 0, 0, width, height);
-        canvas.toBlob(
-          (blob) => blob ? resolve(blob) : reject(new Error('Compression failed')),
-          'image/jpeg',
-          0.85
-        );
+        tryCompress(img, 1280, 0.7);
       };
       img.onerror = () => {
         URL.revokeObjectURL(objectUrl);
-        reject(new Error('Could not read image'));
+        reject(new Error('Could not read image. Try taking a new photo.'));
       };
       img.src = objectUrl;
     });
@@ -84,26 +106,47 @@ export default function PhotoSection({
     setUploading(true);
 
     try {
-      const compressed = await compressImage(file);
+      // Step 1: Compress image (if this fails, try raw file)
+      let uploadBlob: Blob;
+      try {
+        uploadBlob = await compressImage(file);
+      } catch {
+        // Compression failed — use the raw file instead
+        uploadBlob = file;
+      }
 
+      // Step 2: Upload via server (FormData)
       const formData = new FormData();
-      formData.append('file', compressed, file.name.replace(/\.[^.]+$/, '.jpg'));
+      formData.append('file', uploadBlob, 'photo.jpg');
 
       const res = await fetch(`/api/tasks/${taskId}/photos`, {
         method: 'POST',
         body: formData,
       });
 
-      const data = await res.json();
+      if (res.status === 413) {
+        setError('Photo too large (' + Math.round(uploadBlob.size / 1024) + 'KB). Try a smaller photo.');
+        return;
+      }
 
-      if (res.ok) {
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        setError('Server error (status ' + res.status + '). Try again.');
+        return;
+      }
+
+      if (res.ok && data.photo) {
         setPhotos([...photos, data.photo]);
+        toast('Photo uploaded');
         router.refresh();
       } else {
-        setError(data.error || 'Failed to upload');
+        setError(data.error || 'Upload failed (status ' + res.status + ')');
       }
-    } catch {
-      setError('Failed to upload photo');
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      setError('Error: ' + msg);
     } finally {
       setUploading(false);
       if (fileInputRef.current) {
@@ -123,6 +166,7 @@ export default function PhotoSection({
 
       if (res.ok) {
         setPhotos(photos.filter((p) => p.id !== photoId));
+        toast('Photo removed');
         router.refresh();
       }
     } finally {
@@ -205,7 +249,6 @@ export default function PhotoSection({
             ref={fileInputRef}
             type="file"
             accept="image/*"
-            capture="environment"
             onChange={handleFileChange}
             disabled={uploading}
             className="hidden"

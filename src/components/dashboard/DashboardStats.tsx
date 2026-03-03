@@ -18,12 +18,18 @@ export default function DashboardStats({ tasks }: DashboardStatsProps) {
 
   const unassigned = openTasks.filter((t) => !t.assigned_to).length;
 
-  // Worker workload — group open tasks by assigned user
+  // Worker workload — only non-recurring tasks due in the next 10 days
+  const in10Days = new Date(today);
+  in10Days.setDate(in10Days.getDate() + 10);
+  const workloadTasks = openTasks.filter(
+    (t) => !t.recurrence_pattern && t.due_date && new Date(t.due_date) <= in10Days
+  );
+
   const workload: { name: string; count: number }[] = [];
   const byUser = new Map<string, { name: string; count: number }>();
   let unassignedCount = 0;
 
-  for (const t of openTasks) {
+  for (const t of workloadTasks) {
     if (!t.assigned_to) {
       unassignedCount++;
     } else {
@@ -62,7 +68,7 @@ export default function DashboardStats({ tasks }: DashboardStatsProps) {
             className="bg-fw-surface rounded-xl border border-fw-surface px-3 py-3 text-center"
           >
             <p className={`text-2xl font-semibold ${s.color}`}>{s.value}</p>
-            <p className="text-[11px] text-fw-text/50 mt-0.5">{s.label}</p>
+            <p className="text-xs text-fw-text/50 mt-0.5">{s.label}</p>
           </div>
         ))}
       </div>

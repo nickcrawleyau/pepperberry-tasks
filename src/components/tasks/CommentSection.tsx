@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { TaskComment } from '@/lib/types';
+import { useToast } from '@/components/ui/ToastProvider';
 
 function timeAgo(dateStr: string): string {
   const now = new Date();
@@ -26,6 +27,7 @@ interface CommentSectionProps {
 
 export default function CommentSection({ taskId, comments: initialComments }: CommentSectionProps) {
   const router = useRouter();
+  const { toast } = useToast();
   const [comments, setComments] = useState(initialComments);
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(false);
@@ -46,6 +48,7 @@ export default function CommentSection({ taskId, comments: initialComments }: Co
         const data = await res.json();
         setComments([...comments, data.comment]);
         setContent('');
+        toast('Comment posted');
         router.refresh();
       }
     } finally {
@@ -75,7 +78,7 @@ export default function CommentSection({ taskId, comments: initialComments }: Co
                 <span className="text-xs font-medium text-fw-text/80">
                   {comment.user?.name || 'Unknown'}
                 </span>
-                <span className="text-[11px] text-fw-text/50">
+                <span className="text-xs text-fw-text/50">
                   {timeAgo(comment.created_at)}
                 </span>
               </div>
@@ -96,10 +99,10 @@ export default function CommentSection({ taskId, comments: initialComments }: Co
           placeholder="Add a comment..."
           rows={2}
           maxLength={1000}
-          className="w-full rounded-lg border border-fw-text/10 bg-fw-surface px-3 py-2 text-sm text-fw-text placeholder:text-fw-text/30 focus:outline-none focus:ring-2 focus:ring-fw-accent focus:border-transparent transition resize-none"
+          className="w-full rounded-lg border border-fw-text/10 bg-fw-surface px-3 py-2 text-sm text-fw-text placeholder:text-fw-text/50 focus:outline-none focus:ring-2 focus:ring-fw-accent focus:border-transparent transition resize-none"
         />
         <div className="flex items-center justify-between">
-          <span className="text-[10px] text-fw-text/30">{content.length}/1000</span>
+          <span className="text-xs text-fw-text/50">{content.length}/1000</span>
           <button
             type="submit"
             disabled={!content.trim() || loading}

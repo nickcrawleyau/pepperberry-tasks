@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   const { data: users, error } = await supabaseAdmin
     .from('users')
-    .select('name')
+    .select('name, role')
     .eq('is_active', true)
     .order('name');
 

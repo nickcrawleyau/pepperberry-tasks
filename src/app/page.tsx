@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 interface UserOption {
   name: string;
+  role: string;
 }
 
 export default function LoginPage() {
@@ -41,16 +42,7 @@ function LoginForm() {
       })
       .finally(() => setUsersLoading(false));
 
-    // Request geolocation eagerly on page load so it's ready by login time
-    try {
-      navigator.geolocation?.getCurrentPosition(
-        (pos) => {
-          geoRef.current = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-        },
-        () => {},
-        { timeout: 15000, maximumAge: 120000 }
-      );
-    } catch { /* geolocation unavailable */ }
+    // Geolocation is requested on user selection for non-admin users
   }, []);
 
   function handlePinChange(index: number, value: string) {
@@ -114,8 +106,9 @@ function LoginForm() {
     setError('');
     setLoading(true);
 
-    // Use whatever geolocation we have — never block login waiting for it
-    const loc = geoRef.current;
+    // Use whatever geolocation we have — skip for admins
+    const selectedRole = users.find((u) => u.name === selectedUser)?.role;
+    const loc = selectedRole === 'admin' ? null : geoRef.current;
 
     try {
       const res = await fetch('/api/auth/login', {
@@ -194,16 +187,19 @@ function LoginForm() {
                     setForgotPinSent(false);
                     if (e.target.value) {
                       setTimeout(() => pinRefs.current[0]?.focus(), 50);
-                      // Re-request geolocation on user gesture (helps if initial request was denied)
-                      try {
-                        navigator.geolocation?.getCurrentPosition(
-                          (pos) => {
-                            geoRef.current = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-                          },
-                          () => {},
-                          { timeout: 15000, maximumAge: 120000 }
-                        );
-                      } catch { /* geolocation unavailable */ }
+                      // Re-request geolocation on user gesture for non-admin users
+                      const selectedRole = users.find((u) => u.name === e.target.value)?.role;
+                      if (selectedRole !== 'admin') {
+                        try {
+                          navigator.geolocation?.getCurrentPosition(
+                            (pos) => {
+                              geoRef.current = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+                            },
+                            () => {},
+                            { timeout: 15000, maximumAge: 120000 }
+                          );
+                        } catch { /* geolocation unavailable */ }
+                      }
                     }
                   }}
                   disabled={usersLoading}
@@ -322,7 +318,7 @@ function LoginForm() {
                 </svg>
               )}
             </div>
-            <p className="text-center text-[10px] text-fw-text/50 pt-2">version | amber-fern</p>
+            <p className="text-center text-[10px] text-fw-text/50 pt-2">version | {process.env.NEXT_PUBLIC_VERSION_NAME}</p>
             <p className="text-center text-[10px] text-fw-text/50">Property of Nick Crawley &copy;2026</p>
           </div>
         </form>

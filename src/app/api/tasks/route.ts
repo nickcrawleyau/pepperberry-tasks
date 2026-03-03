@@ -3,7 +3,7 @@ import { supabaseAdmin } from '@/lib/supabase/admin';
 import { getSession } from '@/lib/auth';
 import { CATEGORIES, LOCATIONS, PRIORITIES, RECURRENCE_PATTERNS, AREAS, MAX_SUBTASKS } from '@/lib/constants';
 import { sendPushToUser } from '@/lib/notifications';
-import { logActivity } from '@/lib/activity';
+import { logActivity, logActivityBatch } from '@/lib/activity';
 
 function generateDueDates(
   pattern: string,
@@ -29,6 +29,18 @@ function generateDueDates(
         break;
       case 'monthly':
         current.setMonth(current.getMonth() + 1);
+        break;
+      case 'two_monthly':
+        current.setMonth(current.getMonth() + 2);
+        break;
+      case 'quarterly':
+        current.setMonth(current.getMonth() + 3);
+        break;
+      case 'six_monthly':
+        current.setMonth(current.getMonth() + 6);
+        break;
+      case 'annual':
+        current.setFullYear(current.getFullYear() + 1);
         break;
     }
   }
@@ -123,7 +135,7 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error('Error creating recurring tasks:', error);
-      return NextResponse.json({ error: `Failed to create tasks: ${error.message}` }, { status: 500 });
+      return NextResponse.json({ error: 'Failed to create tasks' }, { status: 500 });
     }
 
     // Insert subtasks for each task in the series
@@ -141,20 +153,17 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Log activity for each task in the series
+    // Log activity for all tasks in the series (batch insert)
     if (tasks && tasks.length > 0) {
-      for (const t of tasks) {
-        logActivity(t.id, session.userId, 'created', 'Task created');
-      }
+      const taskIds = tasks.map((t) => t.id);
+      logActivityBatch(taskIds, session.userId, 'created', 'Task created');
       if (assigned_to) {
         const { data: assignee } = await supabaseAdmin
           .from('users')
           .select('name')
           .eq('id', assigned_to)
           .single();
-        for (const t of tasks) {
-          logActivity(t.id, session.userId, 'assigned', `Assigned to ${assignee?.name || 'someone'}`);
-        }
+        logActivityBatch(taskIds, session.userId, 'assigned', `Assigned to ${assignee?.name || 'someone'}`);
         sendPushToUser(assigned_to, {
           title: 'New tasks assigned',
           body: `${tasks.length} "${title.trim()}" tasks have been assigned to you`,
@@ -185,7 +194,7 @@ export async function POST(request: NextRequest) {
 
   if (error) {
     console.error('Error creating task:', error);
-    return NextResponse.json({ error: `Failed to create task: ${error.message}` }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to create task' }, { status: 500 });
   }
 
   // Insert subtasks for one-off task

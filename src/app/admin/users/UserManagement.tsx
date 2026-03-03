@@ -23,8 +23,10 @@ const TRADE_TYPES = [
 const SECTIONS = [
   { value: 'new_job', label: 'New Job' },
   { value: 'weather', label: 'Weather' },
+  { value: 'watering', label: 'Watering' },
   { value: 'cart', label: 'Cart' },
   { value: 'chat', label: 'Messages' },
+  { value: 'logbook', label: 'Log Book' },
 ] as const;
 
 interface User {
@@ -301,7 +303,7 @@ function UserRow({
                 {user.phone}
               </a>
             )}
-            <p className="text-xs text-fw-text/40">
+            <p className="text-xs text-fw-text/50">
               {user.last_login
                 ? `Last login: ${formatLastLogin(user.last_login)}`
                 : 'Never logged in'}
@@ -317,7 +319,7 @@ function UserRow({
                     <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
                     <circle cx="12" cy="10" r="3" />
                   </svg>
-                  <span className="text-[10px]">Map</span>
+                  <span className="text-xs">Map</span>
                 </a>
               )}
             </p>
@@ -429,7 +431,7 @@ function LoginHistory({ loginCounts, hasFailedLogins }: { loginCounts: Record<st
   return (
     <div className="mt-2 pt-2 border-t border-fw-surface">
       <div className="flex items-end gap-0.5">
-        <span className="text-[9px] text-fw-text/30 w-6 shrink-0 pb-0.5">14d</span>
+        <span className="text-[10px] text-fw-text/50 w-6 shrink-0 pb-0.5">14d</span>
         {days.map((day) => {
           const heightPct = day.count > 0 ? Math.max((day.count / maxCount) * 100, 15) : 0;
           const isHigh = day.count > 3;
@@ -506,7 +508,7 @@ function AddUserForm({ onDone }: { onDone: (user: User | null) => void }) {
   }
 
   const inputClass =
-    'w-full rounded-lg border border-fw-surface px-3 py-2 text-sm text-fw-text bg-fw-surface placeholder:text-fw-text/30 focus:outline-none focus:ring-2 focus:ring-fw-accent focus:border-transparent transition';
+    'w-full rounded-lg border border-fw-surface px-3 py-2 text-sm text-fw-text bg-fw-surface placeholder:text-fw-text/50 focus:outline-none focus:ring-2 focus:ring-fw-accent focus:border-transparent transition';
   const selectClass =
     'w-full rounded-lg border border-fw-surface px-3 py-2 text-sm text-fw-text bg-fw-surface focus:outline-none focus:ring-2 focus:ring-fw-accent focus:border-transparent transition';
 
@@ -705,7 +707,7 @@ function EditUserForm({
   }
 
   const inputClass =
-    'w-full rounded-lg border border-fw-surface px-3 py-2 text-sm text-fw-text bg-fw-surface placeholder:text-fw-text/30 focus:outline-none focus:ring-2 focus:ring-fw-accent focus:border-transparent transition';
+    'w-full rounded-lg border border-fw-surface px-3 py-2 text-sm text-fw-text bg-fw-surface placeholder:text-fw-text/50 focus:outline-none focus:ring-2 focus:ring-fw-accent focus:border-transparent transition';
   const selectClass =
     'w-full rounded-lg border border-fw-surface px-3 py-2 text-sm text-fw-text bg-fw-surface focus:outline-none focus:ring-2 focus:ring-fw-accent focus:border-transparent transition';
 

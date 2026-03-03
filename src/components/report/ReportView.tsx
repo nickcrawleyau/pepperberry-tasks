@@ -187,7 +187,7 @@ export default function ReportView({ allTasks, recentActivity, users, completedR
         {stats.map((s) => (
           <div key={s.label} className="bg-fw-surface rounded-xl border border-fw-surface px-3 py-3 text-center">
             <p className={`text-2xl font-semibold ${s.color}`}>{s.value}</p>
-            <p className="text-[11px] text-fw-text/50 mt-0.5">{s.label}</p>
+            <p className="text-xs text-fw-text/50 mt-0.5">{s.label}</p>
           </div>
         ))}
       </div>
@@ -263,9 +263,9 @@ export default function ReportView({ allTasks, recentActivity, users, completedR
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm text-fw-text/80">{a.detail}</p>
-                  <p className="text-[11px] text-fw-text/40 mt-0.5">
+                  <p className="text-xs text-fw-text/50 mt-0.5">
                     {(Array.isArray(a.user) ? a.user[0]?.name : a.user?.name) || 'Unknown'}
-                    {(() => { const title = Array.isArray(a.task) ? a.task[0]?.title : a.task?.title; return title ? <> &middot; <span className="text-fw-text/30">{title}</span></> : null; })()}
+                    {(() => { const title = Array.isArray(a.task) ? a.task[0]?.title : a.task?.title; return title ? <> &middot; <span className="text-fw-text/50">{title}</span></> : null; })()}
                     {' '}&middot; {formatTime(a.created_at)}
                   </p>
                 </div>
@@ -299,7 +299,7 @@ export default function ReportView({ allTasks, recentActivity, users, completedR
                     </a>
                   )}
                 </div>
-                <span className="text-[11px] text-fw-text/40 shrink-0">{formatTime(l.logged_in_at)}</span>
+                <span className="text-xs text-fw-text/50 shrink-0">{formatTime(l.logged_in_at)}</span>
               </div>
             ))}
           </div>

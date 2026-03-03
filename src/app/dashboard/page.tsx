@@ -10,6 +10,7 @@ import UnreadBadges from '@/components/UnreadBadges';
 import KeyboardShortcuts from '@/components/KeyboardShortcuts';
 import SessionTimer from '@/components/SessionTimer';
 import ReportProblem from '@/components/ReportProblem';
+import TodaysJobsReminder from '@/components/TodaysJobsReminder';
 
 export default async function DashboardPage() {
   const session = await getSession();
@@ -63,6 +64,11 @@ export default async function DashboardPage() {
     }
   }
 
+  const todayStr = new Date().toLocaleDateString('en-CA');
+  const todaysTasks = tasks.filter(
+    (t) => t.status !== 'done' && t.due_date === todayStr && t.assigned_to === session.userId
+  );
+
   const openCount = tasks.filter((t) => t.status !== 'done').length;
   const greeting =
     session.role === 'admin'
@@ -110,7 +116,7 @@ export default async function DashboardPage() {
           )}
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-lg bg-fw-accent text-white text-sm font-medium hover:bg-fw-hover active:bg-fw-hover transition shrink-0"
+            className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-lg bg-fw-hover text-white ring-2 ring-fw-accent text-sm font-medium transition shrink-0"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -172,6 +178,27 @@ export default async function DashboardPage() {
               Messages
             </Link>
           )}
+          {(session.role === 'admin' || session.allowedSections?.includes('logbook')) && (
+            <Link
+              href="/logbook"
+              className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-lg bg-fw-accent text-white text-sm font-medium hover:bg-fw-hover active:bg-fw-hover transition shrink-0"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
+              </svg>
+              Log Book
+            </Link>
+          )}
           {(session.role === 'admin' || session.allowedSections?.includes('weather')) && (
             <Link
               href="/weather"
@@ -191,6 +218,27 @@ export default async function DashboardPage() {
                 <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" />
               </svg>
               Weather
+            </Link>
+          )}
+          {(session.role === 'admin' || session.allowedSections?.includes('watering')) && (
+            <Link
+              href="/watering"
+              className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-lg bg-fw-accent text-white text-sm font-medium hover:bg-fw-hover active:bg-fw-hover transition shrink-0"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M12 22a7 7 0 0 0 7-7c0-2-1-3.9-3-5.5s-3.5-4-4-6.5c-.5 2.5-2 4.9-4 6.5C6 11.1 5 13 5 15a7 7 0 0 0 7 7z" />
+              </svg>
+              Watering
             </Link>
           )}
           {session.role === 'admin' && (
@@ -235,6 +283,8 @@ export default async function DashboardPage() {
         </div>
       </header>
 
+      <TodaysJobsReminder todaysTasks={todaysTasks} />
+
       <main className="max-w-2xl mx-auto px-5 py-6">
 
         {/* Chat notifications */}
@@ -253,7 +303,7 @@ export default async function DashboardPage() {
                     {newBoardCount} new board message{newBoardCount !== 1 ? 's' : ''}
                   </span>
                 </div>
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-fw-text/40">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-fw-text/50">
                   <path d="m9 18 6-6-6-6" />
                 </svg>
               </Link>
@@ -272,13 +322,16 @@ export default async function DashboardPage() {
                     {newDmCount} new direct message{newDmCount !== 1 ? 's' : ''}
                   </span>
                 </div>
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-fw-text/40">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-fw-text/50">
                   <path d="m9 18 6-6-6-6" />
                 </svg>
               </Link>
             )}
           </div>
         )}
+
+        {/* Page title */}
+        <h1 className="text-lg font-semibold text-fw-text mb-4">Home</h1>
 
         {/* Summary stats (admin only) */}
         {session.role === 'admin' && <DashboardStats tasks={tasks} />}

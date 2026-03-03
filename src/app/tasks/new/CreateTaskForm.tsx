@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import { useToast } from '@/components/ui/ToastProvider';
 import {
   AREAS,
   AREA_LABELS,
@@ -47,6 +48,18 @@ function countOccurrences(pattern: string, start: string, end: string): number {
       case 'monthly':
         current.setMonth(current.getMonth() + 1);
         break;
+      case 'two_monthly':
+        current.setMonth(current.getMonth() + 2);
+        break;
+      case 'quarterly':
+        current.setMonth(current.getMonth() + 3);
+        break;
+      case 'six_monthly':
+        current.setMonth(current.getMonth() + 6);
+        break;
+      case 'annual':
+        current.setFullYear(current.getFullYear() + 1);
+        break;
     }
   }
   return count;
@@ -78,10 +91,22 @@ const AREA_ICONS: Record<string, React.ReactNode> = {
       <path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z" />
     </svg>
   ),
+  cars_bikes: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2" />
+      <circle cx="7" cy="17" r="2" /><circle cx="17" cy="17" r="2" />
+    </svg>
+  ),
+  equipment: (
+    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z" />
+    </svg>
+  ),
 };
 
 export default function CreateTaskForm({ users }: CreateTaskFormProps) {
   const router = useRouter();
+  const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [step, setStep] = useState(1);
@@ -104,7 +129,7 @@ export default function CreateTaskForm({ users }: CreateTaskFormProps) {
   const [recurrenceStart, setRecurrenceStart] = useState(todayString());
   const [recurrenceEnd, setRecurrenceEnd] = useState(() => {
     const d = new Date();
-    d.setMonth(d.getMonth() + 1);
+    d.setFullYear(d.getFullYear() + 1);
     return d.toLocaleDateString('en-CA');
   });
 
@@ -175,6 +200,7 @@ export default function CreateTaskForm({ users }: CreateTaskFormProps) {
         return;
       }
 
+      toast('Job created');
       router.push(`/tasks/${data.task.id}`);
     } catch {
       setError('Something went wrong. Please try again.');
@@ -192,7 +218,7 @@ export default function CreateTaskForm({ users }: CreateTaskFormProps) {
   const selectDefault = `${selectBase} border border-fw-text/20`;
   const selectFilled = `${selectBase} border border-fw-accent`;
   const inputClass =
-    'w-full rounded-lg border border-fw-text/20 px-3 py-2.5 text-sm text-fw-text bg-fw-surface placeholder:text-fw-text/30 focus:outline-none focus:ring-2 focus:ring-fw-accent focus:border-transparent transition';
+    'w-full rounded-lg border border-fw-text/20 px-3 py-2.5 text-sm text-fw-text bg-fw-surface placeholder:text-fw-text/50 focus:outline-none focus:ring-2 focus:ring-fw-accent focus:border-transparent transition';
   const labelClass = 'block text-xs font-medium text-fw-text/50 mb-1.5';
 
   return (
@@ -449,7 +475,7 @@ export default function CreateTaskForm({ users }: CreateTaskFormProps) {
 
             {subtasks.map((st, i) => (
               <div key={i} className="flex items-center gap-2">
-                <span className="text-xs text-fw-text/30 w-5 text-center">{i + 1}</span>
+                <span className="text-xs text-fw-text/50 w-5 text-center">{i + 1}</span>
                 <input
                   type="text"
                   value={st}
@@ -460,7 +486,7 @@ export default function CreateTaskForm({ users }: CreateTaskFormProps) {
                 <button
                   type="button"
                   onClick={() => removeSubtask(i)}
-                  className="p-1.5 text-fw-text/30 hover:text-red-500 transition"
+                  className="p-1.5 text-fw-text/40 hover:text-red-500 transition"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M18 6 6 18" /><path d="m6 6 12 12" />
@@ -483,7 +509,7 @@ export default function CreateTaskForm({ users }: CreateTaskFormProps) {
             )}
 
             {subtasks.length === 0 && (
-              <p className="text-xs text-fw-text/30 text-center py-4">
+              <p className="text-xs text-fw-text/50 text-center py-4">
                 No sub-tasks. You can skip this step.
               </p>
             )}

@@ -20,7 +20,7 @@ export default function SessionTimer({ expiresAt }: { expiresAt: number }) {
   const label = hours > 0 ? `${hours}h ${mins}m` : `${mins}m`;
 
   return (
-    <span className="text-[10px] text-white/70">
+    <span className="text-xs text-white/70">
       {remaining > 0 ? (
         <>
           <span className="hidden sm:inline">Session expires in </span>
