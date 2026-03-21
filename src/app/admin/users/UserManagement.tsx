@@ -26,7 +26,8 @@ const SECTIONS = [
   { value: 'watering', label: 'Watering' },
   { value: 'cart', label: 'Cart' },
   { value: 'chat', label: 'Messages' },
-  { value: 'logbook', label: 'Log Book' },
+  { value: 'logbook', label: 'Notes' },
+  { value: 'fuel', label: 'Fuel' },
 ] as const;
 
 interface User {

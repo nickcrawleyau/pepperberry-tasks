@@ -196,7 +196,7 @@ export default async function DashboardPage() {
               >
                 <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20" />
               </svg>
-              Log Book
+              Notes
             </Link>
           )}
           {(session.role === 'admin' || session.allowedSections?.includes('weather')) && (
@@ -218,6 +218,30 @@ export default async function DashboardPage() {
                 <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z" />
               </svg>
               Weather
+            </Link>
+          )}
+          {(session.role === 'admin' || session.allowedSections?.includes('fuel')) && (
+            <Link
+              href="/fuel"
+              className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-lg bg-fw-accent text-white text-sm font-medium hover:bg-fw-hover active:bg-fw-hover transition shrink-0"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M3 22V6a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16" />
+                <path d="M13 10h4a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.42L18 4" />
+                <path d="M3 22h10" />
+                <path d="M7 2v4" />
+              </svg>
+              Fuel
             </Link>
           )}
           {(session.role === 'admin' || session.allowedSections?.includes('watering')) && (
