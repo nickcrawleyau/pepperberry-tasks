@@ -85,7 +85,7 @@ pepperberry-tasks/
     │       ├── tasks/           # CRUD, comments, photos, transfer, series, export
     │       ├── users/           # CRUD
     │       ├── chat/            # Board messages, DMs, conversations, seen tracking
-    │       ├── shopping/        # CRUD
+    │       ├── shopping/        # CRUD, photo upload
     │       ├── weather/         # Weather data proxy
     │       ├── push-subscription/   # Push notification registration
     │       └── cron/            # Overdue task reminders
@@ -102,9 +102,9 @@ pepperberry-tasks/
     │   │   └── DashboardStats.tsx   # Admin overview stats
     │   ├── tasks/
     │   │   ├── TaskList.tsx          # Filterable job list
-    │   │   ├── TaskCard.tsx          # Individual job card
+    │   │   ├── TaskCard.tsx          # Individual job card (shows "added by X" when creator differs from assignee)
     │   │   ├── TaskFilters.tsx       # Filter controls
-    │   │   ├── AdminFilters.tsx      # Admin-specific filters
+    │   │   ├── AdminFilters.tsx      # Admin-specific filters (priority, location, assigned to, created by)
     │   │   ├── StatusUpdater.tsx     # Status change controls
     │   │   ├── CommentSection.tsx    # Job comments
     │   │   ├── PhotoSection.tsx      # Photo upload/gallery (max 5, client-side compression)
@@ -242,7 +242,20 @@ The `supabaseAdmin` client in `src/lib/supabase/admin.ts` is configured with `ca
 | added_by | uuid | FK → `users.id` |
 | assigned_to | uuid | FK → `users.id`, nullable. Which admin buys it |
 | is_bought | boolean | Default false |
+| photo_path | text | Nullable. Supabase Storage path for item photo |
 | created_at | timestamptz | Default `now()` |
+
+### `fuel_prices`
+| Column | Type | Notes |
+|--------|------|-------|
+| id | uuid | PK, default `gen_random_uuid()` |
+| station_code | text | Unique station identifier from FuelCheck API |
+| station_name | text | Station display name |
+| station_brand | text | Brand (Shell, Caltex, etc.) |
+| suburb | text | Berry, Shoalhaven Heads, or Bomaderry |
+| fuel_type | text | `U91`, `P98`, or `PDL` |
+| price | numeric | Price in cents per litre (e.g. 189.9) |
+| fetched_at | timestamptz | When this price was fetched |
 
 ### `chat_messages`
 | Column | Type | Notes |
@@ -359,6 +372,7 @@ Use these exact string values in the `location` column:
 - Non-admin users only see sections permitted by their `allowed_sections`
 - Admin dashboard stats summary
 - Filterable/sortable job list; urgent jobs always sorted first
+- Admin filters: priority, sub-category (location), assigned to, created by
 
 ### Weather (`/weather`)
 - Header shows "Weather" with "Open-Meteo · Updated {time}" subtitle
@@ -380,6 +394,7 @@ Use these exact string values in the `location` column:
 - Add items with title, category (hardware/hay/feed/other), and buyer assignment (which admin buys it)
 - Any user with `cart` in `allowed_sections` can add and mark items (not just admins)
 - Each item shows who's assigned to buy it
+- Optional photo per item (visual reminder of what to buy, stored in `shopping-photos` bucket)
 - Mark items as bought, delete items
 
 ### User Management (`/admin/users`)
@@ -454,6 +469,8 @@ npx supabase db push --linked --include-all  # Push migrations
 NEXT_PUBLIC_SUPABASE_URL=         # Supabase project URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY=    # Supabase anon/public key
 SUPABASE_SERVICE_ROLE_KEY=        # Supabase service role key (server only, never expose)
+FUELCHECK_CONSUMER_KEY=           # NSW FuelCheck API consumer key (api.nsw.gov.au)
+FUELCHECK_CONSUMER_SECRET=        # NSW FuelCheck API consumer secret
 ```
 
 Store in `.env.local` (gitignored). Set in Vercel dashboard for production.
