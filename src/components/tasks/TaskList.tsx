@@ -82,7 +82,7 @@ export default function TaskList({ tasks, role, users = [] }: TaskListProps) {
     setDeletedIds((prev) => new Set(prev).add(taskId));
     setOpenCardId(null);
     // Fire and forget — card is already hidden optimistically
-    fetch(`/api/tasks/${taskId}`, { method: 'DELETE' }).catch(() => {});
+    fetch(`/api/tasks/${taskId}`, { method: 'DELETE', keepalive: true }).catch(() => {});
   }, []);
 
   const handleMarkDone = useCallback((taskId: string) => {
@@ -93,6 +93,7 @@ export default function TaskList({ tasks, role, users = [] }: TaskListProps) {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: 'done' }),
+      keepalive: true,
     }).catch(() => {});
   }, []);
 

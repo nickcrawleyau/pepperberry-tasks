@@ -22,7 +22,7 @@ export default function DeleteTaskButton({ taskId }: { taskId: string }) {
     setLoading(true);
     setError('');
     // Fire delete and navigate immediately — dashboard loads fresh data
-    fetch(`/api/tasks/${taskId}`, { method: 'DELETE' }).catch(() => {});
+    fetch(`/api/tasks/${taskId}`, { method: 'DELETE', keepalive: true }).catch(() => {});
     toast('Job deleted');
     window.location.href = '/dashboard';
   }

@@ -22,7 +22,7 @@ export default function DeleteSeriesButton({ groupId }: { groupId: string }) {
     setLoading(true);
     setError('');
     // Fire delete and navigate immediately — dashboard loads fresh data
-    fetch(`/api/tasks/series/${groupId}`, { method: 'DELETE' }).catch(() => {});
+    fetch(`/api/tasks/series/${groupId}`, { method: 'DELETE', keepalive: true }).catch(() => {});
     toast('Series deleted');
     window.location.href = '/dashboard';
   }

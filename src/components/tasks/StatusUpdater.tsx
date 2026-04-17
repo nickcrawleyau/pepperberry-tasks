@@ -44,6 +44,7 @@ export default function StatusUpdater({ taskId, currentStatus }: StatusUpdaterPr
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'done' }),
+        keepalive: true,
       }).catch(() => {});
       toast('Status updated');
       window.location.href = '/dashboard';
