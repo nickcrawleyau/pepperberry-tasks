@@ -49,6 +49,7 @@ export default function StatusUpdater({ taskId, currentStatus }: StatusUpdaterPr
         toast('Status updated');
         if (newStatus === 'done') {
           router.push('/dashboard');
+          // Keep loading=true so buttons stay disabled during navigation
           return;
         }
         setStatus(newStatus);
@@ -60,9 +61,8 @@ export default function StatusUpdater({ taskId, currentStatus }: StatusUpdaterPr
     } catch {
       setError('Connection error. Try again.');
       setStatus(previousStatus);
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   }
 
   return (

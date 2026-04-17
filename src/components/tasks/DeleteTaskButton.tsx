@@ -26,10 +26,13 @@ export default function DeleteTaskButton({ taskId }: { taskId: string }) {
       if (res.ok) {
         toast('Job deleted');
         router.push('/dashboard');
+        // Keep loading=true so button stays disabled during navigation
+        return;
       }
-    } finally {
-      setLoading(false);
+    } catch {
+      // Network error — allow retry
     }
+    setLoading(false);
   }
 
   if (confirming) {

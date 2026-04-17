@@ -198,14 +198,15 @@ export default function CreateTaskForm({ users, currentUserId }: CreateTaskFormP
 
       if (!res.ok) {
         setError(data.error || 'Failed to create job');
+        setLoading(false);
         return;
       }
 
       toast('Job created');
       router.push(`/tasks/${data.task.id}`);
+      // Keep loading=true so "Creating..." stays visible during navigation
     } catch {
       setError('Something went wrong. Please try again.');
-    } finally {
       setLoading(false);
     }
   }
@@ -445,11 +446,11 @@ export default function CreateTaskForm({ users, currentUserId }: CreateTaskFormP
             <p className="text-sm text-red-500 text-center">{error}</p>
           )}
 
-          <div className="flex gap-3">
+          <div className="flex gap-3 w-full min-w-0">
             <button
               type="button"
               onClick={() => setStep(2)}
-              className="px-5 py-2.5 rounded-lg border border-fw-text/20 text-sm font-medium text-fw-text/80 hover:bg-fw-surface transition"
+              className="shrink-0 px-5 py-2.5 rounded-lg border border-fw-text/20 text-sm font-medium text-fw-text/80 hover:bg-fw-surface transition"
             >
               Back
             </button>
@@ -457,7 +458,7 @@ export default function CreateTaskForm({ users, currentUserId }: CreateTaskFormP
               type="button"
               disabled={!canSubmitDetails}
               onClick={() => setStep(4)}
-              className="flex-1 rounded-lg bg-fw-accent py-2.5 text-sm font-medium text-white hover:bg-fw-hover active:bg-fw-hover transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 min-w-0 rounded-lg bg-fw-accent py-2.5 text-sm font-medium text-white hover:bg-fw-hover active:bg-fw-hover transition disabled:opacity-50 disabled:cursor-not-allowed truncate"
             >
               Next
             </button>
@@ -520,11 +521,11 @@ export default function CreateTaskForm({ users, currentUserId }: CreateTaskFormP
             <p className="text-sm text-red-500 text-center">{error}</p>
           )}
 
-          <div className="flex gap-3">
+          <div className="flex gap-3 w-full min-w-0">
             <button
               type="button"
               onClick={() => setStep(3)}
-              className="px-5 py-2.5 rounded-lg border border-fw-text/20 text-sm font-medium text-fw-text/80 hover:bg-fw-surface transition"
+              className="shrink-0 px-5 py-2.5 rounded-lg border border-fw-text/20 text-sm font-medium text-fw-text/80 hover:bg-fw-surface transition"
             >
               Back
             </button>
@@ -532,7 +533,7 @@ export default function CreateTaskForm({ users, currentUserId }: CreateTaskFormP
               type="button"
               disabled={loading}
               onClick={handleSubmit}
-              className="flex-1 rounded-lg bg-fw-accent py-2.5 text-sm font-medium text-white hover:bg-fw-hover active:bg-fw-hover transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 min-w-0 rounded-lg bg-fw-accent py-2.5 text-sm font-medium text-white hover:bg-fw-hover active:bg-fw-hover transition disabled:opacity-50 disabled:cursor-not-allowed truncate"
             >
               {loading
                 ? 'Creating...'

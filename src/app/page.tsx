@@ -132,9 +132,9 @@ function LoginForm() {
       }
 
       router.push(data.must_set_pin ? '/set-pin' : '/dashboard');
+      // Keep loading=true during navigation
     } catch {
       setError('Something went wrong. Please try again.');
-    } finally {
       setLoading(false);
     }
   }

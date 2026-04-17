@@ -26,10 +26,13 @@ export default function DeleteSeriesButton({ groupId }: { groupId: string }) {
       if (res.ok) {
         toast('Series deleted');
         router.push('/dashboard');
+        // Keep loading=true so button stays disabled during navigation
+        return;
       }
-    } finally {
-      setLoading(false);
+    } catch {
+      // Network error — allow retry
     }
+    setLoading(false);
   }
 
   if (confirming) {

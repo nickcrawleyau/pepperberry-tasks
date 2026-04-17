@@ -93,15 +93,16 @@ export default function SetPinPage() {
 
       if (res.ok) {
         router.push('/dashboard');
+        // Keep loading=true during navigation
+        return;
       } else {
         const data = await res.json();
         setError(data.error || 'Failed to set PIN');
       }
     } catch {
       setError('Something went wrong. Please try again.');
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   }
 
   const enterFull = pin.join('').length === 4;
