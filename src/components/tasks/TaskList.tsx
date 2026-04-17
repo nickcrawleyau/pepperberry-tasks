@@ -70,6 +70,7 @@ export default function TaskList({ tasks, role, users = [] }: TaskListProps) {
     priority: '',
     location: '',
     assignedTo: '',
+    createdBy: '',
   });
   const [collapsedBuckets, setCollapsedBuckets] = useState<Record<string, boolean>>({});
   const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set());
@@ -77,50 +78,22 @@ export default function TaskList({ tasks, role, users = [] }: TaskListProps) {
 
   const isAdmin = role === 'admin';
 
-  const handleDelete = useCallback(async (taskId: string) => {
+  const handleDelete = useCallback((taskId: string) => {
     setDeletedIds((prev) => new Set(prev).add(taskId));
     setOpenCardId(null);
-    try {
-      const res = await fetch(`/api/tasks/${taskId}`, { method: 'DELETE' });
-      if (!res.ok) {
-        setDeletedIds((prev) => {
-          const next = new Set(prev);
-          next.delete(taskId);
-          return next;
-        });
-      }
-    } catch {
-      setDeletedIds((prev) => {
-        const next = new Set(prev);
-        next.delete(taskId);
-        return next;
-      });
-    }
+    // Fire and forget — card is already hidden optimistically
+    fetch(`/api/tasks/${taskId}`, { method: 'DELETE' }).catch(() => {});
   }, []);
 
-  const handleMarkDone = useCallback(async (taskId: string) => {
+  const handleMarkDone = useCallback((taskId: string) => {
     // Optimistic: remove from active view
     setDeletedIds((prev) => new Set(prev).add(taskId));
-    try {
-      const res = await fetch(`/api/tasks/${taskId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'done' }),
-      });
-      if (!res.ok) {
-        setDeletedIds((prev) => {
-          const next = new Set(prev);
-          next.delete(taskId);
-          return next;
-        });
-      }
-    } catch {
-      setDeletedIds((prev) => {
-        const next = new Set(prev);
-        next.delete(taskId);
-        return next;
-      });
-    }
+    // Fire and forget
+    fetch(`/api/tasks/${taskId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'done' }),
+    }).catch(() => {});
   }, []);
 
   const filtered = useMemo(() => {
@@ -147,6 +120,9 @@ export default function TaskList({ tasks, role, users = [] }: TaskListProps) {
             (t) => t.assigned_to === adminFilters.assignedTo
           );
         }
+      }
+      if (adminFilters.createdBy) {
+        result = result.filter((t) => t.created_by === adminFilters.createdBy);
       }
     }
 
