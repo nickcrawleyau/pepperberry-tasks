@@ -38,14 +38,21 @@ export default function StatusUpdater({ taskId, currentStatus }: StatusUpdaterPr
 
     const previousStatus = status;
 
-    // Mark as done: fire and navigate immediately
+    // Mark as done: await the update, then navigate
     if (newStatus === 'done') {
-      fetch(`/api/tasks/${taskId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'done' }),
-        keepalive: true,
-      }).catch(() => {});
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 8000);
+        await fetch(`/api/tasks/${taskId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'done' }),
+          signal: controller.signal,
+        });
+        clearTimeout(timeout);
+      } catch {
+        // Timeout or network error — navigate anyway
+      }
       toast('Status updated');
       window.location.href = '/dashboard';
       return;

@@ -18,11 +18,25 @@ export default function DeleteTaskButton({ taskId }: { taskId: string }) {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [confirming]);
 
-  function handleDelete() {
+  async function handleDelete() {
     setLoading(true);
     setError('');
-    // Fire delete and navigate immediately — dashboard loads fresh data
-    fetch(`/api/tasks/${taskId}`, { method: 'DELETE', keepalive: true }).catch(() => {});
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000);
+      const res = await fetch(`/api/tasks/${taskId}`, {
+        method: 'DELETE',
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+      if (!res.ok) {
+        setError('Failed to delete. Try again.');
+        setLoading(false);
+        return;
+      }
+    } catch {
+      // Timeout or network error — navigate anyway
+    }
     toast('Job deleted');
     window.location.href = '/dashboard';
   }

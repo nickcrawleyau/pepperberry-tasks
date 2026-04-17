@@ -78,23 +78,44 @@ export default function TaskList({ tasks, role, users = [] }: TaskListProps) {
 
   const isAdmin = role === 'admin';
 
-  const handleDelete = useCallback((taskId: string) => {
+  const handleDelete = useCallback(async (taskId: string) => {
     setDeletedIds((prev) => new Set(prev).add(taskId));
     setOpenCardId(null);
-    // Fire and forget — card is already hidden optimistically
-    fetch(`/api/tasks/${taskId}`, { method: 'DELETE', keepalive: true }).catch(() => {});
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000);
+      const res = await fetch(`/api/tasks/${taskId}`, {
+        method: 'DELETE',
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+      if (!res.ok) {
+        // Revert — delete failed
+        setDeletedIds((prev) => { const next = new Set(prev); next.delete(taskId); return next; });
+      }
+    } catch {
+      // Timeout — card stays hidden, delete may or may not have worked
+    }
   }, []);
 
-  const handleMarkDone = useCallback((taskId: string) => {
-    // Optimistic: remove from active view
+  const handleMarkDone = useCallback(async (taskId: string) => {
     setDeletedIds((prev) => new Set(prev).add(taskId));
-    // Fire and forget
-    fetch(`/api/tasks/${taskId}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status: 'done' }),
-      keepalive: true,
-    }).catch(() => {});
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 8000);
+      const res = await fetch(`/api/tasks/${taskId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'done' }),
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+      if (!res.ok) {
+        setDeletedIds((prev) => { const next = new Set(prev); next.delete(taskId); return next; });
+      }
+    } catch {
+      // Timeout — card stays hidden
+    }
   }, []);
 
   const filtered = useMemo(() => {
