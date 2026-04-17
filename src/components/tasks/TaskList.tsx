@@ -90,11 +90,12 @@ export default function TaskList({ tasks, role, users = [] }: TaskListProps) {
       });
       clearTimeout(timeout);
       if (!res.ok) {
-        // Revert — delete failed
+        const body = await res.text().catch(() => '');
+        alert(`Delete failed (${res.status}): ${body}`);
         setDeletedIds((prev) => { const next = new Set(prev); next.delete(taskId); return next; });
       }
-    } catch {
-      // Timeout — card stays hidden, delete may or may not have worked
+    } catch (err) {
+      alert(`Delete error: ${err instanceof Error ? err.message : 'unknown'}`);
     }
   }, []);
 
