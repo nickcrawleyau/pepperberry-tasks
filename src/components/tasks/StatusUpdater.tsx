@@ -38,6 +38,18 @@ export default function StatusUpdater({ taskId, currentStatus }: StatusUpdaterPr
 
     const previousStatus = status;
 
+    // Mark as done: fire and navigate immediately
+    if (newStatus === 'done') {
+      fetch(`/api/tasks/${taskId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'done' }),
+      }).catch(() => {});
+      toast('Status updated');
+      window.location.href = '/dashboard';
+      return;
+    }
+
     try {
       const res = await fetch(`/api/tasks/${taskId}`, {
         method: 'PATCH',
@@ -47,10 +59,6 @@ export default function StatusUpdater({ taskId, currentStatus }: StatusUpdaterPr
 
       if (res.ok) {
         toast('Status updated');
-        if (newStatus === 'done') {
-          window.location.href = '/dashboard';
-          return;
-        }
         setStatus(newStatus);
         router.refresh();
       } else {

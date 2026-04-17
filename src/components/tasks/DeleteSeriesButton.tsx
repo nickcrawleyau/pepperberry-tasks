@@ -18,21 +18,13 @@ export default function DeleteSeriesButton({ groupId }: { groupId: string }) {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [confirming]);
 
-  async function handleDelete() {
+  function handleDelete() {
     setLoading(true);
     setError('');
-    try {
-      const res = await fetch(`/api/tasks/series/${groupId}`, { method: 'DELETE' });
-      if (res.ok) {
-        toast('Series deleted');
-        window.location.href = '/dashboard';
-        return;
-      }
-      setError('Failed to delete. Try again.');
-    } catch {
-      setError('Connection error. Try again.');
-    }
-    setLoading(false);
+    // Fire delete and navigate immediately — dashboard loads fresh data
+    fetch(`/api/tasks/series/${groupId}`, { method: 'DELETE' }).catch(() => {});
+    toast('Series deleted');
+    window.location.href = '/dashboard';
   }
 
   if (confirming) {
