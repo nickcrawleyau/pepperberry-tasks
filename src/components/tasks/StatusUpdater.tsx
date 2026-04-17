@@ -48,8 +48,7 @@ export default function StatusUpdater({ taskId, currentStatus }: StatusUpdaterPr
       if (res.ok) {
         toast('Status updated');
         if (newStatus === 'done') {
-          router.push('/dashboard');
-          // Keep loading=true so buttons stay disabled during navigation
+          window.location.href = '/dashboard';
           return;
         }
         setStatus(newStatus);

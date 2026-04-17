@@ -1,14 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/ui/ToastProvider';
 
 export default function DeleteTaskButton({ taskId }: { taskId: string }) {
-  const router = useRouter();
   const { toast } = useToast();
   const [confirming, setConfirming] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (!confirming) return;
@@ -21,23 +20,24 @@ export default function DeleteTaskButton({ taskId }: { taskId: string }) {
 
   async function handleDelete() {
     setLoading(true);
+    setError('');
     try {
       const res = await fetch(`/api/tasks/${taskId}`, { method: 'DELETE' });
       if (res.ok) {
         toast('Job deleted');
-        router.push('/dashboard');
-        // Keep loading=true so button stays disabled during navigation
+        window.location.href = '/dashboard';
         return;
       }
+      setError('Failed to delete. Try again.');
     } catch {
-      // Network error — allow retry
+      setError('Connection error. Try again.');
     }
     setLoading(false);
   }
 
   if (confirming) {
     return (
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-wrap">
         <span className="text-xs text-red-500">Delete this job?</span>
         <button
           onClick={handleDelete}
@@ -48,10 +48,12 @@ export default function DeleteTaskButton({ taskId }: { taskId: string }) {
         </button>
         <button
           onClick={() => setConfirming(false)}
-          className="px-3 py-1.5 rounded-lg border border-fw-text/20 text-xs font-medium text-fw-text/80 hover:bg-fw-bg transition"
+          disabled={loading}
+          className="px-3 py-1.5 rounded-lg border border-fw-text/20 text-xs font-medium text-fw-text/80 hover:bg-fw-bg transition disabled:opacity-50"
         >
           Cancel
         </button>
+        {error && <span className="text-xs text-red-400 w-full">{error}</span>}
       </div>
     );
   }
