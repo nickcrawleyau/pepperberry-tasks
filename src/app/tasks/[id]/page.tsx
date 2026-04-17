@@ -47,18 +47,20 @@ export default async function TaskDetailPage({
   if (!session) redirect('/');
 
   const { id } = await params;
-  const sessionExpiry = await getSessionExpiry();
 
-  // Fetch task with related user names
-  const { data: task, error } = await supabaseAdmin
-    .from('tasks')
-    .select(`
-      *,
-      assigned_user:users!tasks_assigned_to_fkey(name),
-      created_user:users!tasks_created_by_fkey(name)
-    `)
-    .eq('id', id)
-    .single();
+  // Fetch task and session expiry in parallel
+  const [sessionExpiry, { data: task, error }] = await Promise.all([
+    getSessionExpiry(),
+    supabaseAdmin
+      .from('tasks')
+      .select(`
+        *,
+        assigned_user:users!tasks_assigned_to_fkey(name),
+        created_user:users!tasks_created_by_fkey(name)
+      `)
+      .eq('id', id)
+      .single(),
+  ]);
 
   if (error || !task) notFound();
 
@@ -72,49 +74,45 @@ export default async function TaskDetailPage({
     notFound();
   }
 
-  // Fetch comments
-  const { data: comments } = await supabaseAdmin
-    .from('task_comments')
-    .select('id, content, created_at, user:users(name)')
-    .eq('task_id', id)
-    .order('created_at', { ascending: true });
+  // Fetch all task details in parallel
+  const [
+    { data: comments },
+    { data: photos },
+    { data: activities },
+    { data: subtasks },
+    { data: activeUsers },
+  ] = await Promise.all([
+    supabaseAdmin
+      .from('task_comments')
+      .select('id, content, created_at, user:users(name)')
+      .eq('task_id', id)
+      .order('created_at', { ascending: true }),
+    supabaseAdmin
+      .from('task_photos')
+      .select('id, storage_path, uploaded_by, created_at, uploader:users!task_photos_uploaded_by_fkey(name)')
+      .eq('task_id', id)
+      .order('created_at', { ascending: true }),
+    supabaseAdmin
+      .from('task_activity')
+      .select('id, task_id, user_id, action, detail, created_at, user:users(name)')
+      .eq('task_id', id)
+      .order('created_at', { ascending: true }),
+    supabaseAdmin
+      .from('task_subtasks')
+      .select('*')
+      .eq('task_id', id)
+      .order('sort_order', { ascending: true }),
+    supabaseAdmin
+      .from('users')
+      .select('id, name')
+      .eq('is_active', true)
+      .order('name'),
+  ]);
 
   const typedComments = (comments || []) as unknown as TaskComment[];
-
-  // Fetch photos
-  const { data: photos } = await supabaseAdmin
-    .from('task_photos')
-    .select('id, storage_path, uploaded_by, created_at, uploader:users!task_photos_uploaded_by_fkey(name)')
-    .eq('task_id', id)
-    .order('created_at', { ascending: true });
-
   const typedPhotos = (photos || []) as unknown as TaskPhoto[];
-
-  // Fetch activity log
-  const { data: activities } = await supabaseAdmin
-    .from('task_activity')
-    .select('id, task_id, user_id, action, detail, created_at, user:users(name)')
-    .eq('task_id', id)
-    .order('created_at', { ascending: true });
-
   const typedActivities = (activities || []) as unknown as TaskActivity[];
-
-  // Fetch subtasks
-  const { data: subtasks } = await supabaseAdmin
-    .from('task_subtasks')
-    .select('*')
-    .eq('task_id', id)
-    .order('sort_order', { ascending: true });
-
   const typedSubtasks = (subtasks || []) as TaskSubtask[];
-
-  // Fetch active users for transfer dropdown
-  const { data: activeUsers } = await supabaseAdmin
-    .from('users')
-    .select('id, name')
-    .eq('is_active', true)
-    .order('name');
-
   const transferUsers = (activeUsers || []).map((u) => ({ id: u.id as string, name: u.name as string }));
 
   const isOverdue =
@@ -123,7 +121,7 @@ export default async function TaskDetailPage({
     new Date(typedTask.due_date) < new Date(new Date().toDateString());
 
   return (
-    <div className="min-h-screen bg-fw-bg">
+    <div className="min-h-screen bg-fw-bg overflow-x-hidden">
       <header className="bg-fw-surface border-b border-fw-surface sticky top-0 z-30">
         <div className="max-w-2xl mx-auto px-5 py-4">
           <div className="flex items-center gap-4">

@@ -19,49 +19,42 @@ export default async function DashboardPage() {
     redirect('/');
   }
 
-  const [tasks, sessionExpiry] = await Promise.all([
+  const isAdmin = session.role === 'admin';
+  const hasChat = isAdmin || session.allowedSections?.includes('chat');
+
+  // Run all independent queries in parallel
+  const [tasks, sessionExpiry, usersResult, chatUserResult] = await Promise.all([
     fetchTasks(session),
     getSessionExpiry(),
+    isAdmin
+      ? supabaseAdmin.from('users').select('id, name').eq('is_active', true).order('name')
+      : Promise.resolve({ data: null }),
+    hasChat
+      ? supabaseAdmin.from('users').select('board_last_seen_at, dm_last_seen_at').eq('id', session.userId).single()
+      : Promise.resolve({ data: null }),
   ]);
 
-  // Fetch active users for admin filter dropdown
-  let users: { id: string; name: string }[] = [];
-  if (session.role === 'admin') {
-    const { data } = await supabaseAdmin
-      .from('users')
-      .select('id, name')
-      .eq('is_active', true)
-      .order('name');
-    users = data || [];
-  }
+  const users = (usersResult.data || []) as { id: string; name: string }[];
 
-  // Fetch unread chat counts if user has chat access
-  const hasChat = session.role === 'admin' || session.allowedSections?.includes('chat');
+  // Chat counts depend on last-seen timestamps
   let newBoardCount = 0;
   let newDmCount = 0;
 
-  if (hasChat) {
-    const { data: userData } = await supabaseAdmin
-      .from('users')
-      .select('board_last_seen_at, dm_last_seen_at')
-      .eq('id', session.userId)
-      .single();
-
-    if (userData) {
-      const [{ count: boardCount }, { count: dmCount }] = await Promise.all([
-        supabaseAdmin
-          .from('chat_messages')
-          .select('*', { count: 'exact', head: true })
-          .gt('created_at', userData.board_last_seen_at),
-        supabaseAdmin
-          .from('direct_messages')
-          .select('*', { count: 'exact', head: true })
-          .eq('recipient_id', session.userId)
-          .gt('created_at', userData.dm_last_seen_at),
-      ]);
-      newBoardCount = boardCount || 0;
-      newDmCount = dmCount || 0;
-    }
+  if (chatUserResult.data) {
+    const userData = chatUserResult.data as { board_last_seen_at: string; dm_last_seen_at: string };
+    const [{ count: boardCount }, { count: dmCount }] = await Promise.all([
+      supabaseAdmin
+        .from('chat_messages')
+        .select('*', { count: 'exact', head: true })
+        .gt('created_at', userData.board_last_seen_at),
+      supabaseAdmin
+        .from('direct_messages')
+        .select('*', { count: 'exact', head: true })
+        .eq('recipient_id', session.userId)
+        .gt('created_at', userData.dm_last_seen_at),
+    ]);
+    newBoardCount = boardCount || 0;
+    newDmCount = dmCount || 0;
   }
 
   const todayStr = new Date().toLocaleDateString('en-CA');
