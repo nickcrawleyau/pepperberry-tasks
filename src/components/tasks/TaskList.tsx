@@ -78,45 +78,19 @@ export default function TaskList({ tasks, role, users = [] }: TaskListProps) {
 
   const isAdmin = role === 'admin';
 
-  const handleDelete = useCallback(async (taskId: string) => {
+  const handleDelete = useCallback((taskId: string) => {
     setDeletedIds((prev) => new Set(prev).add(taskId));
     setOpenCardId(null);
-    try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 8000);
-      const res = await fetch(`/api/tasks/${taskId}`, {
-        method: 'DELETE',
-        signal: controller.signal,
-      });
-      clearTimeout(timeout);
-      if (!res.ok) {
-        const body = await res.text().catch(() => '');
-        alert(`Delete failed (${res.status}): ${body}`);
-        setDeletedIds((prev) => { const next = new Set(prev); next.delete(taskId); return next; });
-      }
-    } catch (err) {
-      alert(`Delete error: ${err instanceof Error ? err.message : 'unknown'}`);
-    }
+    fetch(`/api/tasks/${taskId}`, { method: 'DELETE' }).catch(() => {});
   }, []);
 
-  const handleMarkDone = useCallback(async (taskId: string) => {
+  const handleMarkDone = useCallback((taskId: string) => {
     setDeletedIds((prev) => new Set(prev).add(taskId));
-    try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 8000);
-      const res = await fetch(`/api/tasks/${taskId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'done' }),
-        signal: controller.signal,
-      });
-      clearTimeout(timeout);
-      if (!res.ok) {
-        setDeletedIds((prev) => { const next = new Set(prev); next.delete(taskId); return next; });
-      }
-    } catch {
-      // Timeout — card stays hidden
-    }
+    fetch(`/api/tasks/${taskId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'done' }),
+    }).catch(() => {});
   }, []);
 
   const filtered = useMemo(() => {

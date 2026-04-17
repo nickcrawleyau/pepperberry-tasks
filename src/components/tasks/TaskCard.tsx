@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Task } from '@/lib/types';
 import {
@@ -52,9 +51,12 @@ export default function TaskCard({ task, onMarkDone, onDelete }: TaskCardProps) 
   const showActions = !!(onMarkDone || onDelete);
 
   return (
-    <Link
-      href={`/tasks/${task.id}`}
-      className={`block rounded-xl border transition overflow-hidden ${
+    <div
+      role="link"
+      tabIndex={0}
+      onClick={() => router.push(`/tasks/${task.id}`)}
+      onKeyDown={(e) => { if (e.key === 'Enter') router.push(`/tasks/${task.id}`); }}
+      className={`block rounded-xl border transition overflow-hidden cursor-pointer ${
         isUrgent
           ? 'bg-red-900/30 border-red-500/30 hover:border-red-400'
           : 'bg-fw-surface border-fw-surface hover:border-fw-text/30'
@@ -89,6 +91,9 @@ export default function TaskCard({ task, onMarkDone, onDelete }: TaskCardProps) 
               {task.assigned_user?.name && (
                 <span>{task.assigned_user.name}</span>
               )}
+              {task.created_user?.name && task.created_user.name !== task.assigned_user?.name && (
+                <span className="italic text-fw-text/40">added by {task.created_user.name}</span>
+              )}
               {task.due_date && (
                 <span className={overdue ? 'text-red-500 font-medium' : ''}>
                   {task.recurrence_pattern && (
@@ -108,15 +113,11 @@ export default function TaskCard({ task, onMarkDone, onDelete }: TaskCardProps) 
             </div>
 
             {showActions && (
-              <div className="flex items-center gap-1 shrink-0">
+              <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
                 {/* Edit */}
                 <button
                   type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    router.push(`/tasks/${task.id}/edit`);
-                  }}
+                  onClick={() => router.push(`/tasks/${task.id}/edit`)}
                   className="p-3 rounded-lg text-fw-text/40 hover:text-fw-accent hover:bg-fw-text/5 transition"
                   aria-label="Edit task"
                 >
@@ -129,11 +130,7 @@ export default function TaskCard({ task, onMarkDone, onDelete }: TaskCardProps) 
                 {task.status !== 'done' && onMarkDone && (
                   <button
                     type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      onMarkDone(task.id);
-                    }}
+                    onClick={() => onMarkDone(task.id)}
                     className="p-3 rounded-lg text-fw-text/40 hover:text-emerald-400 hover:bg-emerald-500/10 transition"
                     aria-label="Mark done"
                   >
@@ -146,11 +143,7 @@ export default function TaskCard({ task, onMarkDone, onDelete }: TaskCardProps) 
                 {onDelete && (
                   <button
                     type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      onDelete(task.id);
-                    }}
+                    onClick={() => onDelete(task.id)}
                     className="p-3 rounded-lg text-fw-text/40 hover:text-red-400 hover:bg-red-500/10 transition"
                     aria-label="Delete task"
                   >
@@ -166,6 +159,6 @@ export default function TaskCard({ task, onMarkDone, onDelete }: TaskCardProps) 
           </div>
         </div>
       </div>
-    </Link>
+    </div>
   );
 }
